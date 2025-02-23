@@ -27,7 +27,7 @@ import com.sedilant.yambol.ui.theme.YambolTheme
 @Composable
 fun NavigationBottomBar(modifier: Modifier = Modifier) {
     var selectedItem by remember { mutableIntStateOf(0) }
-    val items = listOf("Home", "Basketball", "Statistics", "Board", "Profile")
+    val items = listOf("Home", "Training", "Statistics", "Board", "Profile")
     val selectedIcons = listOf(
         Icons.Filled.Home,
         ImageVector.vectorResource(id = R.drawable.sports_basketball_filled),
