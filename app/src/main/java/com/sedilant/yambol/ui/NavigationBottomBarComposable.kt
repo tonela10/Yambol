@@ -21,13 +21,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.sedilant.yambol.R
+import com.sedilant.yambol.YambolScreen
 import com.sedilant.yambol.ui.theme.YambolTheme
 
 @Composable
-fun NavigationBottomBar(modifier: Modifier = Modifier) {
+fun NavigationBottomBar(modifier: Modifier = Modifier, navController: NavController) {
     var selectedItem by remember { mutableIntStateOf(0) }
-    val items = listOf("Home", "Basketball", "Statistics", "Board", "Profile")
+    val items = listOf(
+        YambolScreen.Home.name,
+        YambolScreen.Training.name,
+        YambolScreen.Statistics.name,
+        YambolScreen.Board.name,
+        YambolScreen.Profile.name
+    )
     val selectedIcons = listOf(
         Icons.Filled.Home,
         ImageVector.vectorResource(id = R.drawable.sports_basketball_filled),
@@ -43,6 +52,8 @@ fun NavigationBottomBar(modifier: Modifier = Modifier) {
             ImageVector.vectorResource(id = R.drawable.draw_outlined),
             Icons.Outlined.AccountCircle,
         )
+
+
     Column(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Bottom
@@ -58,17 +69,23 @@ fun NavigationBottomBar(modifier: Modifier = Modifier) {
                     },
                     label = { Text(item) },
                     selected = selectedItem == index,
-                    onClick = { selectedItem = index }
+                    onClick = {
+                        selectedItem = index
+                        navController.navigate(item)
+                    }
                 )
             }
         }
     }
+
 }
 
 @Preview(showBackground = true)
 @Composable
 fun NavigationBarPreview() {
     YambolTheme {
-        NavigationBottomBar()
+        NavigationBottomBar(
+            navController = rememberNavController()
+        )
     }
 }
