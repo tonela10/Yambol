@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Yambol</string>
+    <string name="home_screen_title">Home Screen</string>
+    <string name="training_screen_title">Training Screen</string>
+    <string name="statistic_screen_title">Statistic Screen</string>
+    <string name="board_screen_title">Board Screen</string>
+    <string name="profile_screen_title">Profile Screen</string>
+
 </resources>

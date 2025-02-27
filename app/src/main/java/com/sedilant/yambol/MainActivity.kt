@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
-import com.sedilant.yambol.ui.NavigationBottomBar
-import com.sedilant.yambol.ui.home.HomeScreen
 import com.sedilant.yambol.ui.theme.YambolTheme
 
 class MainActivity : ComponentActivity() {
@@ -21,8 +19,7 @@ class MainActivity : ComponentActivity() {
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                 ) { innerPadding ->
-                    NavigationBottomBar(modifier = Modifier.padding(innerPadding))
-                    HomeScreen(modifier = Modifier.padding(innerPadding))
+                    YambolApp(modifier = Modifier.padding(innerPadding))
                 }
             }
         }
