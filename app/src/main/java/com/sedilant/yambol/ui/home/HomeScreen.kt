@@ -22,6 +22,8 @@ import androidx.compose.material3.SecondaryScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -32,14 +34,31 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sedilant.yambol.R
-import com.sedilant.yambol.ui.home.models.FakeDataTeamsList
 import com.sedilant.yambol.ui.home.models.PlayerUiModel
 import com.sedilant.yambol.ui.home.models.TaskUiModel
+import com.sedilant.yambol.ui.home.models.TeamUiModel
 import com.sedilant.yambol.ui.theme.YambolTheme
+
 
 @Composable
 fun HomeScreen(
+    homeViewModel: HomeViewModel = viewModel()
+) {
+    val homeUiState by homeViewModel.uiState.collectAsState()
+    HomeScreenStateless(
+        currentTeam = homeViewModel.getCurrentTeam(),
+        listOfTeams = homeUiState.listOfTeams,
+        onTeamChange = { homeViewModel.onTeamChange(it) }
+    )
+}
+
+@Composable
+private fun HomeScreenStateless(
+    currentTeam: Int,
+    listOfTeams: List<TeamUiModel>,
+    onTeamChange: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     // TODO ask if you can create a composable height depending of the height of the screen
@@ -62,11 +81,15 @@ fun HomeScreen(
     )
     Box(modifier.fillMaxSize()) {
         Column(
-            Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
-            TeamTabs()
+            TeamTabs(
+                currentTeam = currentTeam,
+                listOfTeams = listOfTeams,
+                onTeamChange = onTeamChange,
+            )
             Spacer(modifier.padding(10.dp))
 
             PlayersRow(listOfPlayer)
@@ -98,23 +121,31 @@ fun HomeScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TeamTabs() {
-    val teams = FakeDataTeamsList()
-    val teamsList = teams.getTeams()
-
+private fun TeamTabs(
+    currentTeam: Int,
+    listOfTeams: List<TeamUiModel>,
+    onTeamChange: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
     SecondaryScrollableTabRow(
-        selectedTabIndex = 0,
-        modifier = Modifier.fillMaxWidth()
+        selectedTabIndex = currentTeam,
+        modifier = modifier.fillMaxWidth(),
     ) {
-        teamsList.forEachIndexed() { index, team ->
+        listOfTeams.forEachIndexed() { index, team ->
             Tab(
-                selected =
-                /** state */
-                index == 0,
-                onClick = { /** state == index*/ },
-                text = { Text(text = team.name, maxLines = 2, overflow = TextOverflow.Ellipsis) }
+                selected = currentTeam == index,
+                onClick = { onTeamChange(index) },
+                text = {
+                    Text(
+                        text = team.name,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                },
             )
+
         }
+
     }
 }
 

@@ -1,13 +1,7 @@
 package com.sedilant.yambol.ui.home.models
 
-data class TeamUiModel (
+data class TeamUiModel(
     val name: String,
-    val players: String, // TODO change this for a list of players
+    val players: List<PlayerUiModel> = emptyList(),
+    val tasks: List<TaskUiModel> = emptyList()
 )
-
-class FakeDataTeamsList(
-
-){
-    fun getTeams(): List<TeamUiModel>{
-        return listOf(TeamUiModel("Team 1", "Tonela"), TeamUiModel("Team 2", "Luis")) }
-}
