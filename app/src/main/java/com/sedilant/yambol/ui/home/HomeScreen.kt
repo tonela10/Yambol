@@ -17,13 +17,18 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SecondaryScrollableTabRow
+import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -37,7 +42,7 @@ import com.sedilant.yambol.ui.theme.YambolTheme
 fun HomeScreen(
     modifier: Modifier = Modifier
 ) {
-
+    // TODO ask if you can create a composable height depending of the height of the screen
     // TODO remove this list. Should be into the UiState
     val listOfPlayer = listOf(
         PlayerUiModel("Antonio", "10", "Point guard"),
@@ -59,8 +64,11 @@ fun HomeScreen(
         Column(
             Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Top
         ) {
+            TeamTabs()
+            Spacer(modifier.padding(10.dp))
+
             PlayersRow(listOfPlayer)
 
             Spacer(modifier.padding(10.dp))
@@ -85,24 +93,29 @@ fun HomeScreen(
                 )
             }
         }
-
-        TeamTabs()
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TeamTabs() {
     val teams = FakeDataTeamsList()
     val teamsList = teams.getTeams()
 
-//    TabRow(
-//        selectedTabIndex =
-//        modifier = TODO(),
-//        containerColor = TODO(),
-//        contentColor = TODO(),
-//        indicator = TODO(),
-//        divider = TODO()
-//    ) { }
+    SecondaryScrollableTabRow(
+        selectedTabIndex = 0,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        teamsList.forEachIndexed() { index, team ->
+            Tab(
+                selected =
+                /** state */
+                index == 0,
+                onClick = { /** state == index*/ },
+                text = { Text(text = team.name, maxLines = 2, overflow = TextOverflow.Ellipsis) }
+            )
+        }
+    }
 }
 
 @Composable
@@ -110,6 +123,11 @@ private fun TaskList(
     listOfTask: List<TaskUiModel>
 ) {
     Card(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = "Objectives",
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        )
         LazyColumn(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             items(listOfTask) { task ->
                 Row(verticalAlignment = Alignment.CenterVertically) {

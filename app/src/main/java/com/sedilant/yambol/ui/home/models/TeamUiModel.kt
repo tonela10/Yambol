@@ -9,5 +9,5 @@ class FakeDataTeamsList(
 
 ){
     fun getTeams(): List<TeamUiModel>{
-        return listOf(TeamUiModel("Utebo", "Tonela"), TeamUiModel("Olivar", "Luis")) }
+        return listOf(TeamUiModel("Team 1", "Tonela"), TeamUiModel("Team 2", "Luis")) }
 }
