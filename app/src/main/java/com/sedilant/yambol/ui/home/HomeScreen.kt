@@ -15,11 +15,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.SecondaryScrollableTabRow
-import androidx.compose.material3.Tab
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -30,7 +34,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -40,7 +43,6 @@ import com.sedilant.yambol.ui.home.models.PlayerUiModel
 import com.sedilant.yambol.ui.home.models.TaskUiModel
 import com.sedilant.yambol.ui.home.models.TeamUiModel
 import com.sedilant.yambol.ui.theme.YambolTheme
-
 
 @Composable
 fun HomeScreen(
@@ -90,11 +92,8 @@ private fun HomeScreenStateless(
                 listOfTeams = listOfTeams,
                 onTeamChange = onTeamChange,
             )
-            Spacer(modifier.padding(10.dp))
 
             PlayersRow(listOfPlayer)
-
-            Spacer(modifier.padding(10.dp))
 
             TaskList(listOfTask)
 
@@ -119,7 +118,6 @@ private fun HomeScreenStateless(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TeamTabs(
     currentTeam: Int,
@@ -127,25 +125,33 @@ private fun TeamTabs(
     onTeamChange: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    SecondaryScrollableTabRow(
-        selectedTabIndex = currentTeam,
-        modifier = modifier.fillMaxWidth(),
+
+    LazyRow(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = modifier.padding(8.dp)
     ) {
-        listOfTeams.forEachIndexed() { index, team ->
-            Tab(
-                selected = currentTeam == index,
-                onClick = { onTeamChange(index) },
-                text = {
-                    Text(
-                        text = team.name,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
+
+        item {
+            AssistChip(
+                onClick = { /*TODO add a team*/ },
+                label = { Text("Add team") },
+                leadingIcon = {
+                    Icon(
+                        Icons.Filled.Add,
+                        contentDescription = "Add team",
+                        Modifier.size(AssistChipDefaults.IconSize)
                     )
                 },
             )
-
         }
+        items(listOfTeams) { team ->
 
+            FilterChip(
+                selected = team == listOfTeams[currentTeam],
+                onClick = { onTeamChange(listOfTeams.indexOf(team)) },
+                label = { Text(text = team.name) },
+            )
+        }
     }
 }
 
@@ -153,12 +159,32 @@ private fun TeamTabs(
 private fun TaskList(
     listOfTask: List<TaskUiModel>
 ) {
-    Card(modifier = Modifier.fillMaxWidth()) {
-        Text(
-            text = "Objectives",
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        )
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(20.dp)
+    ) {
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text(
+                text = "Objectives",
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.align(Alignment.Center)
+            )
+
+            IconButton(
+                onClick = {/*Add note*/ },
+                modifier = Modifier.align(Alignment.CenterEnd),
+
+                ) {
+                Icon(
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = "add note"
+                )
+            }
+        }
         LazyColumn(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             items(listOfTask) { task ->
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -170,10 +196,8 @@ private fun TaskList(
                     Text(
                         text = task.description
                     )
-
                 }
             }
-
         }
     }
 }
@@ -182,6 +206,7 @@ private fun TaskList(
 private fun PlayersRow(listOfPlayer: List<PlayerUiModel>) { // TODO make the row widther than what it is
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier.padding(20.dp)
     ) {
         items(listOfPlayer) { player ->
             Card(Modifier.height(100.dp)) {
