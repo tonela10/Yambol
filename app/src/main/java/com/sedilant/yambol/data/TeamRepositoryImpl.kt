@@ -10,7 +10,7 @@ class TeamRepositoryImpl @Inject constructor(
         return playerDao.getAllTeams()
     }
 
-    override suspend fun getTeamPlayer(id: Int): Flow<List<PlayerEntity>> {
-        return playerDao.getTeamPlayer(id)
+    override suspend fun getTeamPlayers(id: Int): Flow<List<PlayerEntity>> {
+        return playerDao.getTeamPlayers(id)
     }
 }

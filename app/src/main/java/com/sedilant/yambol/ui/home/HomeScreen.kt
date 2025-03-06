@@ -51,77 +51,72 @@ fun HomeScreen(
         initial = HomeUiState.Loading
     ).value
     HomeScreenStateless(
-        currentTeam = 1, // homeViewModel.getCurrentTeam(),
-        listOfTeams = emptyList(),//homeUiState.listOfTeams,
+        homeUiState = homeUiState,
         onTeamChange = { homeViewModel.onTeamChange(it) }
     )
 }
 
 @Composable
 private fun HomeScreenStateless(
-    currentTeam: Int,
-    listOfTeams: List<TeamUiModel>,
+    homeUiState: HomeUiState,
     onTeamChange: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // TODO ask if you can create a composable height depending of the height of the screen
-    // TODO remove this list. Should be into the UiState
-    val listOfPlayer = listOf(
-        PlayerUiModel("Antonio", "10", "Point guard"),
-        PlayerUiModel("Luis", "44", "Strong forward"),
-        PlayerUiModel("Dorrinha", "2", "Center"),
-        PlayerUiModel("Dorrinha", "2", "Center"),
-        PlayerUiModel("Dorrinha", "2", "Center"),
-        PlayerUiModel("Dorrinha", "2", "Center"),
-        PlayerUiModel("Dorrinha", "2", "Center"),
-        PlayerUiModel("Dorrinha", "2", "Center"),
-    )
-
     val listOfTask = listOf(
         TaskUiModel("Correr 10 minutos", false),
         TaskUiModel("Ejercicio de bote", false),
         TaskUiModel("Que todos metan dos libre", true),
     )
-    Box(modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top
-        ) {
-            TeamTabs(
-                currentTeam = currentTeam,
-                listOfTeams = listOfTeams,
-                onTeamChange = onTeamChange,
-            )
+    when (homeUiState) {
+        is HomeUiState.Loading -> {
+            // por ahora nada
+        }
 
-            PlayersRow(listOfPlayer)
+        is HomeUiState.Success -> {
+            Box(modifier.fillMaxSize()) {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Top
+                ) {
+                    TeamTabs(
+                        currentTeam = homeUiState.currentTeam,
+                        listOfTeams = homeUiState.listOfTeams,
+                        onTeamChange = onTeamChange,
+                    )
 
-            TaskList(listOfTask)
+                    PlayersRow(homeUiState.listOfPlayer)
 
-            Spacer(modifier.padding(10.dp))
-            /** Insert Row with two clickable images */
+                    TaskList(listOfTask)
 
-            Row(
-                Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceAround
-            ) {
-                BigButtonYambol(
-                    drawable = R.drawable.healt_icon_filled,
-                    description = "Register your train"
-                )
+                    Spacer(modifier.padding(10.dp))
+                    /** Insert Row with two clickable images */
 
-                BigButtonYambol(
-                    drawable = R.drawable.healt_icon_filled,
-                    description = "Register your train"
-                )
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceAround
+                    ) {
+                        BigButtonYambol(
+                            drawable = R.drawable.healt_icon_filled,
+                            description = "Register your train"
+                        )
+
+                        BigButtonYambol(
+                            drawable = R.drawable.healt_icon_filled,
+                            description = "Register your train"
+                        )
+                    }
+                }
             }
         }
     }
+
+
 }
 
 @Composable
 private fun TeamTabs(
-    currentTeam: Int,
+    currentTeam: TeamUiModel?,
     listOfTeams: List<TeamUiModel>,
     onTeamChange: (Int) -> Unit,
     modifier: Modifier = Modifier
@@ -148,8 +143,8 @@ private fun TeamTabs(
         items(listOfTeams) { team ->
 
             FilterChip(
-                selected = team == listOfTeams[currentTeam],
-                onClick = { onTeamChange(listOfTeams.indexOf(team)) },
+                selected = team == currentTeam,
+                onClick = { onTeamChange(team.id) },
                 label = { Text(text = team.name) },
             )
         }

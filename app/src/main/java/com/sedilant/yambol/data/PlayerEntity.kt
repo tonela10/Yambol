@@ -2,9 +2,22 @@ package com.sedilant.yambol.data
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "player")
+@Entity(
+    tableName = "player",
+    foreignKeys = [
+        ForeignKey(
+            entity = TeamEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["team_id"],
+            onDelete = ForeignKey.CASCADE // O RESTRICT it depends
+        )
+    ],
+    indices = [Index("team_id")]
+)
 data class PlayerEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int,
@@ -14,12 +27,3 @@ data class PlayerEntity(
     @ColumnInfo(name = "team_id")
     val teamId: Int,
 )
-
-// TODO move this to domain
-enum class Position(name: String, number: Int) {
-    POINT_GUARD(name = "point guard", number = 1),
-    SHOOTING_GUARD(name = "shooting guard", number = 2),
-    SMALL_FORWARD(name = "small forward", number = 3),
-    POWER_FORWARD(name = "power forward", number = 4),
-    CENTER(name = "center", number = 5)
-}

@@ -2,6 +2,7 @@ package com.sedilant.yambol.di
 
 import android.app.Application
 import android.content.Context
+import com.sedilant.yambol.data.DataStoreManager
 import com.sedilant.yambol.data.PlayerDao
 import com.sedilant.yambol.data.TeamDatabase
 import com.sedilant.yambol.data.TeamRepository
@@ -31,6 +32,11 @@ abstract class DataModule {
         @Provides
         fun providePlayerDao(context: Context): PlayerDao {
             return TeamDatabase.getDatabase(context).playerDao()
+        }
+
+        @Provides
+        fun provideDataStoreManager(context: Context): DataStoreManager {
+            return DataStoreManager(context)
         }
     }
 }

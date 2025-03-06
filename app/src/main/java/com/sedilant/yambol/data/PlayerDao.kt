@@ -11,5 +11,5 @@ interface PlayerDao {
     fun getAllTeams(): Flow<List<TeamEntity>>
 
     @Query("SELECT * FROM player WHERE team_id = :teamId")
-    fun getTeamPlayer(teamId: Int): Flow<List<PlayerEntity>>
+    fun getTeamPlayers(teamId: Int): Flow<List<PlayerEntity>>
 }

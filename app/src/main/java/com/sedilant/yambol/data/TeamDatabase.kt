@@ -8,7 +8,10 @@ import androidx.room.RoomDatabase
 @Database(
     entities = [PlayerEntity::class, TeamEntity::class],
     version = 1,
-    exportSchema = false
+    exportSchema = true,
+//    autoMigrations = [
+//        AutoMigration(from = 1, to = 1)
+//    ]
 )
 abstract class TeamDatabase : RoomDatabase() {
     abstract fun playerDao(): PlayerDao
