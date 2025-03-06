@@ -260,7 +260,7 @@ private fun BigButtonYambol(
 
 @Preview(showBackground = true)
 @Composable
-fun TaskListPreview() {
+private fun TaskListPreview() {
     YambolTheme {
         TaskList(
             listOf(
@@ -274,7 +274,7 @@ fun TaskListPreview() {
 
 @Preview(showBackground = true)
 @Composable
-fun PlayersRowPreview() {
+private fun PlayersRowPreview() {
     YambolTheme {
         PlayersRow(
             listOf(
@@ -287,7 +287,7 @@ fun PlayersRowPreview() {
 
 @Preview(showBackground = true)
 @Composable
-fun HomeScreenPreview() {
+private fun HomeScreenPreview() {
     YambolTheme {
         HomeScreen()
     }
