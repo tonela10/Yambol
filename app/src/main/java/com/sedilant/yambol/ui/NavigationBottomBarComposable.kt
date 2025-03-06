@@ -14,14 +14,13 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.sedilant.yambol.R
 import com.sedilant.yambol.YambolScreen
@@ -29,56 +28,79 @@ import com.sedilant.yambol.ui.theme.YambolTheme
 
 @Composable
 fun NavigationBottomBar(modifier: Modifier = Modifier, navController: NavController) {
-    var selectedItem by remember { mutableIntStateOf(0) }
-    val items = listOf(
-        YambolScreen.Home.name,
-        YambolScreen.Training.name,
-        YambolScreen.Statistics.name,
-        YambolScreen.Board.name,
-        YambolScreen.Profile.name
-    )
-    val selectedIcons = listOf(
-        Icons.Filled.Home,
-        ImageVector.vectorResource(id = R.drawable.sports_basketball_filled),
-        ImageVector.vectorResource(id = R.drawable.analytics_filled),
-        ImageVector.vectorResource(id = R.drawable.draw_filled),
-        Icons.Filled.AccountCircle,
-    )
-    val unselectedIcons =
-        listOf(
-            Icons.Outlined.Home,
-            ImageVector.vectorResource(id = R.drawable.sports_basketball_oulined),
-            ImageVector.vectorResource(id = R.drawable.analytics_outlined),
-            ImageVector.vectorResource(id = R.drawable.draw_outlined),
-            Icons.Outlined.AccountCircle,
-        )
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
 
+    val topLevelRoutes = listOf(
+        TopLevelRoute("Home", YambolScreen.Home.name, Icons.Filled.Home, Icons.Outlined.Home),
+        TopLevelRoute(
+            "Training",
+            YambolScreen.Training.name,
+            ImageVector.vectorResource(id = R.drawable.sports_basketball_filled),
+            ImageVector.vectorResource(id = R.drawable.sports_basketball_oulined)
+        ),
+        TopLevelRoute(
+            "Statistics",
+            YambolScreen.Statistics.name,
+            ImageVector.vectorResource(id = R.drawable.analytics_filled),
+            ImageVector.vectorResource(id = R.drawable.analytics_outlined),
+        ),
+        TopLevelRoute(
+            "Board",
+            YambolScreen.Board.name,
+            ImageVector.vectorResource(id = R.drawable.draw_filled),
+            ImageVector.vectorResource(id = R.drawable.draw_outlined),
+        ),
+        TopLevelRoute(
+            "Profile",
+            YambolScreen.Profile.name,
+            Icons.Filled.AccountCircle,
+            Icons.Outlined.AccountCircle,
+        ),
+    )
 
     Column(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Bottom
     ) {
         NavigationBar {
-            items.forEachIndexed { index, item ->
+            topLevelRoutes.forEach { item ->
                 NavigationBarItem(
                     icon = {
                         Icon(
-                            imageVector = if (selectedItem == index) selectedIcons[index] else unselectedIcons[index],
-                            contentDescription = item
+                            imageVector = if (currentDestination?.route == item.route) item.filledIcon else item.outlinedIcon,
+                            contentDescription = item.name
                         )
                     },
-                    label = { Text(item) },
-                    selected = selectedItem == index,
+                    label = { Text(item.name) },
+                    selected = currentDestination?.route == item.route,
                     onClick = {
-                        selectedItem = index
-                        navController.navigate(item)
+                        navController.navigate(item.route) {
+                            // Pop up to the start destination of the graph to
+                            // avoid building up a large stack of destinations
+                            // on the back stack as users select items
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            // Avoid multiple copies of the same destination when
+                            // reelecting the same item
+                            launchSingleTop = true
+                            // Restore state when reelecting a previously selected item
+                            restoreState = true
+                        }
                     }
                 )
             }
         }
     }
-
 }
+
+data class TopLevelRoute(
+    val name: String,
+    val route: String,
+    val filledIcon: ImageVector,
+    val outlinedIcon: ImageVector
+)
 
 @Preview(showBackground = true)
 @Composable
