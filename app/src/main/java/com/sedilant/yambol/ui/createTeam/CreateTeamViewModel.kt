@@ -3,7 +3,12 @@ package com.sedilant.yambol.ui.createTeam
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sedilant.yambol.domain.GetTeamIdUseCase
+import com.sedilant.yambol.domain.InsertPlayerUseCase
+import com.sedilant.yambol.domain.InsertTeamUseCase
+import com.sedilant.yambol.domain.Position
+import com.sedilant.yambol.ui.home.models.PlayerUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -16,7 +21,9 @@ import javax.inject.Inject
 @HiltViewModel
 @OptIn(ExperimentalCoroutinesApi::class)
 class CreateTeamViewModel @Inject constructor(
-    private val getTeamIdUseCase: GetTeamIdUseCase
+    private val getTeamIdUseCase: GetTeamIdUseCase,
+    private val insertPlayerUseCase: InsertPlayerUseCase,
+    private val insertTeamUseCase: InsertTeamUseCase,
 ) : ViewModel() {
 
     private var teamId = 0
@@ -32,20 +39,28 @@ class CreateTeamViewModel @Inject constructor(
     val uiState =
         trigger.flatMapLatest { formFlow }
 
-    // private val _uiState  = MutableStateFlow(CreateTeamUiState.AddTeamName)
-    //val uiState: StateFlow<CreateTeamUiState> = _uiState.asStateFlow()
-
     fun onCreateTeam(name: String) {
-        viewModelScope.launch {
-            formFlow.update { CreateTeamUiState.AddPlayer }
-            // create team
-            // teamId = ...
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                // create team
+                insertTeamUseCase(name)
+                teamId = getTeamIdUseCase(name)
+                formFlow.update { CreateTeamUiState.AddPlayer }
+                trigger.emit(Unit)
+            } catch (e: Exception) {
+                // manage errors
+            }
         }
+    }
 
-        fun onNextPlayer() {
-
+    fun onNextPlayer(name: String, number: String, position: Position) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                insertPlayerUseCase(PlayerUiModel(name, number, position), teamId)
+            } catch (e: Exception) {
+                // manage errors
+            }
         }
-
     }
 }
 

@@ -31,6 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.sedilant.yambol.domain.Position
 import com.sedilant.yambol.ui.theme.YambolTheme
 
 
@@ -47,6 +48,14 @@ fun CreateTeamScreen(
     CreateTeamScreenStateless(
         uiState = createTeamUiState,
         onCreateTeam = { createTeamViewModel.onCreateTeam(it) },
+        onNavigateHome = onNavigateHome,
+        onNextPlayer = { name, number, position ->
+            createTeamViewModel.onNextPlayer(
+                name,
+                number,
+                position
+            )
+        },
     )
 }
 
@@ -54,6 +63,8 @@ fun CreateTeamScreen(
 private fun CreateTeamScreenStateless(
     uiState: CreateTeamUiState,
     onCreateTeam: (String) -> Unit,
+    onNavigateHome: () -> Unit,
+    onNextPlayer: (name: String, number: String, position: Position) -> Unit
 ) {
 
     Box(
@@ -68,26 +79,32 @@ private fun CreateTeamScreenStateless(
 
             when (uiState) {
                 CreateTeamUiState.AddTeamName -> {
-                    AddNameForm(onCreateTeam)
+                    AddNameForm(
+                        onNext = onCreateTeam,
+                        onCancel = onNavigateHome
+                    )
                 }
 
                 CreateTeamUiState.AddPlayer -> {
-                    AddPlayer()
+                    AddPlayer(
+                        onNextPlayer = onNextPlayer,
+                        onCancel = onNavigateHome
+                    )
                 }
 
                 CreateTeamUiState.Loading -> {
 
                 }
             }
-
-            // if uiState 2
-            // Create each player. If there is at least one show finish button
         }
     }
 }
 
 @Composable
-private fun AddPlayer() {
+private fun AddPlayer(
+    onNextPlayer: (name: String, number: String, position: Position) -> Unit,
+    onCancel: () -> Unit
+) {
     var count by rememberSaveable { mutableIntStateOf(0) }
     var name by remember { mutableStateOf("") }
     var number by remember { mutableStateOf("") }
@@ -109,13 +126,20 @@ private fun AddPlayer() {
         label = { Text("Number") },
         modifier = Modifier.padding(8.dp)
     )
-    // position que no sea un tex fiel sino que despliegue las posiciones
+    // TODO add more textFiels for position
+
     FormButtons(
         count = count,
-        onNext = {},
-        onCancel = {}
+        onNext = {
+            if (name.isNotEmpty() || number.isNotEmpty()) {
+                onNextPlayer(name, number, Position.POINT_GUARD)
+                count++
+                name = ""
+                number = ""
+            }
+        },
+        onCancel = onCancel
     )
-
 }
 
 @Composable
@@ -127,7 +151,9 @@ private fun FormButtons(
     Column(
     ) {
         Button(
-            onClick = { onNext() },
+            onClick = {
+                onNext()
+            },
             modifier = Modifier.width(width = 250.dp)
         ) {
             Text(text = "Next")
@@ -144,7 +170,7 @@ private fun FormButtons(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             OutlinedButton(
-                onClick = {},
+                onClick = onCancel,
                 modifier = Modifier.width((if (count <= 0) 250.dp else 100.dp))
             ) {
                 Text(text = "Cancel")
@@ -157,7 +183,10 @@ private fun FormButtons(
             // count could be get it from DB with a flow in the future
             if (count > 0) {
                 Button(
-                    onClick = { },
+                    onClick = {
+                        onNext()
+                        onCancel()
+                    },
                 ) {
                     Text(text = "Finish")
                 }
@@ -169,6 +198,7 @@ private fun FormButtons(
 @Composable
 private fun AddNameForm(
     onNext: (String) -> Unit,
+    onCancel: () -> Unit
 ) {
     var name by remember { mutableStateOf("") }
 
@@ -187,8 +217,8 @@ private fun AddNameForm(
     )
 
     FormButtons(
-        onCancel = {},
-        onNext = {}
+        onCancel = onCancel,
+        onNext = { onNext(name) }
     )
 }
 
@@ -199,6 +229,8 @@ private fun CreateTeamScreenAddTeamNamePreview() {
         CreateTeamScreenStateless(
             uiState = CreateTeamUiState.AddTeamName,
             onCreateTeam = {},
+            onNavigateHome = {},
+            onNextPlayer = { name, number, position -> },
         )
     }
 }
@@ -209,7 +241,9 @@ private fun CreateTeamScreenAddPlayerNamePreview() {
     YambolTheme {
         CreateTeamScreenStateless(
             uiState = CreateTeamUiState.AddPlayer,
-            onCreateTeam = {}
+            onCreateTeam = {},
+            onNavigateHome = {},
+            onNextPlayer = { name, number, position -> },
         )
     }
 }

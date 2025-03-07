@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sedilant.yambol.R
+import com.sedilant.yambol.domain.Position
 import com.sedilant.yambol.ui.home.models.PlayerUiModel
 import com.sedilant.yambol.ui.home.models.TaskUiModel
 import com.sedilant.yambol.ui.home.models.TeamUiModel
@@ -229,7 +230,7 @@ private fun PlayersRow(listOfPlayer: List<PlayerUiModel>) { // TODO make the row
                             textAlign = TextAlign.Left,
                         )
                         Text(
-                            text = player.position,
+                            text = player.position.name,
                             fontSize = 8.sp,
                             textAlign = TextAlign.Left,
                         )
@@ -283,8 +284,8 @@ private fun PlayersRowPreview() {
     YambolTheme {
         PlayersRow(
             listOf(
-                PlayerUiModel("Antonio", "10", "Point guard"),
-                PlayerUiModel("Luis", "44", "Strong forward")
+                PlayerUiModel("Antonio", "10", Position.POINT_GUARD),
+                PlayerUiModel("Luis", "44", Position.SHOOTING_GUARD)
             )
         )
     }
