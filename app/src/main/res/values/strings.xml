@@ -5,5 +5,6 @@
     <string name="statistic_screen_title">Statistic Screen</string>
     <string name="board_screen_title">Board Screen</string>
     <string name="profile_screen_title">Profile Screen</string>
+    <string name="create_team_screen">Create Team Screen</string>
 
 </resources>

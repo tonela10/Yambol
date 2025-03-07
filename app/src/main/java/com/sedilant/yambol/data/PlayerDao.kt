@@ -12,4 +12,7 @@ interface PlayerDao {
 
     @Query("SELECT * FROM player WHERE team_id = :teamId")
     fun getTeamPlayers(teamId: Int): Flow<List<PlayerEntity>>
+
+    @Query ("SELECT id FROM team WHERE name = :teamName")
+    fun getTeamId(teamName: String): Int
 }

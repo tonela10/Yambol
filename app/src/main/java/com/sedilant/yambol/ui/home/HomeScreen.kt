@@ -46,13 +46,15 @@ import com.sedilant.yambol.ui.theme.YambolTheme
 @Composable
 fun HomeScreen(
     homeViewModel: HomeViewModel = hiltViewModel<HomeViewModel>(),
+    onCreateTeam: () -> Unit,
 ) {
     val homeUiState = homeViewModel.uiState.collectAsState(
         initial = HomeUiState.Loading
     ).value
     HomeScreenStateless(
         homeUiState = homeUiState,
-        onTeamChange = { homeViewModel.onTeamChange(it) }
+        onTeamChange = { homeViewModel.onTeamChange(it) },
+        onCreateTeam = onCreateTeam
     )
 }
 
@@ -60,6 +62,7 @@ fun HomeScreen(
 private fun HomeScreenStateless(
     homeUiState: HomeUiState,
     onTeamChange: (Int) -> Unit,
+    onCreateTeam: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val listOfTask = listOf(
@@ -83,6 +86,7 @@ private fun HomeScreenStateless(
                         currentTeam = homeUiState.currentTeam,
                         listOfTeams = homeUiState.listOfTeams,
                         onTeamChange = onTeamChange,
+                        onCreateTeam = onCreateTeam,
                     )
 
                     PlayersRow(homeUiState.listOfPlayer)
@@ -119,6 +123,7 @@ private fun TeamTabs(
     currentTeam: TeamUiModel?,
     listOfTeams: List<TeamUiModel>,
     onTeamChange: (Int) -> Unit,
+    onCreateTeam: () -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -129,7 +134,7 @@ private fun TeamTabs(
 
         item {
             AssistChip(
-                onClick = { /*TODO add a team*/ },
+                onClick = onCreateTeam,
                 label = { Text("Add team") },
                 leadingIcon = {
                     Icon(
@@ -289,6 +294,6 @@ private fun PlayersRowPreview() {
 @Composable
 private fun HomeScreenPreview() {
     YambolTheme {
-        HomeScreen()
+        HomeScreen(onCreateTeam = {})
     }
 }

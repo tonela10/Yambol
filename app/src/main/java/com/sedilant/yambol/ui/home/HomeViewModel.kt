@@ -35,7 +35,7 @@ class HomeViewModel @Inject constructor(
     private val currentTeamFlow = MutableStateFlow<Int>(1)
 
     // Home UI state
-    // TODO the initial value of the uiState should be the last teams used
+    // TODO the initial value of the uiState should be the last teams used [YAM-4]
 
     val uiState = trigger.flatMapLatest { _ ->
         // get the list of teams
@@ -55,7 +55,7 @@ class HomeViewModel @Inject constructor(
             val currentTeam =
                 listOfTeams.find { it.id == currentTeamId } ?: listOfTeams.firstOrNull()
 
-            // TODO get the task of the current team
+            // TODO get the task of the current team [YAM-5] https://trello.com/c/ZBtayiO9
 
             HomeUiState.Success(
                 listOfTeams = listOfTeams,

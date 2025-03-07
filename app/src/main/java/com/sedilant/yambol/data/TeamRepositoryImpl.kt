@@ -13,4 +13,8 @@ class TeamRepositoryImpl @Inject constructor(
     override suspend fun getTeamPlayers(id: Int): Flow<List<PlayerEntity>> {
         return playerDao.getTeamPlayers(id)
     }
+
+    override fun getTeamId(teamName: String): Int {
+        return playerDao.getTeamId(teamName)
+    }
 }

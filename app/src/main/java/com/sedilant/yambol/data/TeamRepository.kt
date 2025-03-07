@@ -6,4 +6,6 @@ interface TeamRepository {
     suspend fun getAllTeams(): Flow<List<TeamEntity>>
 
     suspend fun getTeamPlayers(id: Int): Flow<List<PlayerEntity>>
+
+    fun getTeamId(teamName: String) : Int
 }
