@@ -20,8 +20,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -31,7 +29,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.sedilant.yambol.domain.Position
 import com.sedilant.yambol.ui.theme.YambolTheme
 
 
@@ -42,35 +39,36 @@ fun CreateTeamScreen(
 ) {
 
     val createTeamUiState = createTeamViewModel.uiState.collectAsState(
-        initial = CreateTeamUiState.AddTeamName
+        initial = CreateTeamUiState.Loading
     ).value
 
     CreateTeamScreenStateless(
         uiState = createTeamUiState,
-        onCreateTeam = { createTeamViewModel.onCreateTeam(it) },
+        onCreateTeam = createTeamViewModel::onCreateTeam,
         onNavigateHome = onNavigateHome,
-        onNextPlayer = { name, number, position ->
-            createTeamViewModel.onNextPlayer(
-                name,
-                number,
-                position
-            )
-        },
+        onNextPlayer = { createTeamViewModel.onNextPlayer() },
+        updateTeam = { teamName -> createTeamViewModel.updateTeamName(teamName) },
+        onFinish = createTeamViewModel::onFinish,
+        updatePlayerName = createTeamViewModel::updatePlayerName,
+        updatePlayerNumber = createTeamViewModel::updatePlayerNumber,
     )
 }
 
 @Composable
 private fun CreateTeamScreenStateless(
     uiState: CreateTeamUiState,
-    onCreateTeam: (String) -> Unit,
+    onCreateTeam: () -> Unit,
     onNavigateHome: () -> Unit,
-    onNextPlayer: (name: String, number: String, position: Position) -> Unit
+    onNextPlayer: () -> Unit,
+    onFinish: () -> Unit,
+    updateTeam: (String) -> Boolean,
+    updatePlayerName: (String) -> Unit,
+    updatePlayerNumber: (String) -> Unit,
 ) {
 
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        // IconButton -> Something to cancel only if u have already one team
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
@@ -78,23 +76,29 @@ private fun CreateTeamScreenStateless(
         ) {
 
             when (uiState) {
-                CreateTeamUiState.AddTeamName -> {
+                is CreateTeamUiState.AddTeamName -> {
                     AddNameForm(
                         onNext = onCreateTeam,
-                        onCancel = onNavigateHome
+                        onCancel = onNavigateHome,
+                        teamName = uiState.teamName,
+                        updateTeam = updateTeam
                     )
                 }
 
-                CreateTeamUiState.AddPlayer -> {
+                is CreateTeamUiState.AddPlayer -> {
                     AddPlayer(
+                        playerName = uiState.playerName,
+                        playerNumber = uiState.playerNumber,
                         onNextPlayer = onNextPlayer,
-                        onCancel = onNavigateHome
+                        onCancel = onNavigateHome,
+                        onFinish = onFinish,
+                        updatePlayerName = updatePlayerName,
+                        updatePlayerNumber = updatePlayerNumber,
                     )
                 }
 
-                CreateTeamUiState.Loading -> {
-
-                }
+                CreateTeamUiState.Loading ->
+                    Text(text = "Loading")
             }
         }
     }
@@ -102,12 +106,16 @@ private fun CreateTeamScreenStateless(
 
 @Composable
 private fun AddPlayer(
-    onNextPlayer: (name: String, number: String, position: Position) -> Unit,
-    onCancel: () -> Unit
+    playerName: String,
+    playerNumber: String,
+    onNextPlayer: () -> Unit,
+    onCancel: () -> Unit,
+    onFinish: () -> Unit,
+    updatePlayerName: (String) -> Unit,
+    updatePlayerNumber: (String) -> Unit,
 ) {
     var count by rememberSaveable { mutableIntStateOf(0) }
-    var name by remember { mutableStateOf("") }
-    var number by remember { mutableStateOf("") }
+
     Text(
         text = "ADD A PLAYER",
         fontWeight = FontWeight.Bold,
@@ -115,14 +123,14 @@ private fun AddPlayer(
         modifier = Modifier.padding(8.dp),
     )
     TextField(
-        value = name,
-        onValueChange = { name = it },
+        value = playerName,
+        onValueChange = { updatePlayerName(it) },
         label = { Text("Name") },
         modifier = Modifier.padding(8.dp)
     )
     TextField(
-        value = number,
-        onValueChange = { number = it },
+        value = playerNumber,
+        onValueChange = { updatePlayerNumber(it) },
         label = { Text("Number") },
         modifier = Modifier.padding(8.dp)
     )
@@ -131,14 +139,11 @@ private fun AddPlayer(
     FormButtons(
         count = count,
         onNext = {
-            if (name.isNotEmpty() || number.isNotEmpty()) {
-                onNextPlayer(name, number, Position.POINT_GUARD)
-                count++
-                name = ""
-                number = ""
-            }
+            onNextPlayer()
+            count++
         },
-        onCancel = onCancel
+        onCancel = onCancel,
+        onFinish = onFinish,
     )
 }
 
@@ -147,6 +152,8 @@ private fun FormButtons(
     count: Int = 0,
     onNext: () -> Unit,
     onCancel: () -> Unit,
+    onFinish: () -> Unit = {},
+    onNextEnabled: Boolean = true
 ) {
     Column(
     ) {
@@ -154,6 +161,7 @@ private fun FormButtons(
             onClick = {
                 onNext()
             },
+            enabled = onNextEnabled,
             modifier = Modifier.width(width = 250.dp)
         ) {
             Text(text = "Next")
@@ -184,9 +192,9 @@ private fun FormButtons(
             if (count > 0) {
                 Button(
                     onClick = {
-                        onNext()
+                        onFinish()
                         onCancel()
-                    },
+                    }
                 ) {
                     Text(text = "Finish")
                 }
@@ -197,11 +205,11 @@ private fun FormButtons(
 
 @Composable
 private fun AddNameForm(
-    onNext: (String) -> Unit,
-    onCancel: () -> Unit
+    onNext: () -> Unit,
+    onCancel: () -> Unit,
+    updateTeam: (String) -> Boolean,
+    teamName: String,
 ) {
-    var name by remember { mutableStateOf("") }
-
     Text(
         text = "GIVE A NAME TO YOUR TEAM",
         fontWeight = FontWeight.Bold,
@@ -210,15 +218,16 @@ private fun AddNameForm(
     )
 
     TextField(
-        value = name,
-        onValueChange = { name = it },
+        value = teamName,
+        onValueChange = { updateTeam(it) },
         label = { Text("Name") },
         modifier = Modifier.padding(8.dp)
     )
 
     FormButtons(
         onCancel = onCancel,
-        onNext = { onNext(name) }
+        onNext = { onNext() },
+        onNextEnabled = updateTeam(teamName),
     )
 }
 
@@ -227,10 +236,14 @@ private fun AddNameForm(
 private fun CreateTeamScreenAddTeamNamePreview() {
     YambolTheme {
         CreateTeamScreenStateless(
-            uiState = CreateTeamUiState.AddTeamName,
+            uiState = CreateTeamUiState.AddTeamName(""),
             onCreateTeam = {},
             onNavigateHome = {},
-            onNextPlayer = { name, number, position -> },
+            onNextPlayer = {},
+            onFinish = {},
+            updateTeam = { name -> true },
+            updatePlayerName = {},
+            updatePlayerNumber = {},
         )
     }
 }
@@ -240,10 +253,14 @@ private fun CreateTeamScreenAddTeamNamePreview() {
 private fun CreateTeamScreenAddPlayerNamePreview() {
     YambolTheme {
         CreateTeamScreenStateless(
-            uiState = CreateTeamUiState.AddPlayer,
+            uiState = CreateTeamUiState.AddPlayer("", ""),
             onCreateTeam = {},
             onNavigateHome = {},
-            onNextPlayer = { name, number, position -> },
+            onNextPlayer = {},
+            onFinish = {},
+            updateTeam = { name -> true },
+            updatePlayerName = {},
+            updatePlayerNumber = {},
         )
     }
 }

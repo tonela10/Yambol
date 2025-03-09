@@ -13,6 +13,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -27,6 +29,12 @@ class CreateTeamViewModel @Inject constructor(
 ) : ViewModel() {
 
     private var teamId = 0
+    private var listOfPlayers: MutableList<PlayerUiModel> = mutableListOf()
+
+    private val teamNameFlow = MutableStateFlow("")
+    private val playerNameFlow = MutableStateFlow("")
+    private val playerNumberFlow = MutableStateFlow("")
+    private val formFlow = MutableStateFlow(Form.ADD_TEAM)
 
     //MeanWhile trigger
     private val trigger = MutableSharedFlow<Unit>(
@@ -35,37 +43,105 @@ class CreateTeamViewModel @Inject constructor(
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
 
-    private val formFlow = MutableStateFlow<CreateTeamUiState>(CreateTeamUiState.AddTeamName)
     val uiState =
-        trigger.flatMapLatest { formFlow }
+        trigger.flatMapLatest { _ ->
 
-    fun onCreateTeam(name: String) {
+            val combinedFlow = combine(
+                teamNameFlow,
+                playerNameFlow,
+                playerNumberFlow,
+                formFlow,
+            ) { teamName, playerName, playerNumber, form ->
+                when (form) {
+                    Form.ADD_PLAYER ->
+                        CreateTeamUiState.AddPlayer(
+                            playerName = playerName,
+                            playerNumber = playerNumber
+                        )
+
+                    Form.ADD_TEAM -> CreateTeamUiState.AddTeamName(
+                        teamName = teamName
+                    )
+                }
+            }
+            combinedFlow
+        }
+
+    init {
+        viewModelScope.launch {
+            trigger.emit(Unit)
+        }
+    }
+
+    fun onCreateTeam() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                // create team
-                insertTeamUseCase(name)
-                teamId = getTeamIdUseCase(name)
-                formFlow.update { CreateTeamUiState.AddPlayer }
-                trigger.emit(Unit)
+                formFlow.update { Form.ADD_PLAYER }
             } catch (e: Exception) {
                 // manage errors
             }
         }
     }
 
-    fun onNextPlayer(name: String, number: String, position: Position) {
+    fun onNextPlayer() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                insertPlayerUseCase(PlayerUiModel(name, number, position), teamId)
+                val name = playerNameFlow.first()
+                val number = playerNumberFlow.first()
+                listOfPlayers.add(PlayerUiModel(name, number, Position.POINT_GUARD))
+
+                playerNameFlow.update { "" }
+                playerNumberFlow.update { "" }
+
             } catch (e: Exception) {
                 // manage errors
             }
         }
+    }
+
+    fun onFinish() {
+        viewModelScope.launch(Dispatchers.IO) {
+            // save the last player too
+            try {
+                // Save the team and get the id
+                insertTeamUseCase(teamNameFlow.value)
+                teamId = getTeamIdUseCase(teamNameFlow.value)
+
+                listOfPlayers.forEach {
+                    insertPlayerUseCase(PlayerUiModel(it.name, it.number, it.position), teamId)
+                }
+
+            } catch (e: Exception) {
+                //  manage error
+            }
+        }
+    }
+
+    /**
+     * We should make the necessary checks here about the input
+     */
+    // TODO Check if the team exist if  does exist return false
+    fun updateTeamName(name: String): Boolean {
+        teamNameFlow.update { name }
+        return true
+    }
+
+    fun updatePlayerName(name: String) {
+        playerNameFlow.update { name }
+    }
+
+    fun updatePlayerNumber(number: String) {
+        playerNumberFlow.update { number }
+    }
+
+    private enum class Form {
+        ADD_TEAM,
+        ADD_PLAYER,
     }
 }
 
 sealed interface CreateTeamUiState {
-    data object AddTeamName : CreateTeamUiState
-    data object AddPlayer : CreateTeamUiState
+    data class AddTeamName(val teamName: String) : CreateTeamUiState
+    data class AddPlayer(val playerName: String, val playerNumber: String) : CreateTeamUiState
     data object Loading : CreateTeamUiState
 }
