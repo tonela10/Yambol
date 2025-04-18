@@ -10,7 +10,7 @@ class InsertTeamUseCaseImpl @Inject constructor(
     override suspend fun invoke(name: String) {
         teamRepository.insertTeam(
             TeamEntity(
-                name = name
+                name = name.lowercase()
             )
         )
     }

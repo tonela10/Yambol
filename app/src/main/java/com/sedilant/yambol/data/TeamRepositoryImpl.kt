@@ -14,7 +14,7 @@ class TeamRepositoryImpl @Inject constructor(
         return playerDao.getTeamPlayers(id)
     }
 
-    override suspend fun getTeamId(teamName: String): Int {
+    override suspend fun getTeamId(teamName: String): Int? {
         return playerDao.getTeamId(teamName)
     }
 

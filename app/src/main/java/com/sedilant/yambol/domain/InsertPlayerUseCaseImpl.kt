@@ -11,7 +11,7 @@ class InsertPlayerUseCaseImpl @Inject constructor(
     override suspend fun invoke(playerUiModel: PlayerUiModel, teamId: Int) {
         teamRepository.insertPlayer(
             PlayerEntity(
-                name = playerUiModel.name,
+                name = playerUiModel.name.lowercase(),
                 number = playerUiModel.number.toInt(),
                 teamId = teamId,
                 position = when (playerUiModel.position) {
