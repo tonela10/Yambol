@@ -28,10 +28,9 @@ class CreateTeamViewModel @Inject constructor(
     private val insertTeamUseCase: InsertTeamUseCase,
 ) : ViewModel() {
 
-    private var teamId = 0
     private var listOfPlayers: MutableList<PlayerUiModel> = mutableListOf()
 
-    private val teamNameFlow = MutableStateFlow("")
+    private val teamNameFlow = MutableStateFlow(ValueAndValidation())
     private val playerNameFlow = MutableStateFlow("")
     private val playerNumberFlow = MutableStateFlow("")
     private val formFlow = MutableStateFlow(Form.ADD_TEAM)
@@ -53,15 +52,26 @@ class CreateTeamViewModel @Inject constructor(
                 formFlow,
             ) { teamName, playerName, playerNumber, form ->
                 when (form) {
-                    Form.ADD_PLAYER ->
+                    Form.ADD_PLAYER -> {
+                        val nextButtonValidation =
+                            playerName.isNotEmpty() && playerNumber.isNotEmpty()
+                        val finishButtonValidation = listOfPlayers.size >= 5
+
                         CreateTeamUiState.AddPlayer(
                             playerName = playerName,
-                            playerNumber = playerNumber
+                            playerNumber = playerNumber,
+                            isNextButtonEnabled = nextButtonValidation,
+                            isFinishButtonEnabled = finishButtonValidation
                         )
+                    }
 
-                    Form.ADD_TEAM -> CreateTeamUiState.AddTeamName(
-                        teamName = teamName
-                    )
+                    Form.ADD_TEAM -> {
+
+                        CreateTeamUiState.AddTeamName(
+                            teamName = teamName.input,
+                            isErrorMessageShow = !teamName.isValid,
+                        )
+                    }
                 }
             }
             combinedFlow
@@ -75,10 +85,11 @@ class CreateTeamViewModel @Inject constructor(
 
     fun onCreateTeam() {
         viewModelScope.launch(Dispatchers.IO) {
-            try {
+            val teamExists = getTeamIdUseCase(teamNameFlow.value.input)
+            if (teamExists != null) {
+                teamNameFlow.update { ValueAndValidation(it.input, false)}
+            } else {
                 formFlow.update { Form.ADD_PLAYER }
-            } catch (e: Exception) {
-                // manage errors
             }
         }
     }
@@ -101,18 +112,12 @@ class CreateTeamViewModel @Inject constructor(
 
     fun onFinish() {
         viewModelScope.launch(Dispatchers.IO) {
-            // save the last player too
-            try {
-                // Save the team and get the id
-                insertTeamUseCase(teamNameFlow.value)
-                teamId = getTeamIdUseCase(teamNameFlow.value)
-
+            insertTeamUseCase(teamNameFlow.value.input)
+            val teamId = getTeamIdUseCase(teamNameFlow.value.input)
+            teamId?.let {
                 listOfPlayers.forEach {
                     insertPlayerUseCase(PlayerUiModel(it.name, it.number, it.position), teamId)
                 }
-
-            } catch (e: Exception) {
-                //  manage error
             }
         }
     }
@@ -120,10 +125,8 @@ class CreateTeamViewModel @Inject constructor(
     /**
      * We should make the necessary checks here about the input
      */
-    // TODO Check if the team exist if  does exist return false
-    fun updateTeamName(name: String): Boolean {
-        teamNameFlow.update { name }
-        return true
+    fun updateTeamName(name: String) {
+        teamNameFlow.update { ValueAndValidation(name) }
     }
 
     fun updatePlayerName(name: String) {
@@ -141,7 +144,15 @@ class CreateTeamViewModel @Inject constructor(
 }
 
 sealed interface CreateTeamUiState {
-    data class AddTeamName(val teamName: String) : CreateTeamUiState
-    data class AddPlayer(val playerName: String, val playerNumber: String) : CreateTeamUiState
+    data class AddTeamName(val teamName: String, val isErrorMessageShow: Boolean = false) :
+        CreateTeamUiState
+
+    data class AddPlayer(
+        val playerName: String,
+        val playerNumber: String,
+        val isNextButtonEnabled: Boolean = false,
+        val isFinishButtonEnabled: Boolean = false
+    ) : CreateTeamUiState
+
     data object Loading : CreateTeamUiState
 }
