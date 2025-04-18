@@ -22,9 +22,9 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.sedilant.yambol.ui.theme.YambolTheme
 import com.sedilant.yambol.R
 import com.sedilant.yambol.YambolScreen
-import com.sedilant.yambol.ui.theme.YambolTheme
 
 @Composable
 fun NavigationBottomBar(modifier: Modifier = Modifier, navController: NavController) {

@@ -3,11 +3,13 @@ package com.sedilant.yambol
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.sedilant.yambol.ui.NavigationBottomBar
 import com.sedilant.yambol.ui.board.BoardScreen
+import com.sedilant.yambol.ui.createTeam.CreateTeamScreen
 import com.sedilant.yambol.ui.home.HomeScreen
 import com.sedilant.yambol.ui.profile.ProfileScreen
 import com.sedilant.yambol.ui.statistics.StatisticsScreen
@@ -19,6 +21,7 @@ enum class YambolScreen(@StringRes val title: Int) {
     Statistics(title = R.string.statistic_screen_title),
     Board(title = R.string.board_screen_title),
     Profile(title = R.string.profile_screen_title),
+    CreateTeam(title = R.string.create_team_screen),
 }
 
 @Composable
@@ -33,7 +36,7 @@ fun YambolApp(modifier: Modifier = Modifier) {
         modifier = modifier,
     ) {
         composable(route = YambolScreen.Home.name) {
-            HomeScreen(/*parameters if it is needed*/)
+            HomeScreen(onCreateTeam = { navController.navigate(YambolScreen.CreateTeam.name) })
         }
 
         composable(route = YambolScreen.Training.name) {
@@ -50,6 +53,15 @@ fun YambolApp(modifier: Modifier = Modifier) {
 
         composable(route = YambolScreen.Profile.name) {
             ProfileScreen()
+        }
+        composable(route = YambolScreen.CreateTeam.name) {
+            CreateTeamScreen(
+                onNavigateHome = {
+                    navController.navigate(YambolScreen.Home.name) {
+                        popUpTo(navController.graph.findStartDestination().id)
+                    }
+                }
+            )
         }
     }
 }

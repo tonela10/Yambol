@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sedilant.yambol.R
+import com.sedilant.yambol.domain.Position
 import com.sedilant.yambol.ui.home.models.PlayerUiModel
 import com.sedilant.yambol.ui.home.models.TaskUiModel
 import com.sedilant.yambol.ui.home.models.TeamUiModel
@@ -46,13 +47,15 @@ import com.sedilant.yambol.ui.theme.YambolTheme
 @Composable
 fun HomeScreen(
     homeViewModel: HomeViewModel = hiltViewModel<HomeViewModel>(),
+    onCreateTeam: () -> Unit,
 ) {
     val homeUiState = homeViewModel.uiState.collectAsState(
         initial = HomeUiState.Loading
     ).value
     HomeScreenStateless(
         homeUiState = homeUiState,
-        onTeamChange = { homeViewModel.onTeamChange(it) }
+        onTeamChange = { homeViewModel.onTeamChange(it) },
+        onCreateTeam = onCreateTeam
     )
 }
 
@@ -60,6 +63,7 @@ fun HomeScreen(
 private fun HomeScreenStateless(
     homeUiState: HomeUiState,
     onTeamChange: (Int) -> Unit,
+    onCreateTeam: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val listOfTask = listOf(
@@ -83,6 +87,7 @@ private fun HomeScreenStateless(
                         currentTeam = homeUiState.currentTeam,
                         listOfTeams = homeUiState.listOfTeams,
                         onTeamChange = onTeamChange,
+                        onCreateTeam = onCreateTeam,
                     )
 
                     PlayersRow(homeUiState.listOfPlayer)
@@ -119,6 +124,7 @@ private fun TeamTabs(
     currentTeam: TeamUiModel?,
     listOfTeams: List<TeamUiModel>,
     onTeamChange: (Int) -> Unit,
+    onCreateTeam: () -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -129,7 +135,7 @@ private fun TeamTabs(
 
         item {
             AssistChip(
-                onClick = { /*TODO add a team*/ },
+                onClick = onCreateTeam,
                 label = { Text("Add team") },
                 leadingIcon = {
                     Icon(
@@ -224,7 +230,7 @@ private fun PlayersRow(listOfPlayer: List<PlayerUiModel>) { // TODO make the row
                             textAlign = TextAlign.Left,
                         )
                         Text(
-                            text = player.position,
+                            text = player.position.name,
                             fontSize = 8.sp,
                             textAlign = TextAlign.Left,
                         )
@@ -260,7 +266,7 @@ private fun BigButtonYambol(
 
 @Preview(showBackground = true)
 @Composable
-fun TaskListPreview() {
+private fun TaskListPreview() {
     YambolTheme {
         TaskList(
             listOf(
@@ -274,12 +280,12 @@ fun TaskListPreview() {
 
 @Preview(showBackground = true)
 @Composable
-fun PlayersRowPreview() {
+private fun PlayersRowPreview() {
     YambolTheme {
         PlayersRow(
             listOf(
-                PlayerUiModel("Antonio", "10", "Point guard"),
-                PlayerUiModel("Luis", "44", "Strong forward")
+                PlayerUiModel("Antonio", "10", Position.POINT_GUARD),
+                PlayerUiModel("Luis", "44", Position.SHOOTING_GUARD)
             )
         )
     }
@@ -287,8 +293,8 @@ fun PlayersRowPreview() {
 
 @Preview(showBackground = true)
 @Composable
-fun HomeScreenPreview() {
+private fun HomeScreenPreview() {
     YambolTheme {
-        HomeScreen()
+        HomeScreen(onCreateTeam = {})
     }
 }
