@@ -3,7 +3,9 @@ package com.sedilant.yambol.data
 import com.sedilant.yambol.data.entities.PlayerEntity
 import com.sedilant.yambol.data.entities.TeamEntity
 import com.sedilant.yambol.data.entities.TeamObjectivesEntity
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class TeamRepositoryImpl @Inject constructor(
@@ -40,4 +42,15 @@ class TeamRepositoryImpl @Inject constructor(
         return teamObjectivesDao.getTeamObjectives(teamId)
     }
 
+    override suspend fun updateTeamObjective(teamObjectivesEntity: TeamObjectivesEntity) {
+        withContext(Dispatchers.IO) {
+            teamObjectivesDao.updateTeamObjective(teamObjectivesEntity)
+        }
+    }
+
+    override suspend fun getTeamObjectiveById(objectiveId: Int): TeamObjectivesEntity? {
+        return withContext(Dispatchers.IO) {
+            teamObjectivesDao.getTeamObjectiveById(objectiveId)
+        }
+    }
 }

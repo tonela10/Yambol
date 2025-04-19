@@ -7,6 +7,8 @@ import com.sedilant.yambol.domain.GetPlayersUseCase
 import com.sedilant.yambol.domain.GetTeamObjectivesUseCase
 import com.sedilant.yambol.domain.GetTeamsUseCase
 import com.sedilant.yambol.domain.InsertTeamObjectiveUseCase
+import com.sedilant.yambol.domain.ToggleTeamObjectiveUseCase
+import com.sedilant.yambol.domain.UpdateTeamObjectiveUseCase
 import com.sedilant.yambol.ui.home.models.PlayerUiModel
 import com.sedilant.yambol.ui.home.models.TeamObjectivesUiModel
 import com.sedilant.yambol.ui.home.models.TeamUiModel
@@ -32,6 +34,8 @@ class HomeViewModel @Inject constructor(
     private val getPlayersUseCase: GetPlayersUseCase,
     private val getTeamObjectivesUseCase: GetTeamObjectivesUseCase,
     private val insertTeamObjectiveUseCase: InsertTeamObjectiveUseCase,
+    private val updateTeamObjectiveUseCase: UpdateTeamObjectiveUseCase,
+    private val toggleTeamObjectiveUseCase: ToggleTeamObjectiveUseCase,
     private val dataStoreManager: DataStoreManager,
 ) : ViewModel() {
     //MeanWhile trigger
@@ -75,6 +79,7 @@ class HomeViewModel @Inject constructor(
                         TeamObjectivesUiModel(
                             description = it.description,
                             isFinish = it.isFinish,
+                            id = it.id,
                         )
                     }
                 }
@@ -102,7 +107,6 @@ class HomeViewModel @Inject constructor(
     fun onTeamChange(newTeamIndex: Int) {
         viewModelScope.launch {
             currentTeamFlow.update { newTeamIndex }
-            trigger.emit(Unit)
             //   dataStoreManager.saveCurrentTeam(newTeamIndex)
         }
     }
@@ -120,6 +124,22 @@ class HomeViewModel @Inject constructor(
             val teamId = currentTeamFlow.value
             insertTeamObjectiveUseCase(input, teamId)
         }
+    }
+
+    fun onToggleObjectiveStatus(objectiveId: Int) {
+        viewModelScope.launch {
+            toggleTeamObjectiveUseCase(objectiveId)
+        }
+    }
+
+    fun onUpdateObjective(objectiveId: Int, newDescription: String) {
+        viewModelScope.launch {
+            updateTeamObjectiveUseCase(objectiveId, description = newDescription)
+        }
+    }
+
+    fun onDeleteObjective(objectiveId: Int) {
+        // Implementar más tarde si es necesario
     }
 }
 

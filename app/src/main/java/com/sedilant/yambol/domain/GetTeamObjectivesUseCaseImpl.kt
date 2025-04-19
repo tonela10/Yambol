@@ -14,7 +14,8 @@ class GetTeamObjectivesUseCaseImpl @Inject constructor(
             list.map {
                 TeamObjectivesDomainModel(
                     description = it.description,
-                    isFinish = it.isFinish
+                    isFinish = it.isFinish,
+                    id = it.id
                 )
             }
         }

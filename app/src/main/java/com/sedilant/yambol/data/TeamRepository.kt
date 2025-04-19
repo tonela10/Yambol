@@ -15,4 +15,6 @@ interface TeamRepository {
 
     suspend fun getTeamObjectives(teamId: Int): Flow<List<TeamObjectivesEntity>>
     suspend fun insertTeamObjective(teamObjectivesEntity: TeamObjectivesEntity)
+    suspend fun updateTeamObjective(teamObjectivesEntity: TeamObjectivesEntity)
+    suspend fun getTeamObjectiveById(objectiveId: Int): TeamObjectivesEntity?
 }

@@ -31,8 +31,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -59,6 +61,7 @@ fun HomeScreen(
         onAddObjective = homeViewModel::onAddTeamObjective,
         onDismissObjectiveDialog = homeViewModel::onDismissObjectiveDialog,
         onSaveNewObjective = homeViewModel::onSaveNewObjective,
+        onToggleObjectiveStatus = homeViewModel::onToggleObjectiveStatus
     )
 }
 
@@ -70,6 +73,7 @@ private fun HomeScreenStateless(
     onAddObjective: () -> Unit,
     onDismissObjectiveDialog: () -> Unit,
     onSaveNewObjective: (String) -> Unit,
+    onToggleObjectiveStatus: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -96,7 +100,8 @@ private fun HomeScreenStateless(
 
                     TaskList(
                         homeUiState.listOfObjectives,
-                        onAddObjective = onAddObjective
+                        onAddObjective = onAddObjective,
+                        onToggleObjectiveStatus = onToggleObjectiveStatus,
                     )
 
                     if (homeUiState.isObjectiveDialogShow) {
@@ -173,6 +178,7 @@ private fun TeamTabs(
 private fun TaskList(
     listOfTask: List<TeamObjectivesUiModel>,
     onAddObjective: () -> Unit,
+    onToggleObjectiveStatus: (Int) -> Unit,
 ) {
     Card(
         modifier = Modifier
@@ -205,11 +211,14 @@ private fun TaskList(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(
                         checked = task.isFinish,
-                        onCheckedChange = {},
+                        onCheckedChange = { onToggleObjectiveStatus(task.id) },
                     )
 
                     Text(
-                        text = task.description
+                        text = task.description,
+                        style = TextStyle(
+                            textDecoration = if (task.isFinish) TextDecoration.LineThrough else null
+                        )
                     )
                 }
             }
@@ -283,11 +292,12 @@ private fun TaskListPreview() {
     YambolTheme {
         TaskList(
             listOf(
-                TeamObjectivesUiModel("Correr 10 minutos", false),
-                TeamObjectivesUiModel("Ejercicio de bote", false),
-                TeamObjectivesUiModel("Que todos metan dos libre", true),
+                TeamObjectivesUiModel("Correr 10 minutos", false, 1),
+                TeamObjectivesUiModel("Ejercicio de bote", false, 2),
+                TeamObjectivesUiModel("Que todos metan dos libre", true, 3),
             ),
-            onAddObjective = {}
+            onAddObjective = {},
+            onToggleObjectiveStatus = {}
         )
     }
 }
@@ -324,6 +334,7 @@ private fun HomeScreenPreview() {
             onAddObjective = {},
             onDismissObjectiveDialog = {},
             onSaveNewObjective = {},
+            onToggleObjectiveStatus = {}
         )
     }
 }
