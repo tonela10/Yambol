@@ -3,6 +3,8 @@ package com.sedilant.yambol.data
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import com.sedilant.yambol.data.entities.PlayerEntity
+import com.sedilant.yambol.data.entities.TeamEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao

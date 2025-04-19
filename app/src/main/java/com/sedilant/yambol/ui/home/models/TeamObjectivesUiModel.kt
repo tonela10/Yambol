@@ -1,6 +1,6 @@
 package com.sedilant.yambol.ui.home.models
 
-data class TaskUiModel(
+data class TeamObjectivesUiModel(
     val description: String,
-    val isComplete: Boolean,
+    val isFinish: Boolean,
 )

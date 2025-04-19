@@ -1,6 +1,6 @@
 package com.sedilant.yambol.domain
 
-import com.sedilant.yambol.data.TeamEntity
+import com.sedilant.yambol.data.entities.TeamEntity
 import com.sedilant.yambol.data.TeamRepository
 import javax.inject.Inject
 

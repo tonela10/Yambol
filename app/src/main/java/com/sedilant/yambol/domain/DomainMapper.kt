@@ -1,7 +1,8 @@
 package com.sedilant.yambol.domain
 
-import com.sedilant.yambol.data.PlayerEntity
-import com.sedilant.yambol.data.TeamEntity
+import com.sedilant.yambol.data.entities.PlayerEntity
+import com.sedilant.yambol.data.entities.TeamEntity
+import com.sedilant.yambol.domain.models.TeamDomainModel
 import com.sedilant.yambol.ui.home.models.PlayerUiModel
 
 fun TeamEntity.mapToDomain(): TeamDomainModel {

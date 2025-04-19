@@ -1,4 +1,4 @@
-package com.sedilant.yambol.data
+package com.sedilant.yambol.data.entities
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

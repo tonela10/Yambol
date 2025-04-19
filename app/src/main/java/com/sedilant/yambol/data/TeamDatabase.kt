@@ -4,9 +4,12 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.sedilant.yambol.data.entities.PlayerEntity
+import com.sedilant.yambol.data.entities.TeamEntity
+import com.sedilant.yambol.data.entities.TeamObjectivesEntity
 
 @Database(
-    entities = [PlayerEntity::class, TeamEntity::class],
+    entities = [PlayerEntity::class, TeamEntity::class, TeamObjectivesEntity::class],
     version = 1,
     exportSchema = true,
 //    autoMigrations = [
@@ -15,6 +18,7 @@ import androidx.room.RoomDatabase
 )
 abstract class TeamDatabase : RoomDatabase() {
     abstract fun playerDao(): PlayerDao
+    abstract fun teamObjectivesDao(): TeamObjectivesDao
 
     companion object {
         @Volatile
