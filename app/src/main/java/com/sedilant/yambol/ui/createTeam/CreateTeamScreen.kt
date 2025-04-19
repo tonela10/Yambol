@@ -37,7 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sedilant.yambol.ui.theme.YambolTheme
 
-
+// TODO move the cancel to the right top corner [YAM-11] https://trello.com/c/g1aQ621v
 @Composable
 fun CreateTeamScreen(
     createTeamViewModel: CreateTeamViewModel = hiltViewModel<CreateTeamViewModel>(),
