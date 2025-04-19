@@ -40,7 +40,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.sedilant.yambol.R
 import com.sedilant.yambol.domain.Position
 import com.sedilant.yambol.ui.home.models.PlayerUiModel
-import com.sedilant.yambol.ui.home.models.TaskUiModel
+import com.sedilant.yambol.ui.home.models.TeamObjectivesUiModel
 import com.sedilant.yambol.ui.home.models.TeamUiModel
 import com.sedilant.yambol.ui.theme.YambolTheme
 
@@ -55,7 +55,10 @@ fun HomeScreen(
     HomeScreenStateless(
         homeUiState = homeUiState,
         onTeamChange = { homeViewModel.onTeamChange(it) },
-        onCreateTeam = onCreateTeam
+        onCreateTeam = onCreateTeam,
+        onAddObjective = homeViewModel::onAddTeamObjective,
+        onDismissObjectiveDialog = homeViewModel::onDismissObjectiveDialog,
+        onSaveNewObjective = homeViewModel::onSaveNewObjective,
     )
 }
 
@@ -64,13 +67,12 @@ private fun HomeScreenStateless(
     homeUiState: HomeUiState,
     onTeamChange: (Int) -> Unit,
     onCreateTeam: () -> Unit,
+    onAddObjective: () -> Unit,
+    onDismissObjectiveDialog: () -> Unit,
+    onSaveNewObjective: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val listOfTask = listOf(
-        TaskUiModel("Correr 10 minutos", false),
-        TaskUiModel("Ejercicio de bote", false),
-        TaskUiModel("Que todos metan dos libre", true),
-    )
+
     when (homeUiState) {
         is HomeUiState.Loading -> {
             // por ahora nada
@@ -92,7 +94,17 @@ private fun HomeScreenStateless(
 
                     PlayersRow(homeUiState.listOfPlayer)
 
-                    TaskList(listOfTask)
+                    TaskList(
+                        homeUiState.listOfObjectives,
+                        onAddObjective = onAddObjective
+                    )
+
+                    if (homeUiState.isObjectiveDialogShow) {
+                        CreateObjectiveDialogComposable(
+                            onSave = onSaveNewObjective,
+                            onDismiss = onDismissObjectiveDialog,
+                        )
+                    }
 
                     Spacer(modifier.padding(10.dp))
                     /** Insert Row with two clickable images */
@@ -159,7 +171,8 @@ private fun TeamTabs(
 
 @Composable
 private fun TaskList(
-    listOfTask: List<TaskUiModel>
+    listOfTask: List<TeamObjectivesUiModel>,
+    onAddObjective: () -> Unit,
 ) {
     Card(
         modifier = Modifier
@@ -177,7 +190,7 @@ private fun TaskList(
             )
 
             IconButton(
-                onClick = {/*Add note*/ },
+                onClick = onAddObjective,
                 modifier = Modifier.align(Alignment.CenterEnd),
 
                 ) {
@@ -191,7 +204,7 @@ private fun TaskList(
             items(listOfTask) { task ->
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(
-                        checked = task.isComplete,
+                        checked = task.isFinish,
                         onCheckedChange = {},
                     )
 
@@ -205,7 +218,7 @@ private fun TaskList(
 }
 
 @Composable
-private fun PlayersRow(listOfPlayer: List<PlayerUiModel>) { // TODO make the row widther than what it is
+private fun PlayersRow(listOfPlayer: List<PlayerUiModel>) {
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         modifier = Modifier.padding(20.dp)
@@ -270,10 +283,11 @@ private fun TaskListPreview() {
     YambolTheme {
         TaskList(
             listOf(
-                TaskUiModel("Correr 10 minutos", false),
-                TaskUiModel("Ejercicio de bote", false),
-                TaskUiModel("Que todos metan dos libre", true),
-            )
+                TeamObjectivesUiModel("Correr 10 minutos", false),
+                TeamObjectivesUiModel("Ejercicio de bote", false),
+                TeamObjectivesUiModel("Que todos metan dos libre", true),
+            ),
+            onAddObjective = {}
         )
     }
 }
@@ -295,6 +309,21 @@ private fun PlayersRowPreview() {
 @Composable
 private fun HomeScreenPreview() {
     YambolTheme {
-        HomeScreen(onCreateTeam = {})
+        HomeScreenStateless(
+            onCreateTeam = {},
+            homeUiState = HomeUiState.Success(
+                listOfTeams = listOf(),
+                listOfPlayer = listOf(),
+                currentTeam = TeamUiModel(
+                    name = "",
+                    id = 1
+                ),
+                listOfObjectives = listOf()
+            ),
+            onTeamChange = {},
+            onAddObjective = {},
+            onDismissObjectiveDialog = {},
+            onSaveNewObjective = {},
+        )
     }
 }

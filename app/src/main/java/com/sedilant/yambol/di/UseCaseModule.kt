@@ -10,6 +10,8 @@ import com.sedilant.yambol.domain.GetTeamsUseCase
 import com.sedilant.yambol.domain.GetTeamsUseCaseImpl
 import com.sedilant.yambol.domain.InsertPlayerUseCase
 import com.sedilant.yambol.domain.InsertPlayerUseCaseImpl
+import com.sedilant.yambol.domain.InsertTeamObjectiveUseCase
+import com.sedilant.yambol.domain.InsertTeamObjectiveUseCaseImpl
 import com.sedilant.yambol.domain.InsertTeamUseCase
 import com.sedilant.yambol.domain.InsertTeamUseCaseImpl
 import dagger.Binds
@@ -37,5 +39,8 @@ abstract class UseCaseModule {
     abstract fun bindInsertTeam(impl: InsertTeamUseCaseImpl): InsertTeamUseCase
 
     @Binds
-    abstract fun bindGetTeamObjectivesUseCase(impl: GetTeamObjectivesUseCaseImpl): GetTeamObjectivesUseCase
+    abstract fun bindGetTeamObjectives(impl: GetTeamObjectivesUseCaseImpl): GetTeamObjectivesUseCase
+
+    @Binds
+    abstract fun bindInsertTeamObjectives(impl: InsertTeamObjectiveUseCaseImpl): InsertTeamObjectiveUseCase
 }
