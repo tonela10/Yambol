@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -20,10 +19,8 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Card
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -31,10 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -61,7 +55,8 @@ fun HomeScreen(
         onAddObjective = homeViewModel::onAddTeamObjective,
         onDismissObjectiveDialog = homeViewModel::onDismissObjectiveDialog,
         onSaveNewObjective = homeViewModel::onSaveNewObjective,
-        onToggleObjectiveStatus = homeViewModel::onToggleObjectiveStatus
+        onToggleObjectiveStatus = homeViewModel::onToggleObjectiveStatus,
+        onUpdateObjective = homeViewModel::onUpdateObjective,
     )
 }
 
@@ -74,6 +69,7 @@ private fun HomeScreenStateless(
     onDismissObjectiveDialog: () -> Unit,
     onSaveNewObjective: (String) -> Unit,
     onToggleObjectiveStatus: (Int) -> Unit,
+    onUpdateObjective: (Int, String) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -102,6 +98,8 @@ private fun HomeScreenStateless(
                         homeUiState.listOfObjectives,
                         onAddObjective = onAddObjective,
                         onToggleObjectiveStatus = onToggleObjectiveStatus,
+                        onDeleteObjective = {}, // TODO implement
+                        onUpdateObjective = onUpdateObjective,
                     )
 
                     if (homeUiState.isObjectiveDialogShow) {
@@ -174,57 +172,6 @@ private fun TeamTabs(
     }
 }
 
-@Composable
-private fun TaskList(
-    listOfTask: List<TeamObjectivesUiModel>,
-    onAddObjective: () -> Unit,
-    onToggleObjectiveStatus: (Int) -> Unit,
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(20.dp)
-    ) {
-        Box(
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Text(
-                text = "Objectives",
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.align(Alignment.Center)
-            )
-
-            IconButton(
-                onClick = onAddObjective,
-                modifier = Modifier.align(Alignment.CenterEnd),
-
-                ) {
-                Icon(
-                    imageVector = Icons.Filled.Add,
-                    contentDescription = "add note"
-                )
-            }
-        }
-        LazyColumn(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            items(listOfTask) { task ->
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Checkbox(
-                        checked = task.isFinish,
-                        onCheckedChange = { onToggleObjectiveStatus(task.id) },
-                    )
-
-                    Text(
-                        text = task.description,
-                        style = TextStyle(
-                            textDecoration = if (task.isFinish) TextDecoration.LineThrough else null
-                        )
-                    )
-                }
-            }
-        }
-    }
-}
 
 @Composable
 private fun PlayersRow(listOfPlayer: List<PlayerUiModel>) {
@@ -297,7 +244,9 @@ private fun TaskListPreview() {
                 TeamObjectivesUiModel("Que todos metan dos libre", true, 3),
             ),
             onAddObjective = {},
-            onToggleObjectiveStatus = {}
+            onToggleObjectiveStatus = {},
+            onDeleteObjective = {},
+            onUpdateObjective = { _, _ -> }
         )
     }
 }
@@ -334,7 +283,8 @@ private fun HomeScreenPreview() {
             onAddObjective = {},
             onDismissObjectiveDialog = {},
             onSaveNewObjective = {},
-            onToggleObjectiveStatus = {}
+            onToggleObjectiveStatus = {},
+            onUpdateObjective = { _, _ -> },
         )
     }
 }
