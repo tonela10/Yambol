@@ -37,16 +37,19 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.sedilant.yambol.ui.home.models.TeamObjectivesUiModel
+import com.sedilant.yambol.ui.theme.YambolTheme
 
 @Composable
 fun TaskList(
     listOfTask: List<TeamObjectivesUiModel>,
     onAddObjective: () -> Unit,
     onToggleObjectiveStatus: (Int) -> Unit,
-    onDeleteObjective: (Int) -> Unit,
+    onDeleteObjective: (Int, String, Boolean) -> Unit,
     onUpdateObjective: (Int, String) -> Unit,
+    onShowEditMenu: (Int, Boolean) -> Unit,
 ) {
     Card(
         modifier = Modifier
@@ -78,7 +81,6 @@ fun TaskList(
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             items(listOfTask) { task ->
-                val isContextMenuVisible = remember { mutableStateOf(false) }
                 val isEditDialogVisible = remember { mutableStateOf(false) }
                 val editTextState = remember { mutableStateOf(task.description) }
 
@@ -89,7 +91,7 @@ fun TaskList(
                             .pointerInput(Unit) {
                                 detectTapGestures(
                                     onLongPress = {
-                                        isContextMenuVisible.value = true
+                                        onShowEditMenu(task.id, true)
                                     }
                                 )
                             },
@@ -110,7 +112,7 @@ fun TaskList(
 
                         // Context menu icons that appear when long pressed
                         AnimatedVisibility(
-                            visible = isContextMenuVisible.value,
+                            visible = task.isEditMenuShown,
                             enter = fadeIn() + expandHorizontally(),
                             exit = fadeOut() + shrinkHorizontally()
                         ) {
@@ -118,7 +120,7 @@ fun TaskList(
                                 IconButton(
                                     onClick = {
                                         isEditDialogVisible.value = true
-                                        isContextMenuVisible.value = false
+                                        onShowEditMenu(task.id, false)
                                     }
                                 ) {
                                     Icon(
@@ -130,8 +132,8 @@ fun TaskList(
 
                                 IconButton(
                                     onClick = {
-                                        onDeleteObjective(task.id)
-                                        isContextMenuVisible.value = false
+                                        onDeleteObjective(task.id, task.description, task.isFinish)
+                                        onShowEditMenu(task.id, false)
                                     }
                                 ) {
                                     Icon(
@@ -143,7 +145,7 @@ fun TaskList(
 
                                 // Close button for context menu
                                 IconButton(
-                                    onClick = { isContextMenuVisible.value = false }
+                                    onClick = { onShowEditMenu(task.id, false) }
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.Close,
@@ -170,7 +172,7 @@ fun TaskList(
                             confirmButton = {
                                 TextButton(
                                     onClick = {
-                                        onUpdateObjective(task.id, task.description)
+                                        onUpdateObjective(task.id, editTextState.value)
                                         isEditDialogVisible.value = false
                                     }
                                 ) {
@@ -189,5 +191,24 @@ fun TaskList(
                 }
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun TaskListPreview() {
+    YambolTheme {
+        TaskList(
+            listOf(
+                TeamObjectivesUiModel("Correr 10 minutos", false, 1),
+                TeamObjectivesUiModel("Ejercicio de bote", false, 2),
+                TeamObjectivesUiModel("Que todos metan dos libre", true, 3),
+            ),
+            onAddObjective = {},
+            onToggleObjectiveStatus = {},
+            onDeleteObjective = { _, _, _ -> },
+            onUpdateObjective = { _, _ -> },
+            onShowEditMenu = { _, _ -> }
+        )
     }
 }

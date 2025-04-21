@@ -36,7 +36,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.sedilant.yambol.R
 import com.sedilant.yambol.domain.Position
 import com.sedilant.yambol.ui.home.models.PlayerUiModel
-import com.sedilant.yambol.ui.home.models.TeamObjectivesUiModel
 import com.sedilant.yambol.ui.home.models.TeamUiModel
 import com.sedilant.yambol.ui.theme.YambolTheme
 
@@ -57,6 +56,8 @@ fun HomeScreen(
         onSaveNewObjective = homeViewModel::onSaveNewObjective,
         onToggleObjectiveStatus = homeViewModel::onToggleObjectiveStatus,
         onUpdateObjective = homeViewModel::onUpdateObjective,
+        onShowEditObjectiveMenu = homeViewModel::onEditTeamObjective,
+        onDeleteTeamObjective = homeViewModel::onDeleteObjective,
     )
 }
 
@@ -70,6 +71,8 @@ private fun HomeScreenStateless(
     onSaveNewObjective: (String) -> Unit,
     onToggleObjectiveStatus: (Int) -> Unit,
     onUpdateObjective: (Int, String) -> Unit,
+    onShowEditObjectiveMenu: (Int, Boolean) -> Unit,
+    onDeleteTeamObjective: (Int, String, Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -98,8 +101,9 @@ private fun HomeScreenStateless(
                         homeUiState.listOfObjectives,
                         onAddObjective = onAddObjective,
                         onToggleObjectiveStatus = onToggleObjectiveStatus,
-                        onDeleteObjective = {}, // TODO implement
+                        onDeleteObjective = onDeleteTeamObjective,
                         onUpdateObjective = onUpdateObjective,
+                        onShowEditMenu = onShowEditObjectiveMenu,
                     )
 
                     if (homeUiState.isObjectiveDialogShow) {
@@ -235,24 +239,6 @@ private fun BigButtonYambol(
 
 @Preview(showBackground = true)
 @Composable
-private fun TaskListPreview() {
-    YambolTheme {
-        TaskList(
-            listOf(
-                TeamObjectivesUiModel("Correr 10 minutos", false, 1),
-                TeamObjectivesUiModel("Ejercicio de bote", false, 2),
-                TeamObjectivesUiModel("Que todos metan dos libre", true, 3),
-            ),
-            onAddObjective = {},
-            onToggleObjectiveStatus = {},
-            onDeleteObjective = {},
-            onUpdateObjective = { _, _ -> }
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
 private fun PlayersRowPreview() {
     YambolTheme {
         PlayersRow(
@@ -285,6 +271,8 @@ private fun HomeScreenPreview() {
             onSaveNewObjective = {},
             onToggleObjectiveStatus = {},
             onUpdateObjective = { _, _ -> },
+            onShowEditObjectiveMenu = { _, _ -> },
+            onDeleteTeamObjective = { _, _, _ -> }
         )
     }
 }

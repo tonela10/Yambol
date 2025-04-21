@@ -12,7 +12,6 @@ fun TeamEntity.mapToDomain(): TeamDomainModel {
     )
 }
 
-// TODO create a PlayerDomainModel
 fun PlayerEntity.mapToDomain(): PlayerUiModel {
     return PlayerUiModel(
         name = name,
@@ -28,7 +27,6 @@ fun PlayerEntity.mapToDomain(): PlayerUiModel {
     )
 }
 
-// TODO change the hardcode strings with resources
 enum class Position(name: String, number: Int) {
     POINT_GUARD(name = "point guard", number = 1),
     SHOOTING_GUARD(name = "shooting guard", number = 2),

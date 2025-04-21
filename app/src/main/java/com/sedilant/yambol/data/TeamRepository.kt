@@ -17,4 +17,5 @@ interface TeamRepository {
     suspend fun insertTeamObjective(teamObjectivesEntity: TeamObjectivesEntity)
     suspend fun updateTeamObjective(teamObjectivesEntity: TeamObjectivesEntity)
     suspend fun getTeamObjectiveById(objectiveId: Int): TeamObjectivesEntity?
+    suspend fun deleteTeamObjective(teamObjectivesEntity: TeamObjectivesEntity)
 }

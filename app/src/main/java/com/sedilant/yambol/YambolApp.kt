@@ -32,7 +32,7 @@ fun YambolApp(modifier: Modifier = Modifier) {
 
     NavHost(
         navController = navController,
-        startDestination = YambolScreen.Home.name, // TODO it will depend if exists a team or not
+        startDestination = YambolScreen.Home.name,
         modifier = modifier,
     ) {
         composable(route = YambolScreen.Home.name) {

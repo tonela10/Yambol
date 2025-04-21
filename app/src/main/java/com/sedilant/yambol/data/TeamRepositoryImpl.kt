@@ -53,4 +53,10 @@ class TeamRepositoryImpl @Inject constructor(
             teamObjectivesDao.getTeamObjectiveById(objectiveId)
         }
     }
+
+    override suspend fun deleteTeamObjective(teamObjectivesEntity: TeamObjectivesEntity) {
+        return withContext(Dispatchers.IO){
+            teamObjectivesDao.deleteTeamObjective(teamObjectivesEntity)
+        }
+    }
 }

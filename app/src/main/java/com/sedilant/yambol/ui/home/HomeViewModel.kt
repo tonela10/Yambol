@@ -3,6 +3,7 @@ package com.sedilant.yambol.ui.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sedilant.yambol.data.DataStoreManager
+import com.sedilant.yambol.domain.DeleteTeamObjectiveUseCase
 import com.sedilant.yambol.domain.GetPlayersUseCase
 import com.sedilant.yambol.domain.GetTeamObjectivesUseCase
 import com.sedilant.yambol.domain.GetTeamsUseCase
@@ -25,7 +26,7 @@ import kotlinx.coroutines.launch
 import java.util.Locale
 import javax.inject.Inject
 
-// TODO navigate to CreateTeam if there is no team
+// TODO navigate to CreateTeam if there is no team [YAM 12] https://trello.com/c/QAlawJMa
 
 @HiltViewModel
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -36,6 +37,7 @@ class HomeViewModel @Inject constructor(
     private val insertTeamObjectiveUseCase: InsertTeamObjectiveUseCase,
     private val updateTeamObjectiveUseCase: UpdateTeamObjectiveUseCase,
     private val toggleTeamObjectiveUseCase: ToggleTeamObjectiveUseCase,
+    private val deleteTeamObjectiveUseCase: DeleteTeamObjectiveUseCase,
     private val dataStoreManager: DataStoreManager,
 ) : ViewModel() {
     //MeanWhile trigger
@@ -46,6 +48,7 @@ class HomeViewModel @Inject constructor(
     )
     private val currentTeamFlow = MutableStateFlow(1)
     private val isObjectiveDialogShowFlow = MutableStateFlow(false)
+    private val isEditMenuShowFlow = MutableStateFlow(Pair<Int, Boolean>(0, false))
 
     // Home UI state
     // TODO the initial value of the uiState should be the last teams used [YAM-5]
@@ -56,10 +59,8 @@ class HomeViewModel @Inject constructor(
         val combinedFlow = combine(
             teamsFlow,
             currentTeamFlow,
-            isObjectiveDialogShowFlow,
-        ) { teams, currentTeamId, isObjectiveDialogShow ->
-            val currentTeam = teams.find { it.id == currentTeamId }
-                ?: teams.first()
+            isEditMenuShowFlow,
+        ) { teams, currentTeamId, isEditMenuShow ->
 
             val listOfTeams = teams.map { team ->
                 TeamUiModel(
@@ -70,8 +71,8 @@ class HomeViewModel @Inject constructor(
                 )
             }
 
-            Triple(listOfTeams, currentTeam.id, isObjectiveDialogShow)
-        }.flatMapLatest { (listOfTeams, currentTeamId, isObjectiveDialogShow) ->
+            Triple(listOfTeams, currentTeamId, isEditMenuShow)
+        }.flatMapLatest { (listOfTeams, currentTeamId, isEditMenuShow) ->
             combine(
                 getPlayersUseCase(currentTeamId),
                 getTeamObjectivesUseCase(currentTeamId).map { list ->
@@ -80,10 +81,13 @@ class HomeViewModel @Inject constructor(
                             description = it.description,
                             isFinish = it.isFinish,
                             id = it.id,
+                            isEditMenuShown = if (it.id == isEditMenuShow.first) isEditMenuShow.second else false
                         )
                     }
-                }
-            ) { players, objectives ->
+                },
+
+                isObjectiveDialogShowFlow,
+            ) { players, objectives, isObjectiveDialogShow ->
                 HomeUiState.Success(
                     listOfTeams = listOfTeams,
                     currentTeam = listOfTeams.find { it.id == currentTeamId },
@@ -119,6 +123,10 @@ class HomeViewModel @Inject constructor(
         isObjectiveDialogShowFlow.update { false }
     }
 
+    fun onEditTeamObjective(taskId: Int, isShown: Boolean) {
+        isEditMenuShowFlow.update { Pair(taskId, isShown) }
+    }
+
     fun onSaveNewObjective(input: String) {
         viewModelScope.launch {
             val teamId = currentTeamFlow.value
@@ -138,8 +146,16 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun onDeleteObjective(objectiveId: Int) {
-        // Implementar más tarde si es necesario
+    fun onDeleteObjective(objectiveId: Int, description: String, isFinished: Boolean) {
+       viewModelScope.launch {
+           val teamId = currentTeamFlow.value
+           deleteTeamObjectiveUseCase(
+               objectiveId,
+               description = description,
+               isFinish = isFinished,
+               teamId = teamId,
+           )
+       }
     }
 }
 

@@ -4,4 +4,5 @@ data class TeamObjectivesUiModel(
     val description: String,
     val isFinish: Boolean,
     val id: Int,
+    val isEditMenuShown: Boolean = false,
 )
