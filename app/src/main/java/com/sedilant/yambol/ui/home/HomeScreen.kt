@@ -24,6 +24,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.currentCompositionErrors
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -51,12 +52,9 @@ fun HomeScreen(
         homeUiState = homeUiState,
         onTeamChange = { homeViewModel.onTeamChange(it) },
         onCreateTeam = onCreateTeam,
-        onAddObjective = homeViewModel::onAddTeamObjective,
-        onDismissObjectiveDialog = homeViewModel::onDismissObjectiveDialog,
         onSaveNewObjective = homeViewModel::onSaveNewObjective,
         onToggleObjectiveStatus = homeViewModel::onToggleObjectiveStatus,
         onUpdateObjective = homeViewModel::onUpdateObjective,
-        onShowEditObjectiveMenu = homeViewModel::onEditTeamObjective,
         onDeleteTeamObjective = homeViewModel::onDeleteObjective,
     )
 }
@@ -66,12 +64,9 @@ private fun HomeScreenStateless(
     homeUiState: HomeUiState,
     onTeamChange: (Int) -> Unit,
     onCreateTeam: () -> Unit,
-    onAddObjective: () -> Unit,
-    onDismissObjectiveDialog: () -> Unit,
     onSaveNewObjective: (String) -> Unit,
     onToggleObjectiveStatus: (Int) -> Unit,
     onUpdateObjective: (Int, String) -> Unit,
-    onShowEditObjectiveMenu: (Int, Boolean) -> Unit,
     onDeleteTeamObjective: (Int, String, Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -82,6 +77,7 @@ private fun HomeScreenStateless(
         }
 
         is HomeUiState.Success -> {
+
             Box(modifier.fillMaxSize()) {
                 Column(
                     modifier = Modifier.fillMaxSize(),
@@ -99,19 +95,12 @@ private fun HomeScreenStateless(
 
                     TaskList(
                         homeUiState.listOfObjectives,
-                        onAddObjective = onAddObjective,
                         onToggleObjectiveStatus = onToggleObjectiveStatus,
                         onDeleteObjective = onDeleteTeamObjective,
                         onUpdateObjective = onUpdateObjective,
-                        onShowEditMenu = onShowEditObjectiveMenu,
+                        onSaveNewObjective = onSaveNewObjective,
+                        currentTeamId = homeUiState.currentTeam?.id ?: 0,
                     )
-
-                    if (homeUiState.isObjectiveDialogShow) {
-                        CreateObjectiveDialogComposable(
-                            onSave = onSaveNewObjective,
-                            onDismiss = onDismissObjectiveDialog,
-                        )
-                    }
 
                     Spacer(modifier.padding(10.dp))
                     /** Insert Row with two clickable images */
@@ -266,12 +255,9 @@ private fun HomeScreenPreview() {
                 listOfObjectives = listOf()
             ),
             onTeamChange = {},
-            onAddObjective = {},
-            onDismissObjectiveDialog = {},
             onSaveNewObjective = {},
             onToggleObjectiveStatus = {},
             onUpdateObjective = { _, _ -> },
-            onShowEditObjectiveMenu = { _, _ -> },
             onDeleteTeamObjective = { _, _, _ -> }
         )
     }

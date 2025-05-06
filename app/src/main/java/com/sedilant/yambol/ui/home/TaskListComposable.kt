@@ -45,12 +45,22 @@ import com.sedilant.yambol.ui.theme.YambolTheme
 @Composable
 fun TaskList(
     listOfTask: List<TeamObjectivesUiModel>,
-    onAddObjective: () -> Unit,
     onToggleObjectiveStatus: (Int) -> Unit,
     onDeleteObjective: (Int, String, Boolean) -> Unit,
     onUpdateObjective: (Int, String) -> Unit,
-    onShowEditMenu: (Int, Boolean) -> Unit,
+    onSaveNewObjective: (String) -> Unit,
+    currentTeamId: Int,
 ) {
+
+    val isObjectiveDialogShow = remember { mutableStateOf(false) }
+
+    if (isObjectiveDialogShow.value) {
+        CreateObjectiveDialogComposable(
+            onSave = onSaveNewObjective,
+            onDismiss = { isObjectiveDialogShow.value = false },
+        )
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -67,7 +77,7 @@ fun TaskList(
             )
 
             IconButton(
-                onClick = onAddObjective,
+                onClick = { isObjectiveDialogShow.value = true },
                 modifier = Modifier.align(Alignment.CenterEnd),
             ) {
                 Icon(
@@ -80,9 +90,13 @@ fun TaskList(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            items(listOfTask) { task ->
+            items(
+                items = listOfTask,
+                key = { task -> "${task.id}_$currentTeamId" })
+            { task ->
                 val isEditDialogVisible = remember { mutableStateOf(false) }
                 val editTextState = remember { mutableStateOf(task.description) }
+                val isEditMenuShow = remember { mutableStateOf(false) }
 
                 Box {
                     Row(
@@ -91,7 +105,7 @@ fun TaskList(
                             .pointerInput(Unit) {
                                 detectTapGestures(
                                     onLongPress = {
-                                        onShowEditMenu(task.id, true)
+                                        isEditMenuShow.value = true
                                     }
                                 )
                             },
@@ -112,7 +126,7 @@ fun TaskList(
 
                         // Context menu icons that appear when long pressed
                         AnimatedVisibility(
-                            visible = task.isEditMenuShown,
+                            visible = isEditMenuShow.value,
                             enter = fadeIn() + expandHorizontally(),
                             exit = fadeOut() + shrinkHorizontally()
                         ) {
@@ -120,7 +134,7 @@ fun TaskList(
                                 IconButton(
                                     onClick = {
                                         isEditDialogVisible.value = true
-                                        onShowEditMenu(task.id, false)
+                                        isEditMenuShow.value = false
                                     }
                                 ) {
                                     Icon(
@@ -133,7 +147,7 @@ fun TaskList(
                                 IconButton(
                                     onClick = {
                                         onDeleteObjective(task.id, task.description, task.isFinish)
-                                        onShowEditMenu(task.id, false)
+                                        isEditMenuShow.value = false
                                     }
                                 ) {
                                     Icon(
@@ -145,7 +159,7 @@ fun TaskList(
 
                                 // Close button for context menu
                                 IconButton(
-                                    onClick = { onShowEditMenu(task.id, false) }
+                                    onClick = { isEditMenuShow.value = false }
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.Close,
@@ -204,11 +218,11 @@ private fun TaskListPreview() {
                 TeamObjectivesUiModel("Ejercicio de bote", false, 2),
                 TeamObjectivesUiModel("Que todos metan dos libre", true, 3),
             ),
-            onAddObjective = {},
             onToggleObjectiveStatus = {},
             onDeleteObjective = { _, _, _ -> },
             onUpdateObjective = { _, _ -> },
-            onShowEditMenu = { _, _ -> }
+            onSaveNewObjective = {},
+            currentTeamId = 1,
         )
     }
 }

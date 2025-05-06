@@ -20,7 +20,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.Locale
@@ -47,20 +46,20 @@ class HomeViewModel @Inject constructor(
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
     private val currentTeamFlow = MutableStateFlow(1)
-    private val isObjectiveDialogShowFlow = MutableStateFlow(false)
-    private val isEditMenuShowFlow = MutableStateFlow(Pair<Int, Boolean>(0, false))
 
     // Home UI state
     // TODO the initial value of the uiState should be the last teams used [YAM-5]
     // Save into a DataStorage or SharedPreference the last team used
 
     val uiState = trigger.flatMapLatest { _ ->
+
         val teamsFlow = getTeamsUseCase()
         val combinedFlow = combine(
             teamsFlow,
+            currentTeamFlow.flatMapLatest { teamId -> getPlayersUseCase(teamId) },
+            currentTeamFlow.flatMapLatest { teamId -> getTeamObjectivesUseCase(teamId) },
             currentTeamFlow,
-            isEditMenuShowFlow,
-        ) { teams, currentTeamId, isEditMenuShow ->
+        ) { teams, teamPlayerList, teamObjectivesList, currentTeamId ->
 
             val listOfTeams = teams.map { team ->
                 TeamUiModel(
@@ -71,32 +70,18 @@ class HomeViewModel @Inject constructor(
                 )
             }
 
-            Triple(listOfTeams, currentTeamId, isEditMenuShow)
-        }.flatMapLatest { (listOfTeams, currentTeamId, isEditMenuShow) ->
-            combine(
-                getPlayersUseCase(currentTeamId),
-                getTeamObjectivesUseCase(currentTeamId).map { list ->
-                    list.map {
-                        TeamObjectivesUiModel(
-                            description = it.description,
-                            isFinish = it.isFinish,
-                            id = it.id,
-                            isEditMenuShown = if (it.id == isEditMenuShow.first) isEditMenuShow.second else false
-                        )
-                    }
+            HomeUiState.Success(
+                listOfTeams = listOfTeams,
+                currentTeam = listOfTeams.find { it.id == currentTeamId },
+                listOfPlayer = teamPlayerList,
+                listOfObjectives = teamObjectivesList.map {
+                    TeamObjectivesUiModel(
+                        description = it.description,
+                        isFinish = it.isFinish,
+                        id = it.id,
+                    )
                 },
-
-                isObjectiveDialogShowFlow,
-            ) { players, objectives, isObjectiveDialogShow ->
-                HomeUiState.Success(
-                    listOfTeams = listOfTeams,
-                    currentTeam = listOfTeams.find { it.id == currentTeamId },
-                    listOfPlayer = players,
-                    listOfObjectives = objectives,
-                    isObjectiveDialogShow = isObjectiveDialogShow,
-                )
-            }
-            // TODO get the task of the current team [YAM-5] https://trello.com/c/ZBtayiO9
+            )
         }
         combinedFlow
     }
@@ -113,18 +98,6 @@ class HomeViewModel @Inject constructor(
             currentTeamFlow.update { newTeamIndex }
             //   dataStoreManager.saveCurrentTeam(newTeamIndex)
         }
-    }
-
-    fun onAddTeamObjective() {
-        isObjectiveDialogShowFlow.update { true }
-    }
-
-    fun onDismissObjectiveDialog() {
-        isObjectiveDialogShowFlow.update { false }
-    }
-
-    fun onEditTeamObjective(taskId: Int, isShown: Boolean) {
-        isEditMenuShowFlow.update { Pair(taskId, isShown) }
     }
 
     fun onSaveNewObjective(input: String) {
@@ -147,15 +120,15 @@ class HomeViewModel @Inject constructor(
     }
 
     fun onDeleteObjective(objectiveId: Int, description: String, isFinished: Boolean) {
-       viewModelScope.launch {
-           val teamId = currentTeamFlow.value
-           deleteTeamObjectiveUseCase(
-               objectiveId,
-               description = description,
-               isFinish = isFinished,
-               teamId = teamId,
-           )
-       }
+        viewModelScope.launch {
+            val teamId = currentTeamFlow.value
+            deleteTeamObjectiveUseCase(
+                objectiveId,
+                description = description,
+                isFinish = isFinished,
+                teamId = teamId,
+            )
+        }
     }
 }
 
@@ -163,9 +136,8 @@ sealed interface HomeUiState {
     data class Success(
         val listOfTeams: List<TeamUiModel>,
         val listOfPlayer: List<PlayerUiModel>,
-        val currentTeam: TeamUiModel?,
+        val currentTeam: TeamUiModel?, // TODO remove team is nullable YAM-5
         val listOfObjectives: List<TeamObjectivesUiModel>,
-        val isObjectiveDialogShow: Boolean = false,
     ) : HomeUiState
 
     data object Loading : HomeUiState
