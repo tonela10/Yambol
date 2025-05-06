@@ -13,7 +13,6 @@ class DataStoreManager(private val context: Context) {
 
     private val CURRENT_TEAM_KEY = intPreferencesKey("current_team")
 
-    // Guardar un Int en DataStore
     suspend fun saveCurrentTeam(teamId: Int?) {
         context.dataStore.edit { preferences ->
             if (teamId != null) {
@@ -24,7 +23,6 @@ class DataStoreManager(private val context: Context) {
         }
     }
 
-    // Recuperar el Int (puede ser null si no existe)
     val currentTeam: Flow<Int?> = context.dataStore.data
         .map { preferences -> preferences[CURRENT_TEAM_KEY] }
 }
