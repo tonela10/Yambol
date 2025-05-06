@@ -1,5 +1,6 @@
 package com.sedilant.yambol.domain
 
+import com.sedilant.yambol.domain.models.TeamDomainModel
 import kotlinx.coroutines.flow.Flow
 
 interface GetTeamsUseCase {

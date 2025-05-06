@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -20,10 +19,8 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Card
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -31,7 +28,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -40,7 +36,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.sedilant.yambol.R
 import com.sedilant.yambol.domain.Position
 import com.sedilant.yambol.ui.home.models.PlayerUiModel
-import com.sedilant.yambol.ui.home.models.TaskUiModel
 import com.sedilant.yambol.ui.home.models.TeamUiModel
 import com.sedilant.yambol.ui.theme.YambolTheme
 
@@ -55,7 +50,11 @@ fun HomeScreen(
     HomeScreenStateless(
         homeUiState = homeUiState,
         onTeamChange = { homeViewModel.onTeamChange(it) },
-        onCreateTeam = onCreateTeam
+        onCreateTeam = onCreateTeam,
+        onSaveNewObjective = homeViewModel::onSaveNewObjective,
+        onToggleObjectiveStatus = homeViewModel::onToggleObjectiveStatus,
+        onUpdateObjective = homeViewModel::onUpdateObjective,
+        onDeleteTeamObjective = homeViewModel::onDeleteObjective,
     )
 }
 
@@ -64,19 +63,22 @@ private fun HomeScreenStateless(
     homeUiState: HomeUiState,
     onTeamChange: (Int) -> Unit,
     onCreateTeam: () -> Unit,
+    onSaveNewObjective: (String) -> Unit,
+    onToggleObjectiveStatus: (Int) -> Unit,
+    onUpdateObjective: (Int, String) -> Unit,
+    onDeleteTeamObjective: (Int, String, Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val listOfTask = listOf(
-        TaskUiModel("Correr 10 minutos", false),
-        TaskUiModel("Ejercicio de bote", false),
-        TaskUiModel("Que todos metan dos libre", true),
-    )
+
     when (homeUiState) {
         is HomeUiState.Loading -> {
             // por ahora nada
         }
 
+        HomeUiState.CreateTeam -> onCreateTeam()
+
         is HomeUiState.Success -> {
+
             Box(modifier.fillMaxSize()) {
                 Column(
                     modifier = Modifier.fillMaxSize(),
@@ -92,7 +94,14 @@ private fun HomeScreenStateless(
 
                     PlayersRow(homeUiState.listOfPlayer)
 
-                    TaskList(listOfTask)
+                    TaskList(
+                        homeUiState.listOfObjectives,
+                        onToggleObjectiveStatus = onToggleObjectiveStatus,
+                        onDeleteObjective = onDeleteTeamObjective,
+                        onUpdateObjective = onUpdateObjective,
+                        onSaveNewObjective = onSaveNewObjective,
+                        currentTeamId = homeUiState.currentTeam?.id ?: 0,
+                    )
 
                     Spacer(modifier.padding(10.dp))
                     /** Insert Row with two clickable images */
@@ -157,55 +166,9 @@ private fun TeamTabs(
     }
 }
 
-@Composable
-private fun TaskList(
-    listOfTask: List<TaskUiModel>
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(20.dp)
-    ) {
-        Box(
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Text(
-                text = "Objectives",
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.align(Alignment.Center)
-            )
-
-            IconButton(
-                onClick = {/*Add note*/ },
-                modifier = Modifier.align(Alignment.CenterEnd),
-
-                ) {
-                Icon(
-                    imageVector = Icons.Filled.Add,
-                    contentDescription = "add note"
-                )
-            }
-        }
-        LazyColumn(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            items(listOfTask) { task ->
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Checkbox(
-                        checked = task.isComplete,
-                        onCheckedChange = {},
-                    )
-
-                    Text(
-                        text = task.description
-                    )
-                }
-            }
-        }
-    }
-}
 
 @Composable
-private fun PlayersRow(listOfPlayer: List<PlayerUiModel>) { // TODO make the row widther than what it is
+private fun PlayersRow(listOfPlayer: List<PlayerUiModel>) {
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         modifier = Modifier.padding(20.dp)
@@ -266,20 +229,6 @@ private fun BigButtonYambol(
 
 @Preview(showBackground = true)
 @Composable
-private fun TaskListPreview() {
-    YambolTheme {
-        TaskList(
-            listOf(
-                TaskUiModel("Correr 10 minutos", false),
-                TaskUiModel("Ejercicio de bote", false),
-                TaskUiModel("Que todos metan dos libre", true),
-            )
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
 private fun PlayersRowPreview() {
     YambolTheme {
         PlayersRow(
@@ -295,6 +244,22 @@ private fun PlayersRowPreview() {
 @Composable
 private fun HomeScreenPreview() {
     YambolTheme {
-        HomeScreen(onCreateTeam = {})
+        HomeScreenStateless(
+            onCreateTeam = {},
+            homeUiState = HomeUiState.Success(
+                listOfTeams = listOf(),
+                listOfPlayer = listOf(),
+                currentTeam = TeamUiModel(
+                    name = "",
+                    id = 1
+                ),
+                listOfObjectives = listOf()
+            ),
+            onTeamChange = {},
+            onSaveNewObjective = {},
+            onToggleObjectiveStatus = {},
+            onUpdateObjective = { _, _ -> },
+            onDeleteTeamObjective = { _, _, _ -> }
+        )
     }
 }

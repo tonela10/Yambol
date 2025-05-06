@@ -1,4 +1,4 @@
-package com.sedilant.yambol.data
+package com.sedilant.yambol.data.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -7,5 +7,5 @@ import androidx.room.PrimaryKey
 data class TeamEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    val name: String
+    val name: String,
 )

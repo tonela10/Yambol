@@ -1,7 +1,8 @@
 package com.sedilant.yambol.domain
 
-import com.sedilant.yambol.data.PlayerEntity
-import com.sedilant.yambol.data.TeamEntity
+import com.sedilant.yambol.data.entities.PlayerEntity
+import com.sedilant.yambol.data.entities.TeamEntity
+import com.sedilant.yambol.domain.models.TeamDomainModel
 import com.sedilant.yambol.ui.home.models.PlayerUiModel
 
 fun TeamEntity.mapToDomain(): TeamDomainModel {
@@ -11,7 +12,6 @@ fun TeamEntity.mapToDomain(): TeamDomainModel {
     )
 }
 
-// TODO create a PlayerDomainModel
 fun PlayerEntity.mapToDomain(): PlayerUiModel {
     return PlayerUiModel(
         name = name,
@@ -27,7 +27,6 @@ fun PlayerEntity.mapToDomain(): PlayerUiModel {
     )
 }
 
-// TODO change the hardcode strings with resources
 enum class Position(name: String, number: Int) {
     POINT_GUARD(name = "point guard", number = 1),
     SHOOTING_GUARD(name = "shooting guard", number = 2),
