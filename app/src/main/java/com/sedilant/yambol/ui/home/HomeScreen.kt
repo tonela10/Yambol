@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -72,7 +73,7 @@ private fun HomeScreenStateless(
 
     when (homeUiState) {
         is HomeUiState.Loading -> {
-            // por ahora nada
+            // to add thing to load in future
         }
 
         HomeUiState.CreateTeam -> onCreateTeam()
@@ -139,7 +140,8 @@ private fun TeamTabs(
 
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = modifier.padding(8.dp)
+        contentPadding = PaddingValues(start = 20.dp, end = 20.dp),
+        modifier = modifier
     ) {
 
         item {
@@ -171,7 +173,7 @@ private fun TeamTabs(
 private fun PlayersRow(listOfPlayer: List<PlayerUiModel>) {
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = Modifier.padding(20.dp)
+        contentPadding = PaddingValues(start = 20.dp, end = 20.dp),
     ) {
         items(listOfPlayer) { player ->
             Card(Modifier.height(100.dp)) {
@@ -247,7 +249,7 @@ private fun HomeScreenPreview() {
         HomeScreenStateless(
             onCreateTeam = {},
             homeUiState = HomeUiState.Success(
-                listOfTeams = listOf(),
+                listOfTeams = listOf(TeamUiModel("Utebo", 1), TeamUiModel("Olivar", 2)),
                 listOfPlayer = listOf(),
                 currentTeam = TeamUiModel(
                     name = "",
