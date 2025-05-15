@@ -2,10 +2,12 @@ package com.sedilant.yambol
 
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.sedilant.yambol.ui.NavigationBottomBar
 import com.sedilant.yambol.ui.board.BoardScreen
@@ -27,8 +29,15 @@ enum class YambolScreen(@StringRes val title: Int) {
 @Composable
 fun YambolApp(modifier: Modifier = Modifier) {
     val navController = rememberNavController()
-
-    NavigationBottomBar(modifier, navController)
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val screensWithoutBottomBar = listOf(
+        YambolScreen.CreateTeam.name
+    )
+    val shouldShowBottomBar =
+        !screensWithoutBottomBar.contains(navBackStackEntry?.destination?.route)
+    if (shouldShowBottomBar) {
+        NavigationBottomBar(modifier, navController)
+    }
 
     NavHost(
         navController = navController,
