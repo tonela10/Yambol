@@ -13,6 +13,7 @@ import com.sedilant.yambol.ui.NavigationBottomBar
 import com.sedilant.yambol.ui.board.BoardScreen
 import com.sedilant.yambol.ui.createTeam.CreateTeamScreen
 import com.sedilant.yambol.ui.home.HomeScreen
+import com.sedilant.yambol.ui.playerCard.PlayerCardScreen
 import com.sedilant.yambol.ui.profile.ProfileScreen
 import com.sedilant.yambol.ui.statistics.StatisticsScreen
 import com.sedilant.yambol.ui.training.TrainingScreen
@@ -24,6 +25,7 @@ enum class YambolScreen(@StringRes val title: Int) {
     Board(title = R.string.board_screen_title),
     Profile(title = R.string.profile_screen_title),
     CreateTeam(title = R.string.create_team_screen),
+    PlayerCard(title = R.string.player_card_screen)
 }
 
 @Composable
@@ -36,16 +38,23 @@ fun YambolApp(modifier: Modifier = Modifier) {
     val shouldShowBottomBar =
         !screensWithoutBottomBar.contains(navBackStackEntry?.destination?.route)
     if (shouldShowBottomBar) {
-        NavigationBottomBar(modifier, navController)
+        NavigationBottomBar(navController = navController)
     }
 
     NavHost(
         navController = navController,
         startDestination = YambolScreen.Home.name,
-        modifier = modifier,
     ) {
         composable(route = YambolScreen.Home.name) {
-            HomeScreen(onCreateTeam = { navController.navigate(YambolScreen.CreateTeam.name) })
+            HomeScreen(
+                onCreateTeam = {
+                    navController.navigate(YambolScreen.CreateTeam.name)
+                },
+                onPlayerClicked = {
+                    navController.navigate(YambolScreen.PlayerCard.name)
+                },
+                modifier = modifier
+            )
         }
 
         composable(route = YambolScreen.Training.name) {
@@ -70,6 +79,11 @@ fun YambolApp(modifier: Modifier = Modifier) {
                         popUpTo(navController.graph.findStartDestination().id)
                     }
                 }
+            )
+        }
+        composable(route = YambolScreen.PlayerCard.name) {
+            PlayerCardScreen(
+                modifier = modifier
             )
         }
     }
