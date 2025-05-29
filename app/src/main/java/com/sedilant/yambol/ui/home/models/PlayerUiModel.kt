@@ -6,4 +6,5 @@ data class PlayerUiModel(
     val name: String,
     val number: String,
     val position: Position,
+    val id: Int? = null,
 )

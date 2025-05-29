@@ -23,10 +23,12 @@ fun PlayerEntity.mapToDomain(): PlayerUiModel {
             4 -> Position.POWER_FORWARD
             5 -> Position.CENTER
             else -> Position.CENTER
-        }
+        },
+        id = id
     )
 }
 
+// TODO fix the mapper
 enum class Position(name: String, number: Int) {
     POINT_GUARD(name = "point guard", number = 1),
     SHOOTING_GUARD(name = "shooting guard", number = 2),

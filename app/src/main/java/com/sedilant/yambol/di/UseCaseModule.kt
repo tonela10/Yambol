@@ -2,6 +2,8 @@ package com.sedilant.yambol.di
 
 import com.sedilant.yambol.domain.DeleteTeamObjectiveUseCase
 import com.sedilant.yambol.domain.DeleteTeamObjectiveUseCaseImpl
+import com.sedilant.yambol.domain.GetPlayerByIdUseCase
+import com.sedilant.yambol.domain.GetPlayerByIdUseCaseImpl
 import com.sedilant.yambol.domain.GetPlayersUseCase
 import com.sedilant.yambol.domain.GetPlayersUseCaseImpl
 import com.sedilant.yambol.domain.GetTeamIdUseCase
@@ -58,4 +60,7 @@ abstract class UseCaseModule {
 
     @Binds
     abstract fun bindDeleteTeamObjective(impl: DeleteTeamObjectiveUseCaseImpl): DeleteTeamObjectiveUseCase
+
+    @Binds
+    abstract fun bindGetPlayerById(impl: GetPlayerByIdUseCaseImpl): GetPlayerByIdUseCase
 }

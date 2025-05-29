@@ -87,7 +87,7 @@ class CreateTeamViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             val teamExists = getTeamIdUseCase(teamNameFlow.value.input)
             if (teamExists != null) {
-                teamNameFlow.update { ValueAndValidation(it.input, false)}
+                teamNameFlow.update { ValueAndValidation(it.input, false) }
             } else {
                 formFlow.update { Form.ADD_PLAYER }
             }
@@ -99,7 +99,11 @@ class CreateTeamViewModel @Inject constructor(
             try {
                 val name = playerNameFlow.first()
                 val number = playerNumberFlow.first()
-                listOfPlayers.add(PlayerUiModel(name, number, Position.POINT_GUARD))
+                listOfPlayers.add(
+                    PlayerUiModel(
+                        name, number, Position.POINT_GUARD,
+                    )
+                )
 
                 playerNameFlow.update { "" }
                 playerNumberFlow.update { "" }

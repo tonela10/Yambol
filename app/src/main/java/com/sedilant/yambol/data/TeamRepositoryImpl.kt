@@ -3,6 +3,8 @@ package com.sedilant.yambol.data
 import com.sedilant.yambol.data.entities.PlayerEntity
 import com.sedilant.yambol.data.entities.TeamEntity
 import com.sedilant.yambol.data.entities.TeamObjectivesEntity
+import com.sedilant.yambol.domain.mapToDomain
+import com.sedilant.yambol.ui.home.models.PlayerUiModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
@@ -55,8 +57,14 @@ class TeamRepositoryImpl @Inject constructor(
     }
 
     override suspend fun deleteTeamObjective(teamObjectivesEntity: TeamObjectivesEntity) {
-        return withContext(Dispatchers.IO){
+        return withContext(Dispatchers.IO) {
             teamObjectivesDao.deleteTeamObjective(teamObjectivesEntity)
+        }
+    }
+
+    override suspend fun getPlayer(id: Int): PlayerUiModel {
+        return withContext(Dispatchers.IO) {
+            playerDao.getPlayer(id).mapToDomain()
         }
     }
 }
