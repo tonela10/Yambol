@@ -3,6 +3,7 @@ package com.sedilant.yambol.ui.playerCard
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sedilant.yambol.domain.GetPlayerByIdUseCase
+import com.sedilant.yambol.domain.GetPlayerStatsUseCase
 import com.sedilant.yambol.ui.home.models.PlayerUiModel
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -16,7 +17,8 @@ import kotlinx.coroutines.launch
 @HiltViewModel(assistedFactory = PlayerCardViewModelFactory::class)
 class PlayerCardViewModel @AssistedInject constructor(
     @Assisted private val playerId: Int?,
-    getPlayerByIdUseCase: GetPlayerByIdUseCase
+    getPlayerByIdUseCase: GetPlayerByIdUseCase,
+    getPlayerStatsRecord: GetPlayerStatsUseCase,
 ) : ViewModel() {
 
     private val _uiState =
@@ -26,7 +28,14 @@ class PlayerCardViewModel @AssistedInject constructor(
     init {
         viewModelScope.launch {
             val player = playerId?.let { getPlayerByIdUseCase(it) }
-            _uiState.update { PlayerCardDetailsUiState.Success(player!!) } // TODO remove the !!
+            val abilityRecordList =
+                getPlayerStatsRecord(playerId!!).map { it.toUi() }// TODO remove !!
+            _uiState.update {
+                PlayerCardDetailsUiState.Success(
+                    player!!,
+                    abilityRecordList
+                )
+            } // TODO remove the !!
         }
     }
 }
@@ -34,7 +43,8 @@ class PlayerCardViewModel @AssistedInject constructor(
 
 sealed interface PlayerCardDetailsUiState {
     data object Loading : PlayerCardDetailsUiState
-    data class Success(val player: PlayerUiModel) : PlayerCardDetailsUiState
+    data class Success(val player: PlayerUiModel, val abilityList: List<AbilityUiModel>) :
+        PlayerCardDetailsUiState
 }
 
 @AssistedFactory

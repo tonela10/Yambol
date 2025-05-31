@@ -23,7 +23,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.sedilant.yambol.ui.playerCard.Ability
+import com.sedilant.yambol.ui.playerCard.AbilityUiModel
 import com.sedilant.yambol.ui.theme.YambolTheme
 import kotlin.math.cos
 import kotlin.math.min
@@ -31,15 +31,9 @@ import kotlin.math.sin
 
 @Composable
 fun PlayerChartCard(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    listOfAbilities: List<AbilityUiModel>,
 ) {
-    val listOfAbilities = listOf(
-        Ability("Bounce", 2),
-        Ability("Pass", 4),
-        Ability("Shoot", 1),
-        Ability("Defense", 5)
-    )
-
     ElevatedCard(
         modifier = modifier.fillMaxWidth(),
         elevation = CardDefaults.elevatedCardElevation(4.dp),
@@ -71,7 +65,7 @@ fun PlayerChartCard(
 
 @Composable
 private fun RadarChart(
-    abilities: List<Ability>,
+    abilities: List<AbilityUiModel>,
     modifier: Modifier = Modifier,
     maxValue: Int = 5
 ) {
@@ -114,7 +108,7 @@ private fun RadarChart(
             val path = Path()
             abilities.forEachIndexed { index, ability ->
                 val angle = Math.toRadians((index * angleStep - 90).toDouble())
-                val valueRadius = radius * (ability.value.toFloat() / maxValue)
+                val valueRadius = radius * ((ability.value?.toFloat() ?: 0f) / maxValue)
                 val x = center.x + cos(angle).toFloat() * valueRadius
                 val y = center.y + sin(angle).toFloat() * valueRadius
 
@@ -142,7 +136,7 @@ private fun RadarChart(
             // Draw points
             abilities.forEachIndexed { index, ability ->
                 val angle = Math.toRadians((index * angleStep - 90).toDouble())
-                val valueRadius = radius * (ability.value.toFloat() / maxValue)
+                val valueRadius = radius * ((ability.value?.toFloat() ?: 0f) / maxValue)
                 val x = center.x + cos(angle).toFloat() * valueRadius
                 val y = center.y + sin(angle).toFloat() * valueRadius
 
@@ -187,6 +181,9 @@ private fun RadarChart(
 @Composable
 private fun PlayerChartCardPreview() {
     YambolTheme {
-        PlayerAbilityCard()
+        PlayerAbilityCard(
+            modifier = Modifier,
+            listOfAbilities = listOf()
+        )
     }
 }

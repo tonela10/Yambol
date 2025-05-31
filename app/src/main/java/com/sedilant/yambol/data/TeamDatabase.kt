@@ -4,21 +4,25 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.sedilant.yambol.data.entities.AbilityNameEntity
+import com.sedilant.yambol.data.entities.AbilityRecordEntity
 import com.sedilant.yambol.data.entities.PlayerEntity
 import com.sedilant.yambol.data.entities.TeamEntity
 import com.sedilant.yambol.data.entities.TeamObjectivesEntity
 
 @Database(
-    entities = [PlayerEntity::class, TeamEntity::class, TeamObjectivesEntity::class],
+    entities = [PlayerEntity::class, TeamEntity::class, TeamObjectivesEntity::class,
+        AbilityRecordEntity::class, AbilityNameEntity::class],
     version = 1,
-    exportSchema = true,
+//    exportSchema = true,
 //    autoMigrations = [
-//        AutoMigration(from = 1, to = 1)
+//        AutoMigration(from = 1, to = 2)
 //    ]
 )
 abstract class TeamDatabase : RoomDatabase() {
     abstract fun playerDao(): PlayerDao
     abstract fun teamObjectivesDao(): TeamObjectivesDao
+    abstract fun statsDao(): StatsDao
 
     companion object {
         @Volatile

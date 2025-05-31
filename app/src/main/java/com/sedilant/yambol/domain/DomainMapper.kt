@@ -2,6 +2,8 @@ package com.sedilant.yambol.domain
 
 import com.sedilant.yambol.data.entities.PlayerEntity
 import com.sedilant.yambol.data.entities.TeamEntity
+import com.sedilant.yambol.data.queries.AbilityRecordWithName
+import com.sedilant.yambol.domain.models.AbilityDomainModel
 import com.sedilant.yambol.domain.models.TeamDomainModel
 import com.sedilant.yambol.ui.home.models.PlayerUiModel
 
@@ -25,6 +27,13 @@ fun PlayerEntity.mapToDomain(): PlayerUiModel {
             else -> Position.CENTER
         },
         id = id
+    )
+}
+
+fun AbilityRecordWithName.mapToDomain(): AbilityDomainModel {
+    return AbilityDomainModel(
+        name = ability.name,
+        value = record.value.toFloat()
     )
 }
 

@@ -18,20 +18,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.sedilant.yambol.ui.playerCard.Ability
+import com.sedilant.yambol.ui.playerCard.AbilityUiModel
 import com.sedilant.yambol.ui.theme.YambolTheme
 
 @Composable
 fun PlayerAbilityCard(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    listOfAbilities: List<AbilityUiModel>,
 ) {
-    val listOfAbilities = listOf(
-        Ability("Bounce", 2),
-        Ability("Pass", 4),
-        Ability("Shoot", 1),
-        Ability("Defense", 5)
-    )
-
     ElevatedCard(
         modifier = modifier.fillMaxWidth(),
         elevation = CardDefaults.elevatedCardElevation(4.dp),
@@ -54,7 +48,7 @@ fun PlayerAbilityCard(
 }
 
 @Composable
-private fun AbilityRow(ability: Ability, modifier: Modifier = Modifier) {
+private fun AbilityRow(ability: AbilityUiModel, modifier: Modifier = Modifier) {
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
@@ -68,7 +62,9 @@ private fun AbilityRow(ability: Ability, modifier: Modifier = Modifier) {
             modifier = Modifier
                 .padding(start = 8.dp)
                 .weight(3f),
-            progress = { ability.value / 5f }, // Fixed: Convert to 0-1 range (assuming max value is 5)
+            progress = {
+                ability.value.div(5f) ?: 0f
+            }, // Fixed: Convert to 0-1 range (assuming max value is 5)
         )
         Text(
             modifier = Modifier
@@ -84,7 +80,10 @@ private fun AbilityRow(ability: Ability, modifier: Modifier = Modifier) {
 @Composable
 private fun PlayerAbilityCardPreview() {
     YambolTheme {
-        PlayerAbilityCard()
+        PlayerAbilityCard(
+            modifier = Modifier,
+            listOfAbilities = listOf()
+        )
     }
 }
 

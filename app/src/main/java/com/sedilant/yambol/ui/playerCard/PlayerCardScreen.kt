@@ -36,11 +36,6 @@ import com.sedilant.yambol.ui.playerCard.composables.PlayerObjectivesCard
 import com.sedilant.yambol.ui.playerCard.composables.PlayerStatsCard
 import com.sedilant.yambol.ui.theme.YambolTheme
 
-data class Ability(
-    val name: String,
-    val value: Int,
-)
-
 @Composable
 fun PlayerCardScreen(
     modifier: Modifier = Modifier,
@@ -90,9 +85,9 @@ private fun PlayerCardScreenStateless(
 
                 PlayerStatsCard()
 
-                PlayerAbilityCard()
+                PlayerAbilityCard(listOfAbilities = uiState.abilityList)
 
-                PlayerChartCard()
+                PlayerChartCard(listOfAbilities = uiState.abilityList)
 
                 PlayerPerformanceCard()
 
@@ -250,7 +245,8 @@ private fun PlayerCardScreenPreview() {
                     number = "1",
                     position = Position.CENTER,
                     id = 1,
-                )
+                ),
+                abilityList = listOf()
             ),
             modifier = Modifier.fillMaxSize()
         )
