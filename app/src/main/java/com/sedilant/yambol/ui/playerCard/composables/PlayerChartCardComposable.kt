@@ -23,7 +23,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.sedilant.yambol.ui.playerCard.AbilityUiModel
+import com.sedilant.yambol.ui.playerCard.StatUiModel
 import com.sedilant.yambol.ui.theme.YambolTheme
 import kotlin.math.cos
 import kotlin.math.min
@@ -32,7 +32,7 @@ import kotlin.math.sin
 @Composable
 fun PlayerChartCard(
     modifier: Modifier = Modifier,
-    listOfAbilities: List<AbilityUiModel>,
+    listOfAbilities: List<StatUiModel>,
 ) {
     ElevatedCard(
         modifier = modifier.fillMaxWidth(),
@@ -65,7 +65,7 @@ fun PlayerChartCard(
 
 @Composable
 private fun RadarChart(
-    abilities: List<AbilityUiModel>,
+    abilities: List<StatUiModel>,
     modifier: Modifier = Modifier,
     maxValue: Int = 5
 ) {
@@ -136,7 +136,7 @@ private fun RadarChart(
             // Draw points
             abilities.forEachIndexed { index, ability ->
                 val angle = Math.toRadians((index * angleStep - 90).toDouble())
-                val valueRadius = radius * ((ability.value?.toFloat() ?: 0f) / maxValue)
+                val valueRadius = radius * ((ability.value.toFloat() ?: 0f) / maxValue)
                 val x = center.x + cos(angle).toFloat() * valueRadius
                 val y = center.y + sin(angle).toFloat() * valueRadius
 

@@ -11,6 +11,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.sedilant.yambol.ui.NavigationBottomBar
+import com.sedilant.yambol.ui.addStats.AddTeamStatsScreen
 import com.sedilant.yambol.ui.board.BoardScreen
 import com.sedilant.yambol.ui.createTeam.CreateTeamScreen
 import com.sedilant.yambol.ui.home.HomeScreen
@@ -24,19 +25,31 @@ import kotlinx.serialization.Serializable
 sealed class YambolScreen(@StringRes val route: Int) {
     @Serializable
     data object Home : YambolScreen(route = R.string.home_screen_title)
+
     @Serializable
     data object Training : YambolScreen(route = R.string.training_screen_title)
+
     @Serializable
     data object Statistics : YambolScreen(route = R.string.statistic_screen_title)
+
     @Serializable
     data object Board : YambolScreen(route = R.string.board_screen_title)
+
     @Serializable
     data object Profile : YambolScreen(route = R.string.profile_screen_title)
+
     @Serializable
     data object CreateTeam : YambolScreen(route = R.string.create_team_screen)
+
     @Serializable
     data class PlayerCardDetails(val id: Int?) :
         YambolScreen(route = R.string.player_card_screen)
+
+    @Serializable
+    data class AddTeamStats(val teamId: Int, val statsIds: List<Int>) : YambolScreen(
+        route =
+            R.string.add_teams_stats_screen
+    )
 }
 
 @Composable
@@ -68,7 +81,15 @@ fun YambolApp(modifier: Modifier = Modifier) {
                             player
                         )
                     )
-                }
+                },
+                onRegisterTrain = { teamId, statIds ->
+                    navController.navigate(
+                        YambolScreen.AddTeamStats(
+                            teamId = teamId,
+                            statsIds = statIds
+                        )
+                    )
+                },
             )
         }
         composable<YambolScreen.Training> {
@@ -100,6 +121,18 @@ fun YambolApp(modifier: Modifier = Modifier) {
             PlayerCardScreen(
                 playerId = id,
                 modifier = modifier
+            )
+        }
+
+        composable<YambolScreen.AddTeamStats> { navBackStackEntry ->
+            val args = navBackStackEntry.toRoute<YambolScreen.AddTeamStats>()
+
+            AddTeamStatsScreen(
+                modifier = modifier,
+                teamId = args.teamId,
+                statIds = args.statsIds,
+                onNavigateBack = { navController.popBackStack() },
+                onCompleted = { navController.popBackStack() },
             )
         }
     }

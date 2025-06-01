@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sedilant.yambol.data.DataStoreManager
 import com.sedilant.yambol.domain.DeleteTeamObjectiveUseCase
-import com.sedilant.yambol.domain.GetPlayersUseCase
+import com.sedilant.yambol.domain.GetPlayersByTeamIdUseCase
 import com.sedilant.yambol.domain.GetTeamObjectivesUseCase
 import com.sedilant.yambol.domain.GetTeamsUseCase
 import com.sedilant.yambol.domain.InsertTeamObjectiveUseCase
@@ -31,7 +31,7 @@ import javax.inject.Inject
 @OptIn(ExperimentalCoroutinesApi::class)
 class HomeViewModel @Inject constructor(
     private val getTeamsUseCase: GetTeamsUseCase,
-    private val getPlayersUseCase: GetPlayersUseCase,
+    private val getPlayersByTeamIdUseCase: GetPlayersByTeamIdUseCase,
     private val getTeamObjectivesUseCase: GetTeamObjectivesUseCase,
     private val insertTeamObjectiveUseCase: InsertTeamObjectiveUseCase,
     private val updateTeamObjectiveUseCase: UpdateTeamObjectiveUseCase,
@@ -63,7 +63,7 @@ class HomeViewModel @Inject constructor(
                     teamsFlow,
                     currentTeamFlow.flatMapLatest { teamId ->
                         if (teamId != null) {
-                            getPlayersUseCase(teamId)
+                            getPlayersByTeamIdUseCase(teamId)
                         } else {
                             MutableStateFlow(emptyList())
                         }

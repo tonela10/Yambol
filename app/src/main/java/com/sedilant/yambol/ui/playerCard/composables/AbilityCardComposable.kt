@@ -18,13 +18,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.sedilant.yambol.ui.playerCard.AbilityUiModel
+import com.sedilant.yambol.ui.playerCard.StatUiModel
 import com.sedilant.yambol.ui.theme.YambolTheme
 
 @Composable
 fun PlayerAbilityCard(
     modifier: Modifier = Modifier,
-    listOfAbilities: List<AbilityUiModel>,
+    listOfAbilities: List<StatUiModel>,
 ) {
     ElevatedCard(
         modifier = modifier.fillMaxWidth(),
@@ -48,7 +48,7 @@ fun PlayerAbilityCard(
 }
 
 @Composable
-private fun AbilityRow(ability: AbilityUiModel, modifier: Modifier = Modifier) {
+private fun AbilityRow(ability: StatUiModel, modifier: Modifier = Modifier) {
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,

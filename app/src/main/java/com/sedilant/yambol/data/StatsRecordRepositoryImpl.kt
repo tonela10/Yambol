@@ -1,5 +1,7 @@
 package com.sedilant.yambol.data
 
+import com.sedilant.yambol.data.entities.AbilityNameEntity
+import com.sedilant.yambol.data.entities.AbilityRecordEntity
 import com.sedilant.yambol.data.queries.AbilityRecordWithName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -13,6 +15,18 @@ class StatsRecordRepositoryImpl @Inject constructor(
     override suspend fun getPlayerStats(playerId: Int): Flow<List<AbilityRecordWithName>> {
         return withContext(Dispatchers.IO) {
             statsDao.getAbilityRecordsWithName(playerId)
+        }
+    }
+
+    override suspend fun getStatById(statId: Int): AbilityNameEntity {
+        return withContext(Dispatchers.IO) {
+            statsDao.getStatById(statId = statId)
+        }
+    }
+
+    override suspend fun insertPlayerStatUseCase(abilityRecordEntity: AbilityRecordEntity) {
+        return withContext(Dispatchers.IO) {
+            statsDao.insertStatRecord(abilityRecordEntity)
         }
     }
 }

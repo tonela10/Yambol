@@ -74,7 +74,7 @@ sealed interface PlayerCardDetailsUiState {
 
     data class Success(
         val player: PlayerUiModel,
-        val abilityList: List<AbilityUiModel>
+        val abilityList: List<StatUiModel>
     ) : PlayerCardDetailsUiState
 
     data class Error(val message: String) : PlayerCardDetailsUiState

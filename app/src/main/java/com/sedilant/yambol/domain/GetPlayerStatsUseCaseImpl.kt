@@ -17,7 +17,10 @@ class GetPlayerStatsUseCaseImpl @Inject constructor(
                 .groupBy { it.name }
                 .map { (name, group) ->
                 val averageValue = group.sumOf { it.value.toDouble() } / group.size
-                AbilityDomainModel(name, averageValue.toFloat())
+                AbilityDomainModel(
+                    name = name,
+                    value =  averageValue.toFloat(),
+                )
             }
         }
     }

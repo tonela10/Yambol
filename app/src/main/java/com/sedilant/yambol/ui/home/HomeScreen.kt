@@ -1,6 +1,7 @@
 package com.sedilant.yambol.ui.home
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -46,6 +47,7 @@ fun HomeScreen(
     homeViewModel: HomeViewModel = hiltViewModel<HomeViewModel>(),
     onCreateTeam: () -> Unit,
     onPlayerClicked: (Int) -> Unit,
+    onRegisterTrain: (Int, List<Int>) -> Unit
 ) {
     val homeUiState = homeViewModel.uiState.collectAsState(
         initial = HomeUiState.Loading
@@ -60,11 +62,13 @@ fun HomeScreen(
         onToggleObjectiveStatus = homeViewModel::onToggleObjectiveStatus,
         onUpdateObjective = homeViewModel::onUpdateObjective,
         onDeleteTeamObjective = homeViewModel::onDeleteObjective,
+        onRegisterTrain = { teamId, statsId -> onRegisterTrain(teamId, statsId) }
     )
 }
 
 @Composable
 private fun HomeScreenStateless(
+    modifier: Modifier = Modifier,
     homeUiState: HomeUiState,
     onTeamChange: (Int) -> Unit,
     onCreateTeam: () -> Unit,
@@ -73,7 +77,7 @@ private fun HomeScreenStateless(
     onToggleObjectiveStatus: (Int) -> Unit,
     onUpdateObjective: (Int, String) -> Unit,
     onDeleteTeamObjective: (Int, String, Boolean) -> Unit,
-    modifier: Modifier = Modifier
+    onRegisterTrain: (Int, List<Int>) -> Unit,
 ) {
 
     when (homeUiState) {
@@ -121,12 +125,18 @@ private fun HomeScreenStateless(
                     ) {
                         BigButtonYambol(
                             drawable = R.drawable.healt_icon_filled,
-                            description = "Register your train"
+                            description = "Register your train",
+                            onClick = {
+                                homeUiState.currentTeam?.let {
+                                    onRegisterTrain(it.id, listOf(1, 2, 3))
+                                }
+                            }
                         )
 
                         BigButtonYambol(
                             drawable = R.drawable.healt_icon_filled,
-                            description = "Register your train"
+                            description = "Register your train",
+                            onClick = {}
                         )
                     }
                 }
@@ -185,7 +195,7 @@ private fun PlayersRow(listOfPlayer: List<PlayerUiModel>, onPlayerClicked: (Int)
     ) {
         items(listOfPlayer) { player ->
             Card(
-                onClick = { player.id?.let { onPlayerClicked(it) } },
+                onClick = { player.id.let { onPlayerClicked(it) } },
                 Modifier.height(100.dp)
             ) {
                 Row(
@@ -224,12 +234,14 @@ private fun PlayersRow(listOfPlayer: List<PlayerUiModel>, onPlayerClicked: (Int)
 @Composable
 private fun BigButtonYambol(
     drawable: Int,
-    description: String
+    description: String,
+    onClick: () -> Unit,
 ) {
     Card(
         Modifier
             .height(150.dp)
-            .width(150.dp),
+            .width(150.dp)
+            .clickable(onClick = onClick),
     ) {
         Image(
             painter = painterResource(drawable),
@@ -262,6 +274,7 @@ private fun PlayersRowPreview() {
 private fun HomeScreenPreview() {
     YambolTheme {
         HomeScreenStateless(
+            modifier = Modifier,
             onCreateTeam = {},
             homeUiState = HomeUiState.Success(
                 listOfTeams = listOf(TeamUiModel("Utebo", 1), TeamUiModel("Olivar", 2)),
@@ -278,6 +291,7 @@ private fun HomeScreenPreview() {
             onUpdateObjective = { _, _ -> },
             onDeleteTeamObjective = { _, _, _ -> },
             onPlayerClicked = {},
+            onRegisterTrain = { _, _ -> },
         )
     }
 }
