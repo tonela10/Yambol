@@ -11,40 +11,73 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 
 @HiltViewModel(assistedFactory = PlayerCardViewModelFactory::class)
 class PlayerCardViewModel @AssistedInject constructor(
     @Assisted private val playerId: Int?,
-    getPlayerByIdUseCase: GetPlayerByIdUseCase,
-    getPlayerStatsRecord: GetPlayerStatsUseCase,
+    private val getPlayerByIdUseCase: GetPlayerByIdUseCase,
+    private val getPlayerStatsUseCase: GetPlayerStatsUseCase,
 ) : ViewModel() {
 
     private val _uiState =
         MutableStateFlow<PlayerCardDetailsUiState>(PlayerCardDetailsUiState.Loading)
-    val uiState: StateFlow<PlayerCardDetailsUiState> = _uiState
+    val uiState: StateFlow<PlayerCardDetailsUiState> = _uiState.asStateFlow()
 
     init {
-        viewModelScope.launch {
-            val player = playerId?.let { getPlayerByIdUseCase(it) }
-            val abilityRecordList =
-                getPlayerStatsRecord(playerId!!).map { it.toUi() }// TODO remove !!
-            _uiState.update {
-                PlayerCardDetailsUiState.Success(
-                    player!!,
-                    abilityRecordList
-                )
-            } // TODO remove the !!
+        loadPlayerData()
+    }
+
+    private fun loadPlayerData() {
+        if (playerId == null) {
+            _uiState.value = PlayerCardDetailsUiState.Error("Invalid player ID")
+            return
         }
+
+        viewModelScope.launch {
+            try {
+                // Get player data (assuming this is a suspend function)
+                val player = getPlayerByIdUseCase(playerId)
+
+                // Get player stats flow and combine with player data
+                getPlayerStatsUseCase(playerId)
+                    .catch { exception ->
+                        _uiState.value = PlayerCardDetailsUiState.Error(
+                            exception.message ?: "Failed to load player stats"
+                        )
+                    }
+                    .collect { playerStatsList ->
+                        _uiState.value = PlayerCardDetailsUiState.Success(
+                            player = player,
+                            abilityList = playerStatsList.map { it.toUi() }
+                        )
+                    }
+            } catch (exception: Exception) {
+                _uiState.value = PlayerCardDetailsUiState.Error(
+                    exception.message ?: "Failed to load player data"
+                )
+            }
+        }
+    }
+
+
+    fun retry() {
+        _uiState.value = PlayerCardDetailsUiState.Loading
+        loadPlayerData()
     }
 }
 
-
 sealed interface PlayerCardDetailsUiState {
     data object Loading : PlayerCardDetailsUiState
-    data class Success(val player: PlayerUiModel, val abilityList: List<AbilityUiModel>) :
-        PlayerCardDetailsUiState
+
+    data class Success(
+        val player: PlayerUiModel,
+        val abilityList: List<AbilityUiModel>
+    ) : PlayerCardDetailsUiState
+
+    data class Error(val message: String) : PlayerCardDetailsUiState
 }
 
 @AssistedFactory

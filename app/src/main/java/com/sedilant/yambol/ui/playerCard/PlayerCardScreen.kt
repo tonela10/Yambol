@@ -69,6 +69,8 @@ private fun PlayerCardScreenStateless(
             // TODO show something while loading
         }
 
+        is PlayerCardDetailsUiState.Error -> {}
+
         is PlayerCardDetailsUiState.Success -> {
             Column(
                 modifier = modifier
@@ -85,6 +87,7 @@ private fun PlayerCardScreenStateless(
 
                 PlayerStatsCard()
 
+                // TODO add case for when ability are empty
                 PlayerAbilityCard(listOfAbilities = uiState.abilityList)
 
                 PlayerChartCard(listOfAbilities = uiState.abilityList)
