@@ -2,6 +2,8 @@ package com.sedilant.yambol.domain
 
 import com.sedilant.yambol.data.entities.PlayerEntity
 import com.sedilant.yambol.data.entities.TeamEntity
+import com.sedilant.yambol.data.queries.AbilityRecordWithName
+import com.sedilant.yambol.domain.models.AbilityDomainModel
 import com.sedilant.yambol.domain.models.TeamDomainModel
 import com.sedilant.yambol.ui.home.models.PlayerUiModel
 
@@ -23,10 +25,19 @@ fun PlayerEntity.mapToDomain(): PlayerUiModel {
             4 -> Position.POWER_FORWARD
             5 -> Position.CENTER
             else -> Position.CENTER
-        }
+        },
+        id = id
     )
 }
 
+fun AbilityRecordWithName.mapToDomain(): AbilityDomainModel {
+    return AbilityDomainModel(
+        name = ability.name,
+        value = record.value.toFloat()
+    )
+}
+
+// TODO fix the mapper
 enum class Position(name: String, number: Int) {
     POINT_GUARD(name = "point guard", number = 1),
     SHOOTING_GUARD(name = "shooting guard", number = 2),

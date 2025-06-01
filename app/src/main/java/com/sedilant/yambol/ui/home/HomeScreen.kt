@@ -42,16 +42,20 @@ import com.sedilant.yambol.ui.theme.YambolTheme
 
 @Composable
 fun HomeScreen(
+    modifier: Modifier = Modifier,
     homeViewModel: HomeViewModel = hiltViewModel<HomeViewModel>(),
     onCreateTeam: () -> Unit,
+    onPlayerClicked: (Int) -> Unit,
 ) {
     val homeUiState = homeViewModel.uiState.collectAsState(
         initial = HomeUiState.Loading
     ).value
     HomeScreenStateless(
+        modifier = modifier,
         homeUiState = homeUiState,
         onTeamChange = { homeViewModel.onTeamChange(it) },
         onCreateTeam = onCreateTeam,
+        onPlayerClicked = { id -> onPlayerClicked(id) },
         onSaveNewObjective = homeViewModel::onSaveNewObjective,
         onToggleObjectiveStatus = homeViewModel::onToggleObjectiveStatus,
         onUpdateObjective = homeViewModel::onUpdateObjective,
@@ -64,6 +68,7 @@ private fun HomeScreenStateless(
     homeUiState: HomeUiState,
     onTeamChange: (Int) -> Unit,
     onCreateTeam: () -> Unit,
+    onPlayerClicked: (Int) -> Unit,
     onSaveNewObjective: (String) -> Unit,
     onToggleObjectiveStatus: (Int) -> Unit,
     onUpdateObjective: (Int, String) -> Unit,
@@ -93,7 +98,10 @@ private fun HomeScreenStateless(
                         onCreateTeam = onCreateTeam,
                     )
 
-                    PlayersRow(homeUiState.listOfPlayer)
+                    PlayersRow(
+                        onPlayerClicked = onPlayerClicked,
+                        listOfPlayer = homeUiState.listOfPlayer,
+                    )
 
                     TaskList(
                         homeUiState.listOfObjectives,
@@ -162,7 +170,7 @@ private fun TeamTabs(
             FilterChip(
                 selected = team == currentTeam,
                 onClick = { onTeamChange(team.id) },
-                label = { Text(text = team.name) },
+                label = { Text(text = team.name, maxLines = 1) },
             )
         }
     }
@@ -170,13 +178,16 @@ private fun TeamTabs(
 
 
 @Composable
-private fun PlayersRow(listOfPlayer: List<PlayerUiModel>) {
+private fun PlayersRow(listOfPlayer: List<PlayerUiModel>, onPlayerClicked: (Int) -> Unit) {
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         contentPadding = PaddingValues(start = 20.dp, end = 20.dp),
     ) {
         items(listOfPlayer) { player ->
-            Card(Modifier.height(100.dp)) {
+            Card(
+                onClick = { player.id?.let { onPlayerClicked(it) } },
+                Modifier.height(100.dp)
+            ) {
                 Row(
                     Modifier.fillMaxSize(),
                     verticalAlignment = Alignment.CenterVertically
@@ -235,9 +246,13 @@ private fun PlayersRowPreview() {
     YambolTheme {
         PlayersRow(
             listOf(
-                PlayerUiModel("Antonio", "10", Position.POINT_GUARD),
-                PlayerUiModel("Luis", "44", Position.SHOOTING_GUARD)
-            )
+                PlayerUiModel("Antonio", "10", Position.POINT_GUARD, id = 0),
+                PlayerUiModel(
+                    "Luis", "44", Position.SHOOTING_GUARD,
+                    id = 0
+                )
+            ),
+            onPlayerClicked = {}
         )
     }
 }
@@ -261,7 +276,8 @@ private fun HomeScreenPreview() {
             onSaveNewObjective = {},
             onToggleObjectiveStatus = {},
             onUpdateObjective = { _, _ -> },
-            onDeleteTeamObjective = { _, _, _ -> }
+            onDeleteTeamObjective = { _, _, _ -> },
+            onPlayerClicked = {},
         )
     }
 }

@@ -24,4 +24,7 @@ interface PlayerDao {
 
     @Insert
     fun insertPlayer(playerEntity: PlayerEntity)
+
+    @Query("SELECT * FROM player WHERE id = :playerId")
+    fun getPlayer(playerId: Int): PlayerEntity
 }

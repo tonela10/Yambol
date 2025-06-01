@@ -32,28 +32,33 @@ fun NavigationBottomBar(modifier: Modifier = Modifier, navController: NavControl
     val currentDestination = navBackStackEntry?.destination
 
     val topLevelRoutes = listOf(
-        TopLevelRoute("Home", YambolScreen.Home.name, Icons.Filled.Home, Icons.Outlined.Home),
+        TopLevelRoute(
+            "Home",
+            YambolScreen.Home,
+            Icons.Filled.Home,
+            Icons.Outlined.Home
+        ),
         TopLevelRoute(
             "Training",
-            YambolScreen.Training.name,
+            YambolScreen.Training,
             ImageVector.vectorResource(id = R.drawable.sports_basketball_filled),
             ImageVector.vectorResource(id = R.drawable.sports_basketball_oulined)
         ),
         TopLevelRoute(
             "Statistics",
-            YambolScreen.Statistics.name,
+            YambolScreen.Statistics,
             ImageVector.vectorResource(id = R.drawable.analytics_filled),
             ImageVector.vectorResource(id = R.drawable.analytics_outlined),
         ),
         TopLevelRoute(
             "Board",
-            YambolScreen.Board.name,
+            YambolScreen.Board,
             ImageVector.vectorResource(id = R.drawable.draw_filled),
             ImageVector.vectorResource(id = R.drawable.draw_outlined),
         ),
         TopLevelRoute(
             "Profile",
-            YambolScreen.Profile.name,
+            YambolScreen.Profile,
             Icons.Filled.AccountCircle,
             Icons.Outlined.AccountCircle,
         ),
@@ -65,15 +70,17 @@ fun NavigationBottomBar(modifier: Modifier = Modifier, navController: NavControl
     ) {
         NavigationBar {
             topLevelRoutes.forEach { item ->
+                val isSelected = currentDestination?.route?.startsWith(item.route::class.qualifiedName.orEmpty()) == true
+
                 NavigationBarItem(
                     icon = {
                         Icon(
-                            imageVector = if (currentDestination?.route == item.route) item.filledIcon else item.outlinedIcon,
+                            imageVector = if (isSelected) item.filledIcon else item.outlinedIcon,
                             contentDescription = item.name
                         )
                     },
                     label = { Text(item.name) },
-                    selected = currentDestination?.route == item.route,
+                    selected = isSelected,
                     onClick = {
                         navController.navigate(item.route) {
                             // Pop up to the start destination of the graph to
@@ -97,7 +104,7 @@ fun NavigationBottomBar(modifier: Modifier = Modifier, navController: NavControl
 
 data class TopLevelRoute(
     val name: String,
-    val route: String,
+    val route: YambolScreen,
     val filledIcon: ImageVector,
     val outlinedIcon: ImageVector
 )

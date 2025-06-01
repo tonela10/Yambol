@@ -4,6 +4,9 @@ import android.app.Application
 import android.content.Context
 import com.sedilant.yambol.data.DataStoreManager
 import com.sedilant.yambol.data.PlayerDao
+import com.sedilant.yambol.data.StatsDao
+import com.sedilant.yambol.data.StatsRecordRepository
+import com.sedilant.yambol.data.StatsRecordRepositoryImpl
 import com.sedilant.yambol.data.TeamDatabase
 import com.sedilant.yambol.data.TeamObjectivesDao
 import com.sedilant.yambol.data.TeamRepository
@@ -22,6 +25,9 @@ abstract class DataModule {
     @Binds
     abstract fun binTeamRepository(impl: TeamRepositoryImpl): TeamRepository
 
+    @Binds
+    abstract fun bindStatsRecordRepository(impl: StatsRecordRepositoryImpl): StatsRecordRepository
+
     companion object {
 
         @Provides
@@ -38,6 +44,11 @@ abstract class DataModule {
         @Provides
         fun provideTeamObjectivesDao(context: Context): TeamObjectivesDao {
             return TeamDatabase.getDatabase(context).teamObjectivesDao()
+        }
+
+        @Provides
+        fun provideStatsDao(context: Context): StatsDao {
+            return TeamDatabase.getDatabase(context).statsDao()
         }
 
         @Provides
