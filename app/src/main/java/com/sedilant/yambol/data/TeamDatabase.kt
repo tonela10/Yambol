@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.sedilant.yambol.data.entities.AbilityNameEntity
 import com.sedilant.yambol.data.entities.AbilityRecordEntity
 import com.sedilant.yambol.data.entities.PlayerEntity
@@ -30,6 +31,22 @@ abstract class TeamDatabase : RoomDatabase() {
         fun getDatabase(context: Context): TeamDatabase {
             return Instance ?: synchronized(this) {
                 Room.databaseBuilder(context, TeamDatabase::class.java, "team_database")
+                    .addCallback(object : Callback() {
+                        override fun onCreate(db: SupportSQLiteDatabase) {
+                            super.onCreate(db)
+                            db.execSQL(
+                                """
+                            INSERT INTO ability_name (name) VALUES 
+                            ('bounce'), 
+                            ('pass'), 
+                            ('shoot'), 
+                            ('defend'), 
+                            ('physical_state'), 
+                            ('mental_state');
+                        """.trimIndent()
+                            )
+                        }
+                    })
                     .build()
                     .also { Instance = it }
             }
