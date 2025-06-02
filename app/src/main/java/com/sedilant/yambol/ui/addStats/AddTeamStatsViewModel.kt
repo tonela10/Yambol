@@ -94,11 +94,9 @@ class AddTeamStatsViewModel @AssistedInject constructor(
     fun proceedToNext() {
         viewModelScope.launch {
             try {
-                // Save current ratings
                 saveCurrentRatings()
 
                 if (hasNextStat()) {
-                    // Move to next stat
                     currentStatIndex++
                     val nextStat = getStatByIdUseCase(statIds[currentStatIndex])
 
@@ -189,7 +187,6 @@ class AddTeamStatsViewModel @AssistedInject constructor(
     }
 }
 
-// UI State
 sealed interface AddTeamStatsUiState {
     data object Loading : AddTeamStatsUiState
 
@@ -205,14 +202,6 @@ sealed interface AddTeamStatsUiState {
     data class Error(val message: String) : AddTeamStatsUiState
 }
 
-// Data models
-//data class StatUiModel(
-//    val id: Int,
-//    val name: String,
-//    val description: String? = null
-//)
-
-// Factory
 @AssistedFactory
 interface AddTeamStatsViewModelFactory {
     fun create(teamId: Int, statIds: List<Int>): AddTeamStatsViewModel

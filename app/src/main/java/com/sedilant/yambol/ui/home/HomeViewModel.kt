@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.sedilant.yambol.data.DataStoreManager
 import com.sedilant.yambol.domain.DeleteTeamObjectiveUseCase
 import com.sedilant.yambol.domain.GetPlayersByTeamIdUseCase
+import com.sedilant.yambol.domain.GetStatByNameUseCase
 import com.sedilant.yambol.domain.GetTeamObjectivesUseCase
 import com.sedilant.yambol.domain.GetTeamsUseCase
 import com.sedilant.yambol.domain.InsertTeamObjectiveUseCase
@@ -38,6 +39,7 @@ class HomeViewModel @Inject constructor(
     private val toggleTeamObjectiveUseCase: ToggleTeamObjectiveUseCase,
     private val deleteTeamObjectiveUseCase: DeleteTeamObjectiveUseCase,
     private val dataStoreManager: DataStoreManager,
+    private val getStatByNameUseCase: GetStatByNameUseCase,
 ) : ViewModel() {
     // MeanWhile trigger
     private val trigger = MutableSharedFlow<Unit>(
@@ -57,6 +59,12 @@ class HomeViewModel @Inject constructor(
 
     private fun setupUiStateFlow() {
         viewModelScope.launch {
+
+            val statIds =
+                listOf(
+                    getStatByNameUseCase("physical_state"),
+                    getStatByNameUseCase("mental_state")
+                ).map { it.id }
             trigger.flatMapLatest { _ ->
                 val teamsFlow = getTeamsUseCase()
                 combine(
@@ -118,6 +126,7 @@ class HomeViewModel @Inject constructor(
                                 id = it.id,
                             )
                         },
+                        statIds = statIds,
                     )
                 }
             }.collect { state ->
@@ -203,6 +212,7 @@ sealed interface HomeUiState {
         val listOfPlayer: List<PlayerUiModel>,
         val currentTeam: TeamUiModel?,
         val listOfObjectives: List<TeamObjectivesUiModel>,
+        val statIds: List<Int>
     ) : HomeUiState
 
     data object Loading : HomeUiState

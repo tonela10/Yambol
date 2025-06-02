@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -23,6 +22,7 @@ import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -125,19 +125,20 @@ private fun HomeScreenStateless(
                     ) {
                         BigButtonYambol(
                             drawable = R.drawable.healt_icon_filled,
+                            description = "Go to your last train",
+                            onClick = {}
+                        )
+
+                        BigButtonYambol(
+                            drawable = R.drawable.fitness_center,
                             description = "Register your train",
                             onClick = {
                                 homeUiState.currentTeam?.let {
-                                    onRegisterTrain(it.id, listOf(1, 2, 3))
+                                    onRegisterTrain(it.id, homeUiState.statIds)
                                 }
                             }
                         )
 
-                        BigButtonYambol(
-                            drawable = R.drawable.healt_icon_filled,
-                            description = "Register your train",
-                            onClick = {}
-                        )
                     }
                 }
             }
@@ -233,22 +234,31 @@ private fun PlayersRow(listOfPlayer: List<PlayerUiModel>, onPlayerClicked: (Int)
 
 @Composable
 private fun BigButtonYambol(
+    modifier: Modifier = Modifier,
     drawable: Int,
     description: String,
     onClick: () -> Unit,
 ) {
+
     Card(
-        Modifier
-            .height(150.dp)
-            .width(150.dp)
+        modifier
             .clickable(onClick = onClick),
     ) {
-        Image(
-            painter = painterResource(drawable),
-            contentDescription = description,
-            contentScale = ContentScale.FillWidth,
-            modifier = Modifier.fillMaxSize()
-        )
+        Column(
+            modifier = Modifier.padding(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Image(
+                painter = painterResource(drawable),
+                contentDescription = description,
+                contentScale = ContentScale.FillWidth,
+                modifier = Modifier.size(50.dp)
+            )
+            Text(
+                text = description,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
     }
 }
 
@@ -271,6 +281,17 @@ private fun PlayersRowPreview() {
 
 @Preview(showBackground = true)
 @Composable
+private fun YambolButtonPreview() {
+    YambolTheme {
+        BigButtonYambol(
+            drawable = R.drawable.fitness_center,
+            description = "Register your train"
+        ) { }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
 private fun HomeScreenPreview() {
     YambolTheme {
         HomeScreenStateless(
@@ -283,7 +304,8 @@ private fun HomeScreenPreview() {
                     name = "",
                     id = 1
                 ),
-                listOfObjectives = listOf()
+                listOfObjectives = listOf(),
+                statIds = listOf()
             ),
             onTeamChange = {},
             onSaveNewObjective = {},

@@ -11,6 +11,8 @@ interface StatsRecordRepository {
     suspend fun getPlayerStats(playerId: Int): Flow<List<AbilityRecordWithName>>
 
     suspend fun getStatById(statId: Int): AbilityNameEntity
+    suspend fun getStatByName(statName:String): AbilityNameEntity
 
     suspend fun insertPlayerStatUseCase(abilityRecordEntity: AbilityRecordEntity)
+
 }

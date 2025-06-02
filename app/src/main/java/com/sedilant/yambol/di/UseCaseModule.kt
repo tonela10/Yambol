@@ -10,6 +10,8 @@ import com.sedilant.yambol.domain.GetPlayersByTeamIdUseCase
 import com.sedilant.yambol.domain.GetPlayersByTeamIdUseCaseImpl
 import com.sedilant.yambol.domain.GetStatByIdUseCase
 import com.sedilant.yambol.domain.GetStatByIdUseCaseImpl
+import com.sedilant.yambol.domain.GetStatByNameUseCase
+import com.sedilant.yambol.domain.GetStatByNameUseCaseImpl
 import com.sedilant.yambol.domain.GetTeamIdUseCase
 import com.sedilant.yambol.domain.GetTeamIdUseCaseImpl
 import com.sedilant.yambol.domain.GetTeamObjectivesUseCase
@@ -78,4 +80,7 @@ abstract class UseCaseModule {
 
     @Binds
     abstract fun bindSavePlayerStatUseCase(impl: SavePlayerStatUseCaseImpl): SavePlayerStatUseCase
+
+    @Binds
+    abstract fun bindGetStatByNameUseCase(impl: GetStatByNameUseCaseImpl): GetStatByNameUseCase
 }

@@ -66,12 +66,6 @@ fun AddTeamStatsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    LaunchedEffect(uiState) {
-        if (uiState is AddTeamStatsUiState.Completed) {
-            onCompleted()
-        }
-    }
-
     AddTeamStatsScreenStateless(
         modifier = modifier,
         uiState = uiState,
@@ -81,6 +75,7 @@ fun AddTeamStatsScreen(
         onPreviousClicked = viewModel::goToPrevious,
         canProceed = viewModel.canProceed(),
         onRetry = viewModel::retry,
+        onCompleted = onCompleted,
     )
 }
 
@@ -95,6 +90,7 @@ private fun AddTeamStatsScreenStateless(
     onPreviousClicked: () -> Unit,
     canProceed: Boolean,
     onRetry: () -> Unit,
+    onCompleted: () -> Unit,
 ) {
 
     Scaffold(
@@ -112,11 +108,11 @@ private fun AddTeamStatsScreenStateless(
         }
     ) { paddingValues ->
         Box(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            when (val state = uiState) {
+            when (uiState) {
                 is AddTeamStatsUiState.Loading -> {
                     CircularProgressIndicator(
                         modifier = Modifier.align(Alignment.Center)
@@ -125,7 +121,7 @@ private fun AddTeamStatsScreenStateless(
 
                 is AddTeamStatsUiState.Success -> {
                     TeamRatingContent(
-                        state = state,
+                        state = uiState,
                         onRatingChanged = updatePlayerRating,
                         onNextClicked = onNextClicked,
                         onPreviousClicked = onPreviousClicked,
@@ -135,14 +131,14 @@ private fun AddTeamStatsScreenStateless(
 
                 is AddTeamStatsUiState.Error -> {
                     ErrorContent(
-                        message = state.message,
+                        message = uiState.message,
                         onRetry = onRetry,
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }
 
                 is AddTeamStatsUiState.Completed -> {
-                    // This will trigger navigation through LaunchedEffect
+                    onCompleted()
                 }
             }
         }
@@ -162,18 +158,15 @@ private fun TeamRatingContent(
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        // Progress indicator
         ProgressSection(
             currentIndex = state.currentStatIndex,
             total = state.totalStats,
             statName = state.currentStat.name
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
-
         // Players list
         LazyColumn(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(1f).padding(top = 24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(state.players) { player ->
@@ -187,10 +180,8 @@ private fun TeamRatingContent(
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Navigation buttons
         NavigationButtons(
+            modifier = Modifier.padding(top = 16.dp),
             canGoBack = state.currentStatIndex > 0,
             canProceed = canProceed,
             isLastStat = state.currentStatIndex == state.totalStats - 1,
@@ -213,10 +204,10 @@ private fun ProgressSection(
             fontWeight = FontWeight.Bold
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
-
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -227,11 +218,11 @@ private fun ProgressSection(
             )
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
-
         LinearProgressIndicator(
             progress = { (currentIndex + 1).toFloat() / total.toFloat() },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp),
         )
     }
 }
@@ -318,6 +309,7 @@ private fun RatingButton(
 
 @Composable
 private fun NavigationButtons(
+    modifier: Modifier = Modifier,
     canGoBack: Boolean,
     canProceed: Boolean,
     isLastStat: Boolean,
@@ -325,7 +317,7 @@ private fun NavigationButtons(
     onNextClicked: () -> Unit
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         if (canGoBack) {
@@ -413,7 +405,8 @@ private fun AddTeamStatsScreenPreview() {
             onNextClicked = {},
             onPreviousClicked = {},
             canProceed = true,
-            onRetry = {}
+            onRetry = {},
+            onCompleted = {},
         )
     }
 }

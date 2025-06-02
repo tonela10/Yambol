@@ -24,6 +24,12 @@ class StatsRecordRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getStatByName(statName: String): AbilityNameEntity {
+        return withContext(Dispatchers.IO) {
+            statsDao.getStatByName(statName)
+        }
+    }
+
     override suspend fun insertPlayerStatUseCase(abilityRecordEntity: AbilityRecordEntity) {
         return withContext(Dispatchers.IO) {
             statsDao.insertStatRecord(abilityRecordEntity)

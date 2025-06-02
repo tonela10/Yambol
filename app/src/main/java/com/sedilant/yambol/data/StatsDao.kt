@@ -18,6 +18,9 @@ interface StatsDao {
     @Query("SELECT * FROM ability_name WHERE id = :statId")
     fun getStatById(statId: Int): AbilityNameEntity
 
+    @Query("SELECT * FROM ability_name WHERE name = :statName")
+    fun getStatByName(statName: String): AbilityNameEntity
+
     @Insert
     fun insertStatRecord(abilityRecordEntity: AbilityRecordEntity)
 }
