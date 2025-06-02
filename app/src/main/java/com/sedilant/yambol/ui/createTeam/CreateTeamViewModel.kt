@@ -53,8 +53,7 @@ class CreateTeamViewModel @Inject constructor(
             ) { teamName, playerName, playerNumber, form ->
                 when (form) {
                     Form.ADD_PLAYER -> {
-                        val nextButtonValidation =
-                            playerName.isNotEmpty() && playerNumber.isNotEmpty()
+                        val nextButtonValidation = isPlayerDataValid(playerName, playerNumber)
                         val finishButtonValidation = listOfPlayers.size >= 5
 
                         CreateTeamUiState.AddPlayer(
@@ -66,7 +65,6 @@ class CreateTeamViewModel @Inject constructor(
                     }
 
                     Form.ADD_TEAM -> {
-
                         CreateTeamUiState.AddTeamName(
                             teamName = teamName.input,
                             isErrorMessageShow = !teamName.isValid,
@@ -85,10 +83,18 @@ class CreateTeamViewModel @Inject constructor(
 
     fun onCreateTeam() {
         viewModelScope.launch(Dispatchers.IO) {
-            val teamExists = getTeamIdUseCase(teamNameFlow.value.input)
+            val teamName = teamNameFlow.value.input.trim()
+
+            if (teamName.isEmpty()) {
+                teamNameFlow.update { ValueAndValidation(it.input, false) }
+                return@launch
+            }
+
+            val teamExists = getTeamIdUseCase(teamName)
             if (teamExists != null) {
                 teamNameFlow.update { ValueAndValidation(it.input, false) }
             } else {
+                teamNameFlow.update { ValueAndValidation(teamName, true) }
                 formFlow.update { Form.ADD_PLAYER }
             }
         }
@@ -97,11 +103,23 @@ class CreateTeamViewModel @Inject constructor(
     fun onNextPlayer() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val name = playerNameFlow.first()
+                val name = playerNameFlow.first().trim()
                 val number = playerNumberFlow.first()
+
+                if (!isPlayerDataValid(name, number)) {
+                    return@launch
+                }
+
+                if (isPlayerNumberTaken(number)) {
+
+                    return@launch
+                }
+
                 listOfPlayers.add(
                     PlayerUiModel(
-                        name, number, Position.POINT_GUARD,
+                        name = name,
+                        number = number,
+                        position = Position.POINT_GUARD,
                     )
                 )
 
@@ -109,37 +127,91 @@ class CreateTeamViewModel @Inject constructor(
                 playerNumberFlow.update { "" }
 
             } catch (e: Exception) {
-                // manage errors
+                // Handle errors - could emit error state
             }
         }
     }
 
     fun onFinish() {
         viewModelScope.launch(Dispatchers.IO) {
-            insertTeamUseCase(teamNameFlow.value.input)
-            val teamId = getTeamIdUseCase(teamNameFlow.value.input)
-            teamId?.let {
-                listOfPlayers.forEach {
-                    insertPlayerUseCase(PlayerUiModel(it.name, it.number, it.position), teamId)
+            try {
+                val teamName = teamNameFlow.value.input.trim()
+
+                insertTeamUseCase(teamName)
+                val teamId = getTeamIdUseCase(teamName)
+
+                teamId?.let { id ->
+                    listOfPlayers.forEach { player ->
+                        insertPlayerUseCase(player, id)
+                    }
                 }
+            } catch (e: Exception) {
+                // Handle errors
             }
         }
     }
 
     /**
-     * We should make the necessary checks here about the input
+     * Validates team name input
      */
     fun updateTeamName(name: String) {
-        teamNameFlow.update { ValueAndValidation(name) }
+        teamNameFlow.update { ValueAndValidation(name, true) }
     }
 
+    /**
+     * Updates player name with basic validation
+     */
     fun updatePlayerName(name: String) {
-        playerNameFlow.update { name }
+        // Allow only reasonable name lengths
+        if (name.length <= 50) {
+            playerNameFlow.update { name }
+        }
     }
 
+    /**
+     * Updates player number with validation (0-99)
+     */
     fun updatePlayerNumber(number: String) {
-        playerNumberFlow.update { number }
+        if (number.isEmpty()) {
+            playerNumberFlow.update { number }
+        } else {
+            val numValue = number.toIntOrNull()
+            if (numValue != null && numValue in 0..99) {
+                playerNumberFlow.update { number }
+            }
+        }
     }
+
+    /**
+     * Returns the current number of players added
+     */
+    fun getPlayersCount(): Int = listOfPlayers.size
+
+    /**
+     * Validates if player data is complete and valid
+     */
+    private fun isPlayerDataValid(name: String, number: String): Boolean {
+        val trimmedName = name.trim()
+        val numValue = number.toIntOrNull()
+
+        return trimmedName.isNotEmpty() &&
+                trimmedName.length >= 2 &&
+                numValue != null &&
+                numValue in 0..99 &&
+                !isPlayerNumberTaken(number)
+    }
+
+    /**
+     * Checks if a player number is already taken
+     */
+    private fun isPlayerNumberTaken(number: String): Boolean {
+        return listOfPlayers.any { it.number == number }
+    }
+
+    /**
+     * Gets list of taken numbers for UI feedback if needed
+     */
+    fun getTakenNumbers(): List<String> = listOfPlayers.map { it.number } // TODO Add it to the ui checks
 
     private enum class Form {
         ADD_TEAM,
@@ -148,8 +220,10 @@ class CreateTeamViewModel @Inject constructor(
 }
 
 sealed interface CreateTeamUiState {
-    data class AddTeamName(val teamName: String, val isErrorMessageShow: Boolean = false) :
-        CreateTeamUiState
+    data class AddTeamName(
+        val teamName: String,
+        val isErrorMessageShow: Boolean = false
+    ) : CreateTeamUiState
 
     data class AddPlayer(
         val playerName: String,
