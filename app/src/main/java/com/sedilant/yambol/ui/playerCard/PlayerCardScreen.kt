@@ -40,6 +40,7 @@ import com.sedilant.yambol.ui.theme.YambolTheme
 fun PlayerCardScreen(
     modifier: Modifier = Modifier,
     playerId: Int?,
+    onNavigateBack: () -> Unit,
     playerCardViewModel: PlayerCardViewModel = hiltViewModel(
         creationCallback = { factory: PlayerCardViewModelFactory ->
             factory.create(
