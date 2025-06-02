@@ -1,5 +1,6 @@
 package com.sedilant.yambol.ui.playerCard.composables
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -47,6 +48,7 @@ fun PlayerAbilityCard(
     }
 }
 
+@SuppressLint("DefaultLocale")
 @Composable
 private fun AbilityRow(ability: StatUiModel, modifier: Modifier = Modifier) {
     Row(
@@ -55,8 +57,9 @@ private fun AbilityRow(ability: StatUiModel, modifier: Modifier = Modifier) {
     ) {
         Text(
             modifier = Modifier.weight(1f),
-            text = ability.name,
+            text = ability.name.substringBefore(" "),
             style = MaterialTheme.typography.bodyLarge,
+            maxLines = 1,
         )
         LinearProgressIndicator(
             modifier = Modifier
@@ -70,7 +73,7 @@ private fun AbilityRow(ability: StatUiModel, modifier: Modifier = Modifier) {
             modifier = Modifier
                 .padding(start = 4.dp)
                 .weight(1f),
-            text = ability.value.toString(),
+            text = String.format("%.2f", ability.value),
             textAlign = TextAlign.Center,
         )
     }
@@ -82,7 +85,13 @@ private fun PlayerAbilityCardPreview() {
     YambolTheme {
         PlayerAbilityCard(
             modifier = Modifier,
-            listOfAbilities = listOf()
+            listOfAbilities = listOf(
+                StatUiModel(
+                    id = 1,
+                    name = "shooting too much",
+                    value = 3.6666665f
+                )
+            )
         )
     }
 }
