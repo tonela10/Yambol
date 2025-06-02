@@ -1,5 +1,6 @@
 package com.sedilant.yambol.ui.playerCard.composables
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,13 +19,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.sedilant.yambol.ui.playerCard.AbilityUiModel
+import com.sedilant.yambol.ui.playerCard.StatUiModel
 import com.sedilant.yambol.ui.theme.YambolTheme
 
 @Composable
 fun PlayerAbilityCard(
     modifier: Modifier = Modifier,
-    listOfAbilities: List<AbilityUiModel>,
+    listOfAbilities: List<StatUiModel>,
 ) {
     ElevatedCard(
         modifier = modifier.fillMaxWidth(),
@@ -47,16 +48,18 @@ fun PlayerAbilityCard(
     }
 }
 
+@SuppressLint("DefaultLocale")
 @Composable
-private fun AbilityRow(ability: AbilityUiModel, modifier: Modifier = Modifier) {
+private fun AbilityRow(ability: StatUiModel, modifier: Modifier = Modifier) {
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             modifier = Modifier.weight(1f),
-            text = ability.name,
+            text = ability.name.substringBefore(" "),
             style = MaterialTheme.typography.bodyLarge,
+            maxLines = 1,
         )
         LinearProgressIndicator(
             modifier = Modifier
@@ -70,7 +73,7 @@ private fun AbilityRow(ability: AbilityUiModel, modifier: Modifier = Modifier) {
             modifier = Modifier
                 .padding(start = 4.dp)
                 .weight(1f),
-            text = ability.value.toString(),
+            text = String.format("%.2f", ability.value),
             textAlign = TextAlign.Center,
         )
     }
@@ -82,7 +85,13 @@ private fun PlayerAbilityCardPreview() {
     YambolTheme {
         PlayerAbilityCard(
             modifier = Modifier,
-            listOfAbilities = listOf()
+            listOfAbilities = listOf(
+                StatUiModel(
+                    id = 1,
+                    name = "shooting too much",
+                    value = 3.6666665f
+                )
+            )
         )
     }
 }

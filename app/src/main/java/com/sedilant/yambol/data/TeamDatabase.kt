@@ -15,7 +15,7 @@ import com.sedilant.yambol.data.entities.TeamObjectivesEntity
     entities = [PlayerEntity::class, TeamEntity::class, TeamObjectivesEntity::class,
         AbilityRecordEntity::class, AbilityNameEntity::class],
     version = 1,
-//    exportSchema = true,
+    exportSchema = false,
 //    autoMigrations = [
 //        AutoMigration(from = 1, to = 2)
 //    ]

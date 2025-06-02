@@ -7,4 +7,5 @@
     <string name="profile_screen_title">Profile Screen</string>
     <string name="create_team_screen">Create Team Screen</string>
     <string name="player_card_screen">Player info Card Screen</string>
+    <string name="add_teams_stats_screen">Add teams stats screen</string>
 </resources>

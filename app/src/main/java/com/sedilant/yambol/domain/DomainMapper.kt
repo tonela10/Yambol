@@ -33,7 +33,9 @@ fun PlayerEntity.mapToDomain(): PlayerUiModel {
 fun AbilityRecordWithName.mapToDomain(): AbilityDomainModel {
     return AbilityDomainModel(
         name = ability.name,
-        value = record.value.toFloat()
+        value = record.value.toFloat(),
+        recordId = record.id,
+        id = ability.id,
     )
 }
 

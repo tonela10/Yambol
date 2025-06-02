@@ -6,9 +6,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-class GetPlayersUseCaseImpl @Inject constructor(
+class GetPlayersByTeamIdUseCaseImpl @Inject constructor(
     private val teamRepository: TeamRepository
-) : GetPlayersUseCase {
+) : GetPlayersByTeamIdUseCase {
     override suspend fun invoke(teamId: Int): Flow<List<PlayerUiModel>> {
         return teamRepository.getTeamPlayers(teamId).map { list ->
             list.map { it.mapToDomain() }

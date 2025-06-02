@@ -6,8 +6,12 @@ import com.sedilant.yambol.domain.GetPlayerByIdUseCase
 import com.sedilant.yambol.domain.GetPlayerByIdUseCaseImpl
 import com.sedilant.yambol.domain.GetPlayerStatsUseCase
 import com.sedilant.yambol.domain.GetPlayerStatsUseCaseImpl
-import com.sedilant.yambol.domain.GetPlayersUseCase
-import com.sedilant.yambol.domain.GetPlayersUseCaseImpl
+import com.sedilant.yambol.domain.GetPlayersByTeamIdUseCase
+import com.sedilant.yambol.domain.GetPlayersByTeamIdUseCaseImpl
+import com.sedilant.yambol.domain.GetStatByIdUseCase
+import com.sedilant.yambol.domain.GetStatByIdUseCaseImpl
+import com.sedilant.yambol.domain.GetStatByNameUseCase
+import com.sedilant.yambol.domain.GetStatByNameUseCaseImpl
 import com.sedilant.yambol.domain.GetTeamIdUseCase
 import com.sedilant.yambol.domain.GetTeamIdUseCaseImpl
 import com.sedilant.yambol.domain.GetTeamObjectivesUseCase
@@ -20,6 +24,8 @@ import com.sedilant.yambol.domain.InsertTeamObjectiveUseCase
 import com.sedilant.yambol.domain.InsertTeamObjectiveUseCaseImpl
 import com.sedilant.yambol.domain.InsertTeamUseCase
 import com.sedilant.yambol.domain.InsertTeamUseCaseImpl
+import com.sedilant.yambol.domain.SavePlayerStatUseCase
+import com.sedilant.yambol.domain.SavePlayerStatUseCaseImpl
 import com.sedilant.yambol.domain.ToggleTeamObjectiveUseCase
 import com.sedilant.yambol.domain.ToggleTeamObjectiveUseCaseImpl
 import com.sedilant.yambol.domain.UpdateTeamObjectiveUseCase
@@ -37,7 +43,7 @@ abstract class UseCaseModule {
     abstract fun bindGetTeamsUseCase(impl: GetTeamsUseCaseImpl): GetTeamsUseCase
 
     @Binds
-    abstract fun bindGetPlayersUseCase(impl: GetPlayersUseCaseImpl): GetPlayersUseCase
+    abstract fun bindGetPlayersUseCase(impl: GetPlayersByTeamIdUseCaseImpl): GetPlayersByTeamIdUseCase
 
     @Binds
     abstract fun bindGetTeamIdUseCase(impl: GetTeamIdUseCaseImpl): GetTeamIdUseCase
@@ -68,4 +74,13 @@ abstract class UseCaseModule {
 
     @Binds
     abstract fun bindGetPlayerStatsdUseCase(impl: GetPlayerStatsUseCaseImpl): GetPlayerStatsUseCase
+
+    @Binds
+    abstract fun bindGetStatByIdUseCase(impl: GetStatByIdUseCaseImpl): GetStatByIdUseCase
+
+    @Binds
+    abstract fun bindSavePlayerStatUseCase(impl: SavePlayerStatUseCaseImpl): SavePlayerStatUseCase
+
+    @Binds
+    abstract fun bindGetStatByNameUseCase(impl: GetStatByNameUseCaseImpl): GetStatByNameUseCase
 }
