@@ -40,6 +40,7 @@ import com.sedilant.yambol.ui.theme.YambolTheme
 fun PlayerCardScreen(
     modifier: Modifier = Modifier,
     playerId: Int?,
+    onNavigateBack: () -> Unit,
     playerCardViewModel: PlayerCardViewModel = hiltViewModel(
         creationCallback = { factory: PlayerCardViewModelFactory ->
             factory.create(
@@ -50,7 +51,6 @@ fun PlayerCardScreen(
 ) {
 
     val uiState = playerCardViewModel.uiState.collectAsState().value
-
     PlayerCardScreenStateless(
         uiState = uiState,
         modifier = modifier,

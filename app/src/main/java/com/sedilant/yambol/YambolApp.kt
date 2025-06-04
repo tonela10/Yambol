@@ -1,6 +1,9 @@
 package com.sedilant.yambol
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -47,93 +50,103 @@ sealed class YambolScreen(@StringRes val route: Int) {
 
     @Serializable
     data class AddTeamStats(val teamId: Int, val statsIds: List<Int>) : YambolScreen(
-        route =
-            R.string.add_teams_stats_screen
+        route = R.string.add_teams_stats_screen
     )
 }
 
 @Composable
-fun YambolApp(modifier: Modifier = Modifier) {
+fun YambolApp() {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val screensWithoutBottomBar = listOf(
-        YambolScreen.CreateTeam.route.toString()
-    )
-    val shouldShowBottomBar =
-        !screensWithoutBottomBar.contains(navBackStackEntry?.destination?.route)
-    if (shouldShowBottomBar) {
-        NavigationBottomBar(navController = navController)
+
+    // Check the current destination against the actual screen types
+    val currentDestination = navBackStackEntry?.destination?.route
+    val shouldShowBottomBar = when {
+        currentDestination?.contains("CreateTeam") == true -> false
+        currentDestination?.contains("PlayerCardDetails") == true -> false
+        currentDestination?.contains("AddTeamStats") == true -> false
+        else -> true
     }
 
-    NavHost(
-        navController = navController,
-        startDestination = YambolScreen.Home,
-    ) {
-        composable<YambolScreen.Home> {
-            HomeScreen(
-                modifier = modifier,
-                onCreateTeam = {
-                    navController.navigate(YambolScreen.CreateTeam)
-                },
-                onPlayerClicked = { player ->
-                    navController.navigate(
-                        YambolScreen.PlayerCardDetails(
-                            player
-                        )
-                    )
-                },
-                onRegisterTrain = { teamId, statIds ->
-                    navController.navigate(
-                        YambolScreen.AddTeamStats(
-                            teamId = teamId,
-                            statsIds = statIds
-                        )
-                    )
-                },
-            )
-        }
-        composable<YambolScreen.Training> {
-            TrainingScreen()
-        }
-
-        composable<YambolScreen.Statistics> {
-            StatisticsScreen()
-        }
-
-        composable<YambolScreen.Board> {
-            BoardScreen()
-        }
-
-        composable<YambolScreen.Profile> {
-            ProfileScreen()
-        }
-
-        composable<YambolScreen.CreateTeam> {
-            CreateTeamScreen {
-                navController.navigate(YambolScreen.Home) {
-                    popUpTo(navController.graph.findStartDestination().id)
-                }
+    Scaffold(
+        //contentWindowInsets = WindowInsets(0.dp),
+        modifier = Modifier.fillMaxSize(),
+        bottomBar = {
+            if (shouldShowBottomBar) {
+                NavigationBottomBar(navController = navController)
             }
         }
+    ) { paddingValues ->
+        NavHost(
+            navController = navController,
+            startDestination = YambolScreen.Home,
+            modifier = Modifier.padding(paddingValues)
+        ) {
+            composable<YambolScreen.Home> {
+                HomeScreen(
+                    onCreateTeam = {
+                        navController.navigate(YambolScreen.CreateTeam)
+                    },
+                    onPlayerClicked = { player ->
+                        navController.navigate(
+                            YambolScreen.PlayerCardDetails(player)
+                        )
+                    },
+                    onRegisterTrain = { teamId, statIds ->
+                        navController.navigate(
+                            YambolScreen.AddTeamStats(
+                                teamId = teamId,
+                                statsIds = statIds
+                            )
+                        )
+                    },
+                )
+            }
 
-        composable<YambolScreen.PlayerCardDetails> { navBackStackEntry ->
-            val id = navBackStackEntry.toRoute<YambolScreen.PlayerCardDetails>().id
-            PlayerCardScreen(
-                playerId = id,
-                modifier = modifier
-            )
-        }
+            composable<YambolScreen.Training> {
+                TrainingScreen()
+            }
 
-        composable<YambolScreen.AddTeamStats> { navBackStackEntry ->
-            val args = navBackStackEntry.toRoute<YambolScreen.AddTeamStats>()
+            composable<YambolScreen.Statistics> {
+                StatisticsScreen()
+            }
 
-            AddTeamStatsScreen(
-                modifier = modifier,
-                teamId = args.teamId,
-                statIds = args.statsIds,
-                onNavigateBack = { navController.popBackStack() },
-                onCompleted = { navController.popBackStack() },
-            )
+            composable<YambolScreen.Board> {
+                BoardScreen()
+            }
+
+            composable<YambolScreen.Profile> {
+                ProfileScreen()
+            }
+
+            composable<YambolScreen.CreateTeam> {
+                CreateTeamScreen {
+                    navController.navigate(YambolScreen.Home) {
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            inclusive = true
+                        }
+                    }
+                }
+            }
+
+            composable<YambolScreen.PlayerCardDetails> { navBackStackEntry ->
+                val id = navBackStackEntry.toRoute<YambolScreen.PlayerCardDetails>().id
+                PlayerCardScreen(
+                    playerId = id,
+                    onNavigateBack = { navController.popBackStack() }
+                )
+            }
+
+            composable<YambolScreen.AddTeamStats> { navBackStackEntry ->
+                val args = navBackStackEntry.toRoute<YambolScreen.AddTeamStats>()
+
+                AddTeamStatsScreen(
+                    teamId = args.teamId,
+                    statIds = args.statsIds,
+                    onNavigateBack = { navController.popBackStack() },
+                    onCompleted = { navController.popBackStack() },
+                )
+            }
         }
     }
 }

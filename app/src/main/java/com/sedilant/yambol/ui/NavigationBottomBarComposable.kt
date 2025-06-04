@@ -1,8 +1,5 @@
 package com.sedilant.yambol.ui
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Home
@@ -14,7 +11,6 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -22,12 +18,14 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.sedilant.yambol.ui.theme.YambolTheme
 import com.sedilant.yambol.R
 import com.sedilant.yambol.YambolScreen
+import com.sedilant.yambol.ui.theme.YambolTheme
 
 @Composable
-fun NavigationBottomBar(modifier: Modifier = Modifier, navController: NavController) {
+fun NavigationBottomBar(
+    navController: NavController,
+) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
@@ -64,40 +62,37 @@ fun NavigationBottomBar(modifier: Modifier = Modifier, navController: NavControl
         ),
     )
 
-    Column(
-        modifier = modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Bottom
-    ) {
-        NavigationBar {
-            topLevelRoutes.forEach { item ->
-                val isSelected = currentDestination?.route?.startsWith(item.route::class.qualifiedName.orEmpty()) == true
+    NavigationBar {
+        topLevelRoutes.forEach { item ->
+            val isSelected = currentDestination?.route?.startsWith(
+                item.route::class.qualifiedName.orEmpty()
+            ) == true
 
-                NavigationBarItem(
-                    icon = {
-                        Icon(
-                            imageVector = if (isSelected) item.filledIcon else item.outlinedIcon,
-                            contentDescription = item.name
-                        )
-                    },
-                    label = { Text(item.name) },
-                    selected = isSelected,
-                    onClick = {
-                        navController.navigate(item.route) {
-                            // Pop up to the start destination of the graph to
-                            // avoid building up a large stack of destinations
-                            // on the back stack as users select items
-                            popUpTo(navController.graph.findStartDestination().id) {
-                                saveState = true
-                            }
-                            // Avoid multiple copies of the same destination when
-                            // reelecting the same item
-                            launchSingleTop = true
-                            // Restore state when reelecting a previously selected item
-                            restoreState = true
+            NavigationBarItem(
+                icon = {
+                    Icon(
+                        imageVector = if (isSelected) item.filledIcon else item.outlinedIcon,
+                        contentDescription = item.name
+                    )
+                },
+                label = { Text(item.name) },
+                selected = isSelected,
+                onClick = {
+                    navController.navigate(item.route) {
+                        // Pop up to the start destination of the graph to
+                        // avoid building up a large stack of destinations
+                        // on the back stack as users select items
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            saveState = true
                         }
+                        // Avoid multiple copies of the same destination when
+                        // reselecting the same item
+                        launchSingleTop = true
+                        // Restore state when reselecting a previously selected item
+                        restoreState = true
                     }
-                )
-            }
+                }
+            )
         }
     }
 }
