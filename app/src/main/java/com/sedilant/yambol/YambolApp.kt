@@ -69,6 +69,7 @@ fun YambolApp() {
     }
 
     Scaffold(
+        //contentWindowInsets = WindowInsets(0.dp),
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
             if (shouldShowBottomBar) {

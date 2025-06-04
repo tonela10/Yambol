@@ -61,6 +61,7 @@ dependencies {
     // Room
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.media3.common.ktx)
+    implementation(libs.ui.text.google.fonts)
     ksp(libs.androidx.room.compiler)
 
     // Hilt

@@ -51,7 +51,6 @@ fun PlayerCardScreen(
 ) {
 
     val uiState = playerCardViewModel.uiState.collectAsState().value
-
     PlayerCardScreenStateless(
         uiState = uiState,
         modifier = modifier,

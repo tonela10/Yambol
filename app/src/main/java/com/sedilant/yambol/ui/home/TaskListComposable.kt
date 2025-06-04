@@ -7,7 +7,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,10 +14,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -131,6 +126,21 @@ fun TaskList(
                         textAlign = TextAlign.Center,
                         modifier = Modifier.padding(top = 4.dp)
                     )
+//                    Spacer(modifier = Modifier.height(12.dp))
+//                    Button(onClick = {}) {
+//                        Row(
+//                            verticalAlignment = Alignment.CenterVertically,
+//                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+//                        ) {
+//                            Text(
+//                                text = "Add Objective"
+//                            )
+//                            Icon(
+//                                imageVector = Icons.Filled.Add,
+//                                contentDescription = "Add objective",
+//                                tint = MaterialTheme.colorScheme.onPrimary
+//                            )
+
                 }
             } else {
                 Spacer(modifier = Modifier.height(8.dp))
@@ -144,8 +154,19 @@ fun TaskList(
                         ObjectiveItem(
                             objective = task,
                             onToggleStatus = { onToggleObjectiveStatus(task.id) },
-                            onDelete = { onDeleteObjective(task.id, task.description, task.isFinish) },
-                            onUpdate = { newDescription -> onUpdateObjective(task.id, newDescription) }
+                            onDelete = {
+                                onDeleteObjective(
+                                    task.id,
+                                    task.description,
+                                    task.isFinish
+                                )
+                            },
+                            onUpdate = { newDescription ->
+                                onUpdateObjective(
+                                    task.id,
+                                    newDescription
+                                )
+                            }
                         )
                     }
                 }
