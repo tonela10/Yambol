@@ -2,8 +2,8 @@ package com.sedilant.yambol.ui.playerCard
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sedilant.yambol.domain.GetPlayerByIdUseCase
-import com.sedilant.yambol.domain.GetPlayerStatsUseCase
+import com.sedilant.yambol.domain.get.GetPlayerByIdUseCase
+import com.sedilant.yambol.domain.get.GetPlayerStatsUseCase
 import com.sedilant.yambol.ui.home.models.PlayerUiModel
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory

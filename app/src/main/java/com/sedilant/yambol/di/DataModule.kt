@@ -11,6 +11,7 @@ import com.sedilant.yambol.data.TeamDatabase
 import com.sedilant.yambol.data.TeamObjectivesDao
 import com.sedilant.yambol.data.TeamRepository
 import com.sedilant.yambol.data.TeamRepositoryImpl
+import com.sedilant.yambol.data.TrainingDao
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -49,6 +50,11 @@ abstract class DataModule {
         @Provides
         fun provideStatsDao(context: Context): StatsDao {
             return TeamDatabase.getDatabase(context).statsDao()
+        }
+
+        @Provides
+        fun provideTrainingDao(context: Context): TrainingDao {
+            return TeamDatabase.getDatabase(context).trainingDao()
         }
 
         @Provides

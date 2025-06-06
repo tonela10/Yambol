@@ -3,6 +3,7 @@ package com.sedilant.yambol.data
 import com.sedilant.yambol.data.entities.PlayerEntity
 import com.sedilant.yambol.data.entities.TeamEntity
 import com.sedilant.yambol.data.entities.TeamObjectivesEntity
+import com.sedilant.yambol.data.entities.TrainEntity
 import com.sedilant.yambol.ui.home.models.PlayerUiModel
 import kotlinx.coroutines.flow.Flow
 
@@ -24,4 +25,7 @@ interface TeamRepository {
 
     // player information related methods
     suspend fun getPlayer(id: Int): PlayerUiModel // TODO create a PlayerDomainModel
+
+    // team trainings related info
+    suspend fun getAllTrainingsByTeamId(teamId: Int): List<TrainEntity>
 }

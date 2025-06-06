@@ -3,6 +3,7 @@ package com.sedilant.yambol.data
 import com.sedilant.yambol.data.entities.PlayerEntity
 import com.sedilant.yambol.data.entities.TeamEntity
 import com.sedilant.yambol.data.entities.TeamObjectivesEntity
+import com.sedilant.yambol.data.entities.TrainEntity
 import com.sedilant.yambol.domain.mapToDomain
 import com.sedilant.yambol.ui.home.models.PlayerUiModel
 import kotlinx.coroutines.Dispatchers
@@ -13,6 +14,7 @@ import javax.inject.Inject
 class TeamRepositoryImpl @Inject constructor(
     private val playerDao: PlayerDao,
     private val teamObjectivesDao: TeamObjectivesDao,
+    private val trainingDao: TrainingDao,
 ) : TeamRepository {
     // PLAYER DAO METHODS
     override suspend fun getAllTeams(): Flow<List<TeamEntity>> {
@@ -65,6 +67,13 @@ class TeamRepositoryImpl @Inject constructor(
     override suspend fun getPlayer(id: Int): PlayerUiModel {
         return withContext(Dispatchers.IO) {
             playerDao.getPlayer(id).mapToDomain()
+        }
+    }
+
+    // TRAIN DAO METHODS
+    override suspend fun getAllTrainingsByTeamId(teamId: Int): List<TrainEntity> {
+        return withContext(Dispatchers.IO) {
+            trainingDao.getAllTrainsByTeamId(teamId)
         }
     }
 }
