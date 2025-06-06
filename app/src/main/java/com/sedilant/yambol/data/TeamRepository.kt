@@ -4,6 +4,7 @@ import com.sedilant.yambol.data.entities.PlayerEntity
 import com.sedilant.yambol.data.entities.TeamEntity
 import com.sedilant.yambol.data.entities.TeamObjectivesEntity
 import com.sedilant.yambol.data.entities.TrainEntity
+import com.sedilant.yambol.data.queries.TrainWithTrainTask
 import com.sedilant.yambol.ui.home.models.PlayerUiModel
 import kotlinx.coroutines.flow.Flow
 
@@ -28,4 +29,5 @@ interface TeamRepository {
 
     // team trainings related info
     suspend fun getAllTrainingsByTeamId(teamId: Int): List<TrainEntity>
+    suspend fun getTrainWithTrainTaskByTrainId(trainId: Int): TrainWithTrainTask
 }

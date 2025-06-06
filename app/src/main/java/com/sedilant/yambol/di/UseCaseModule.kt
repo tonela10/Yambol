@@ -32,6 +32,8 @@ import com.sedilant.yambol.domain.UpdateTeamObjectiveUseCase
 import com.sedilant.yambol.domain.UpdateTeamObjectiveUseCaseImpl
 import com.sedilant.yambol.domain.get.GetAllTrainsByTeamIdUseCase
 import com.sedilant.yambol.domain.get.GetAllTrainsByTeamIdUseCaseImpl
+import com.sedilant.yambol.domain.get.GetTrainWithTrainTaskByTrainIdUseCase
+import com.sedilant.yambol.domain.get.GetTrainWithTrainTaskByTrainIdUseCaseImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -88,4 +90,7 @@ abstract class UseCaseModule {
 
     @Binds
     abstract fun bindGetAllTrainsByTeamIdUseCase(impl: GetAllTrainsByTeamIdUseCaseImpl): GetAllTrainsByTeamIdUseCase
+
+    @Binds
+    abstract fun bindGetTrainWithTrainTaskByTrainIdUseCase(impl: GetTrainWithTrainTaskByTrainIdUseCaseImpl): GetTrainWithTrainTaskByTrainIdUseCase
 }

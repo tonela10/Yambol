@@ -4,6 +4,7 @@ import com.sedilant.yambol.data.entities.PlayerEntity
 import com.sedilant.yambol.data.entities.TeamEntity
 import com.sedilant.yambol.data.entities.TeamObjectivesEntity
 import com.sedilant.yambol.data.entities.TrainEntity
+import com.sedilant.yambol.data.queries.TrainWithTrainTask
 import com.sedilant.yambol.domain.mapToDomain
 import com.sedilant.yambol.ui.home.models.PlayerUiModel
 import kotlinx.coroutines.Dispatchers
@@ -74,6 +75,12 @@ class TeamRepositoryImpl @Inject constructor(
     override suspend fun getAllTrainingsByTeamId(teamId: Int): List<TrainEntity> {
         return withContext(Dispatchers.IO) {
             trainingDao.getAllTrainsByTeamId(teamId)
+        }
+    }
+
+    override suspend fun getTrainWithTrainTaskByTrainId(trainId: Int): TrainWithTrainTask {
+        return withContext(Dispatchers.IO) {
+            trainingDao.getTrainWithTrainTaskByTrainId(trainId)
         }
     }
 }
