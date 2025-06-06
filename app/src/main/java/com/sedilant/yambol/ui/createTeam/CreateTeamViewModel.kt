@@ -2,10 +2,10 @@ package com.sedilant.yambol.ui.createTeam
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sedilant.yambol.domain.GetTeamIdUseCase
-import com.sedilant.yambol.domain.InsertPlayerUseCase
-import com.sedilant.yambol.domain.InsertTeamUseCase
 import com.sedilant.yambol.domain.Position
+import com.sedilant.yambol.domain.get.GetTeamIdUseCase
+import com.sedilant.yambol.domain.insert.InsertPlayerUseCase
+import com.sedilant.yambol.domain.insert.InsertTeamUseCase
 import com.sedilant.yambol.ui.home.models.PlayerUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -211,7 +211,8 @@ class CreateTeamViewModel @Inject constructor(
     /**
      * Gets list of taken numbers for UI feedback if needed
      */
-    fun getTakenNumbers(): List<String> = listOfPlayers.map { it.number } // TODO Add it to the ui checks
+    fun getTakenNumbers(): List<String> =
+        listOfPlayers.map { it.number } // TODO Add it to the ui checks
 
     private enum class Form {
         ADD_TEAM,

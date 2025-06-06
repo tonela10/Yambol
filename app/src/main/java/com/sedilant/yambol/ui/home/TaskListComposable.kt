@@ -1,10 +1,5 @@
 package com.sedilant.yambol.ui.home
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandHorizontally
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -17,26 +12,30 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -47,7 +46,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.sedilant.yambol.ui.home.models.TeamObjectivesUiModel
 import com.sedilant.yambol.ui.theme.YambolTheme
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TaskList(
     listOfTask: List<TeamObjectivesUiModel>,
@@ -55,17 +56,13 @@ fun TaskList(
     onDeleteObjective: (Int, String, Boolean) -> Unit,
     onUpdateObjective: (Int, String) -> Unit,
     onSaveNewObjective: (String) -> Unit,
-    currentTeamId: Int,
     modifier: Modifier = Modifier
 ) {
-    val isObjectiveDialogShow = remember { mutableStateOf(false) }
-
-    if (isObjectiveDialogShow.value) {
-        CreateObjectiveDialogComposable(
-            onSave = onSaveNewObjective,
-            onDismiss = { isObjectiveDialogShow.value = false },
-        )
-    }
+    val isBottomSheetVisible = remember { mutableStateOf(false) }
+    val bottomSheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+    )
+    val scope = rememberCoroutineScope()
 
     Card(
         modifier = modifier
@@ -94,7 +91,7 @@ fun TaskList(
                 )
 
                 IconButton(
-                    onClick = { isObjectiveDialogShow.value = true },
+                    onClick = { isBottomSheetVisible.value = true },
                     modifier = Modifier.size(36.dp)
                 ) {
                     Icon(
@@ -106,7 +103,6 @@ fun TaskList(
             }
 
             if (listOfTask.isEmpty()) {
-                // Empty state
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -126,26 +122,11 @@ fun TaskList(
                         textAlign = TextAlign.Center,
                         modifier = Modifier.padding(top = 4.dp)
                     )
-//                    Spacer(modifier = Modifier.height(12.dp))
-//                    Button(onClick = {}) {
-//                        Row(
-//                            verticalAlignment = Alignment.CenterVertically,
-//                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-//                        ) {
-//                            Text(
-//                                text = "Add Objective"
-//                            )
-//                            Icon(
-//                                imageVector = Icons.Filled.Add,
-//                                contentDescription = "Add objective",
-//                                tint = MaterialTheme.colorScheme.onPrimary
-//                            )
-
                 }
             } else {
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Task list - using Column instead of LazyColumn to avoid nested scrolling
+                // Task list
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -173,8 +154,111 @@ fun TaskList(
             }
         }
     }
+
+    if (isBottomSheetVisible.value) {
+        ModalBottomSheet(
+            onDismissRequest = { isBottomSheetVisible.value = false },
+            sheetState = bottomSheetState,
+        ) {
+            CreateObjectiveBottomSheetContent(
+                onSave = { description ->
+                    onSaveNewObjective(description)
+                    scope.launch {
+                        bottomSheetState.hide()
+                        isBottomSheetVisible.value = false
+                    }
+                },
+                onCancel = {
+                    scope.launch {
+                        bottomSheetState.hide()
+                        isBottomSheetVisible.value = false
+                    }
+                }
+            )
+        }
+    }
 }
 
+@Composable
+private fun CreateObjectiveBottomSheetContent(
+    onSave: (String) -> Unit,
+    onCancel: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val textState = remember { mutableStateOf("") }
+    val isError = remember { mutableStateOf(false) }
+
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(24.dp)
+            .padding(bottom = 32.dp), // Extra padding for better bottom sheet appearance
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Text(
+            text = "Add New Objective",
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+
+        OutlinedTextField(
+            value = textState.value,
+            onValueChange = {
+                textState.value = it
+                isError.value = false
+            },
+            label = { Text("Objective description") },
+            placeholder = { Text("e.g., Score 10 free throws in a row") },
+            modifier = Modifier.fillMaxWidth(),
+            isError = isError.value,
+            supportingText = if (isError.value) {
+                { Text("Please enter an objective description") }
+            } else null,
+            shape = RoundedCornerShape(12.dp),
+            maxLines = 3
+        )
+
+        Text(
+            text = "Describe what the team should achieve during training",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(start = 4.dp)
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            OutlinedButton(
+                onClick = onCancel,
+                modifier = Modifier.weight(1f),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text("Cancel")
+            }
+
+            Button(
+                onClick = {
+                    if (textState.value.trim().isNotEmpty()) {
+                        onSave(textState.value.trim())
+                    } else {
+                        isError.value = true
+                    }
+                },
+                modifier = Modifier.weight(1f),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text("Add Objective")
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ObjectiveItem(
     objective: TeamObjectivesUiModel,
@@ -183,15 +267,27 @@ private fun ObjectiveItem(
     onUpdate: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val isEditDialogVisible = remember { mutableStateOf(false) }
-    val editTextState = remember { mutableStateOf(objective.description) }
-    val isEditMenuShow = remember { mutableStateOf(false) }
+    val isEditBottomSheetVisible = remember { mutableStateOf(false) }
+    val editBottomSheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+    )
+    val scope = rememberCoroutineScope()
 
     Card(
-        modifier = modifier,
+        modifier = modifier
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onTap = {
+                        onToggleStatus()
+                    },
+                    onLongPress = {
+                        isEditBottomSheetVisible.value = true
+                    }
+                )
+            },
         colors = CardDefaults.cardColors(
             containerColor = if (objective.isFinish) {
-                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)
             } else {
                 MaterialTheme.colorScheme.surfaceVariant
             }
@@ -202,19 +298,14 @@ private fun ObjectiveItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp)
-                .pointerInput(Unit) {
-                    detectTapGestures(
-                        onLongPress = {
-                            isEditMenuShow.value = true
-                        }
-                    )
-                },
+                .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically,
-        ) {
+
+            ) {
             Checkbox(
                 checked = objective.isFinish,
-                onCheckedChange = { onToggleStatus() },
+                onCheckedChange = null, // Disable checkbox direct interaction
+                enabled = false // Visual indicator only
             )
 
             Text(
@@ -227,102 +318,44 @@ private fun ObjectiveItem(
                         MaterialTheme.colorScheme.onSurfaceVariant
                     }
                 ),
-                modifier = Modifier.weight(1f),
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 4.dp),
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
-
-            // Context menu icons that appear when long pressed
-            AnimatedVisibility(
-                visible = isEditMenuShow.value,
-                enter = fadeIn() + expandHorizontally(),
-                exit = fadeOut() + shrinkHorizontally()
-            ) {
-                Row {
-                    IconButton(
-                        onClick = {
-                            isEditDialogVisible.value = true
-                            isEditMenuShow.value = false
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = "Edit objective",
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
-
-                    IconButton(
-                        onClick = {
-                            onDelete()
-                            isEditMenuShow.value = false
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = "Delete objective",
-                            tint = MaterialTheme.colorScheme.error,
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
-
-                    IconButton(
-                        onClick = { isEditMenuShow.value = false }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = "Close menu",
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
-                }
-            }
         }
     }
 
-    // Edit dialog
-    if (isEditDialogVisible.value) {
-        AlertDialog(
-            onDismissRequest = { isEditDialogVisible.value = false },
-            title = {
-                Text(
-                    "Edit Objective",
-                    style = MaterialTheme.typography.titleMedium
-                )
-            },
-            text = {
-                TextField(
-                    value = editTextState.value,
-                    onValueChange = { editTextState.value = it },
-                    label = { Text("Objective description") },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = Color.Transparent,
-                        unfocusedContainerColor = Color.Transparent
-                    ),
-                    shape = RoundedCornerShape(8.dp)
-                )
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        onUpdate(editTextState.value)
-                        isEditDialogVisible.value = false
+    if (isEditBottomSheetVisible.value) {
+        ModalBottomSheet(
+            onDismissRequest = { isEditBottomSheetVisible.value = false },
+            sheetState = editBottomSheetState,
+        ) {
+            ObjectiveOptionsBottomSheetContent(
+                objective = objective,
+                onEdit = { newDescription ->
+                    onUpdate(newDescription)
+                    scope.launch {
+                        editBottomSheetState.hide()
+                        isEditBottomSheetVisible.value = false
                     }
-                ) {
-                    Text("Save")
+                },
+                onDelete = {
+                    onDelete()
+                    scope.launch {
+                        editBottomSheetState.hide()
+                        isEditBottomSheetVisible.value = false
+                    }
+                },
+                onCancel = {
+                    scope.launch {
+                        editBottomSheetState.hide()
+                        isEditBottomSheetVisible.value = false
+                    }
                 }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = { isEditDialogVisible.value = false }
-                ) {
-                    Text("Cancel")
-                }
-            },
-            shape = RoundedCornerShape(16.dp)
-        )
+            )
+        }
     }
 }
 
@@ -340,8 +373,8 @@ private fun TaskListPreview() {
             onDeleteObjective = { _, _, _ -> },
             onUpdateObjective = { _, _ -> },
             onSaveNewObjective = {},
-            currentTeamId = 1,
-        )
+
+            )
     }
 }
 
@@ -355,7 +388,198 @@ private fun EmptyTaskListPreview() {
             onDeleteObjective = { _, _, _ -> },
             onUpdateObjective = { _, _ -> },
             onSaveNewObjective = {},
-            currentTeamId = 1,
+        )
+    }
+}
+
+@Composable
+private fun ObjectiveOptionsBottomSheetContent(
+    objective: TeamObjectivesUiModel,
+    onEdit: (String) -> Unit,
+    onDelete: () -> Unit,
+    onCancel: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val textState = remember { mutableStateOf(objective.description) }
+    val isError = remember { mutableStateOf(false) }
+    val showDeleteConfirmation = remember { mutableStateOf(false) }
+
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(24.dp)
+            .padding(bottom = 32.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Text(
+            text = "Edit Objective",
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+
+        if (objective.isFinish) {
+            Card(
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                ),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.CheckCircle,
+                        contentDescription = "Completed",
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Text(
+                        text = "This objective is completed",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                }
+            }
+        }
+
+        OutlinedTextField(
+            value = textState.value,
+            onValueChange = {
+                textState.value = it
+                isError.value = false
+            },
+            label = { Text("Objective description") },
+            modifier = Modifier.fillMaxWidth(),
+            isError = isError.value,
+            supportingText = if (isError.value) {
+                { Text("Please enter an objective description") }
+            } else null,
+            shape = RoundedCornerShape(12.dp),
+            maxLines = 3
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Button(
+                onClick = {
+                    if (textState.value.trim().isNotEmpty()) {
+                        onEdit(textState.value.trim())
+                    } else {
+                        isError.value = true
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(modifier = Modifier.size(8.dp))
+                Text("Save Changes")
+            }
+
+            OutlinedButton(
+                onClick = { showDeleteConfirmation.value = true },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = androidx.compose.material3.ButtonDefaults.outlinedButtonColors(
+                    contentColor = MaterialTheme.colorScheme.error
+                ),
+                border = androidx.compose.foundation.BorderStroke(
+                    1.dp,
+                    MaterialTheme.colorScheme.error
+                )
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(modifier = Modifier.size(8.dp))
+                Text("Delete Objective")
+            }
+
+            OutlinedButton(
+                onClick = onCancel,
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text("Cancel")
+            }
+        }
+    }
+
+    if (showDeleteConfirmation.value) {
+        AlertDialog(
+            onDismissRequest = { showDeleteConfirmation.value = false },
+            title = {
+                Text(
+                    "Delete Objective",
+                    style = MaterialTheme.typography.titleMedium
+                )
+            },
+            text = {
+                Text(
+                    "Are you sure you want to delete this objective? This action cannot be undone.",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteConfirmation.value = false
+                        onDelete()
+                    }
+                ) {
+                    Text(
+                        "Delete",
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showDeleteConfirmation.value = false }
+                ) {
+                    Text("Cancel")
+                }
+            },
+            shape = RoundedCornerShape(16.dp)
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun CreateObjectiveBottomSheetPreview() {
+    YambolTheme {
+        CreateObjectiveBottomSheetContent(
+            onSave = {},
+            onCancel = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ObjectiveOptionsBottomSheetPreview() {
+    YambolTheme {
+        ObjectiveOptionsBottomSheetContent(
+            objective = TeamObjectivesUiModel("Correr 10 minutos", false, 1),
+            onEdit = {},
+            onDelete = {},
+            onCancel = {}
         )
     }
 }
