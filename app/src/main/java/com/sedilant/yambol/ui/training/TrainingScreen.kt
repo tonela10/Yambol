@@ -12,6 +12,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.sedilant.yambol.ui.home.SectionHeader
 import com.sedilant.yambol.ui.home.TeamTabs
 import com.sedilant.yambol.ui.theme.YambolTheme
+import com.sedilant.yambol.ui.training.composables.TrainingList
 
 @Composable
 fun TrainingScreen(
@@ -22,14 +23,16 @@ fun TrainingScreen(
     val uiState = trainingViewModel.uiState.collectAsState().value
 
     TrainingScreenStateless(
-        uiState = uiState
+        uiState = uiState,
+        onTeamChange = { trainingViewModel.onTeamChange(it) },
     )
 }
 
 @Composable
 private fun TrainingScreenStateless(
     modifier: Modifier = Modifier,
-    uiState: TrainingUiState
+    uiState: TrainingUiState,
+    onTeamChange: (Int) -> Unit,
 ) {
     when (uiState) {
         is TrainingUiState.Error -> {}
@@ -45,13 +48,19 @@ private fun TrainingScreenStateless(
                 SectionHeader(title = "Teams")
                 TeamTabs(
                     currentTeamId = 1,
-                    listOfTeams = listOf(),
-                    onTeamChange = {},
+                    listOfTeams = uiState.teamList,
+                    onTeamChange = onTeamChange,
                     onCreateTeam = {},
                     isAddTeamShow = false,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
                 Filtering()
+
+                TrainingList(
+                    trainings = uiState.trainList,
+                    onTrainingClick = {},
+                    modifier = Modifier
+                )
             }
         }
     }
@@ -68,8 +77,11 @@ private fun TrainingScreenPreview() {
     YambolTheme {
         TrainingScreenStateless(
             uiState = TrainingUiState.Success(
-                trainList = listOf()
-            )
+                trainList = listOf(),
+                teamList = listOf()
+            ),
+            modifier = Modifier,
+            onTeamChange = {}
         )
     }
 }
