@@ -1,4 +1,4 @@
-package com.sedilant.yambol.domain
+package com.sedilant.yambol.domain.insert
 
 import com.sedilant.yambol.data.TeamRepository
 import com.sedilant.yambol.data.entities.TeamObjectivesEntity
@@ -8,7 +8,7 @@ import javax.inject.Inject
 
 class InsertTeamObjectiveUseCaseImpl @Inject constructor(
     private val teamRepository: TeamRepository
-) : InsertTeamObjectiveUseCase{
+) : InsertTeamObjectiveUseCase {
     override suspend fun invoke(description: String, teamId: Int) {
        withContext(Dispatchers.IO){
            teamRepository.insertTeamObjective(

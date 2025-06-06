@@ -1,4 +1,4 @@
-package com.sedilant.yambol.domain
+package com.sedilant.yambol.domain.insert
 
 import com.sedilant.yambol.data.entities.TeamEntity
 import com.sedilant.yambol.data.TeamRepository

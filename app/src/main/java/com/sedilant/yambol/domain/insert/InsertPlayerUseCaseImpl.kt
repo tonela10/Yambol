@@ -1,7 +1,8 @@
-package com.sedilant.yambol.domain
+package com.sedilant.yambol.domain.insert
 
 import com.sedilant.yambol.data.entities.PlayerEntity
 import com.sedilant.yambol.data.TeamRepository
+import com.sedilant.yambol.domain.Position
 import com.sedilant.yambol.ui.home.models.PlayerUiModel
 import javax.inject.Inject
 

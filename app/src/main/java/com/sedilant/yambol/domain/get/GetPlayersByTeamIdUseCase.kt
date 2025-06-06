@@ -1,4 +1,4 @@
-package com.sedilant.yambol.domain
+package com.sedilant.yambol.domain.get
 
 import com.sedilant.yambol.ui.home.models.PlayerUiModel
 import kotlinx.coroutines.flow.Flow

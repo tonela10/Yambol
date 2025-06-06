@@ -1,4 +1,4 @@
-package com.sedilant.yambol.domain
+package com.sedilant.yambol.domain.insert
 
 import com.sedilant.yambol.ui.home.models.PlayerUiModel
 

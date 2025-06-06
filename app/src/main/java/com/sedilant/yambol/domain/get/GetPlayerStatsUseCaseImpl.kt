@@ -1,6 +1,7 @@
-package com.sedilant.yambol.domain
+package com.sedilant.yambol.domain.get
 
 import com.sedilant.yambol.data.StatsRecordRepository
+import com.sedilant.yambol.domain.mapToDomain
 import com.sedilant.yambol.domain.models.AbilityDomainModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map

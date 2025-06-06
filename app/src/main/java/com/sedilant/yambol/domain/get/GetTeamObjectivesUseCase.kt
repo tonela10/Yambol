@@ -1,4 +1,4 @@
-package com.sedilant.yambol.domain
+package com.sedilant.yambol.domain.get
 
 import com.sedilant.yambol.domain.models.TeamObjectivesDomainModel
 import kotlinx.coroutines.flow.Flow
