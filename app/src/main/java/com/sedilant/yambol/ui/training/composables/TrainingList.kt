@@ -36,7 +36,7 @@ import java.util.Locale
 @Composable
 fun TrainingList(
     trainings: List<TrainDomainModel>,
-    onTrainingClick: (TrainDomainModel) -> Unit = {},
+    onTrainingClick: (Int) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -47,7 +47,7 @@ fun TrainingList(
         items(trainings) { training ->
             TrainingItem(
                 training = training,
-                onClick = { onTrainingClick(training) }
+                onClick = { onTrainingClick(training.id) }
             )
         }
     }

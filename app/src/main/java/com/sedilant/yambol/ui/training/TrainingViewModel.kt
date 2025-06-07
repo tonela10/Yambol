@@ -53,16 +53,19 @@ class TrainingViewModel @Inject constructor(
             flowOf(
                 TrainingUiState.Success(
                     trainList = emptyList(),
-                    teamList = teamList
+                    teamList = teamList,
+                    currentTeamId = 0
                 )
             )
         } else {
             try {
-                val trainList = getAllTrainsByTeamIdUseCase(currentTeamId) // TODO change with a flow
+                val trainList =
+                    getAllTrainsByTeamIdUseCase(currentTeamId) // TODO change with a flow
                 flowOf(
                     TrainingUiState.Success(
                         trainList = trainList,
-                        teamList = teamList
+                        teamList = teamList,
+                        currentTeamId = currentTeamId
                     )
                 )
             } catch (e: Exception) {
@@ -89,7 +92,8 @@ sealed interface TrainingUiState {
     data object Loading : TrainingUiState
     data class Success(
         val trainList: List<TrainDomainModel>,
-        val teamList: List<TeamUiModel>
+        val teamList: List<TeamUiModel>,
+        val currentTeamId: Int
     ) : TrainingUiState
 
     data class Error(val message: String) : TrainingUiState

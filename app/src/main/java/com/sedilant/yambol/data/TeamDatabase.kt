@@ -27,7 +27,7 @@ import com.sedilant.yambol.data.entities.TrainTaskEntity
         TrainCrossTrainTaskEntity::class,
         TrainTaskEntity::class],
     version = 1,
-    exportSchema = false,
+    exportSchema = true,
 //    autoMigrations = [
 //        AutoMigration(from = 1, to = 2)
 //    ]

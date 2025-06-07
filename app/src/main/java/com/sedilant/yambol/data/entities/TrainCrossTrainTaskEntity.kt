@@ -2,8 +2,8 @@ package com.sedilant.yambol.data.entities
 
 import androidx.room.Entity
 
-@Entity(primaryKeys = ["trainId", "trainTaskId"])
+@Entity(primaryKeys = ["trainId", "trainingTaskId"])
 data class TrainCrossTrainTaskEntity(
     val trainId: Int,
-    val trainTaskId: Int
+    val trainingTaskId: Int
 )
