@@ -2,34 +2,38 @@ package com.sedilant.yambol.di
 
 import com.sedilant.yambol.domain.DeleteTeamObjectiveUseCase
 import com.sedilant.yambol.domain.DeleteTeamObjectiveUseCaseImpl
-import com.sedilant.yambol.domain.GetPlayerByIdUseCase
-import com.sedilant.yambol.domain.GetPlayerByIdUseCaseImpl
-import com.sedilant.yambol.domain.GetPlayerStatsUseCase
-import com.sedilant.yambol.domain.GetPlayerStatsUseCaseImpl
-import com.sedilant.yambol.domain.GetPlayersByTeamIdUseCase
-import com.sedilant.yambol.domain.GetPlayersByTeamIdUseCaseImpl
-import com.sedilant.yambol.domain.GetStatByIdUseCase
-import com.sedilant.yambol.domain.GetStatByIdUseCaseImpl
-import com.sedilant.yambol.domain.GetStatByNameUseCase
-import com.sedilant.yambol.domain.GetStatByNameUseCaseImpl
-import com.sedilant.yambol.domain.GetTeamIdUseCase
-import com.sedilant.yambol.domain.GetTeamIdUseCaseImpl
-import com.sedilant.yambol.domain.GetTeamObjectivesUseCase
-import com.sedilant.yambol.domain.GetTeamObjectivesUseCaseImpl
-import com.sedilant.yambol.domain.GetTeamsUseCase
-import com.sedilant.yambol.domain.GetTeamsUseCaseImpl
-import com.sedilant.yambol.domain.InsertPlayerUseCase
-import com.sedilant.yambol.domain.InsertPlayerUseCaseImpl
-import com.sedilant.yambol.domain.InsertTeamObjectiveUseCase
-import com.sedilant.yambol.domain.InsertTeamObjectiveUseCaseImpl
-import com.sedilant.yambol.domain.InsertTeamUseCase
-import com.sedilant.yambol.domain.InsertTeamUseCaseImpl
-import com.sedilant.yambol.domain.SavePlayerStatUseCase
-import com.sedilant.yambol.domain.SavePlayerStatUseCaseImpl
+import com.sedilant.yambol.domain.get.GetPlayerByIdUseCase
+import com.sedilant.yambol.domain.get.GetPlayerByIdUseCaseImpl
+import com.sedilant.yambol.domain.get.GetPlayerStatsUseCase
+import com.sedilant.yambol.domain.get.GetPlayerStatsUseCaseImpl
+import com.sedilant.yambol.domain.get.GetPlayersByTeamIdUseCase
+import com.sedilant.yambol.domain.get.GetPlayersByTeamIdUseCaseImpl
+import com.sedilant.yambol.domain.get.GetStatByIdUseCase
+import com.sedilant.yambol.domain.get.GetStatByIdUseCaseImpl
+import com.sedilant.yambol.domain.get.GetStatByNameUseCase
+import com.sedilant.yambol.domain.get.GetStatByNameUseCaseImpl
+import com.sedilant.yambol.domain.get.GetTeamIdUseCase
+import com.sedilant.yambol.domain.get.GetTeamIdUseCaseImpl
+import com.sedilant.yambol.domain.get.GetTeamObjectivesUseCase
+import com.sedilant.yambol.domain.get.GetTeamObjectivesUseCaseImpl
+import com.sedilant.yambol.domain.get.GetTeamsUseCase
+import com.sedilant.yambol.domain.get.GetTeamsUseCaseImpl
+import com.sedilant.yambol.domain.insert.InsertPlayerUseCase
+import com.sedilant.yambol.domain.insert.InsertPlayerUseCaseImpl
+import com.sedilant.yambol.domain.insert.InsertTeamObjectiveUseCase
+import com.sedilant.yambol.domain.insert.InsertTeamObjectiveUseCaseImpl
+import com.sedilant.yambol.domain.insert.InsertTeamUseCase
+import com.sedilant.yambol.domain.insert.InsertTeamUseCaseImpl
+import com.sedilant.yambol.domain.insert.SavePlayerStatUseCase
+import com.sedilant.yambol.domain.insert.SavePlayerStatUseCaseImpl
 import com.sedilant.yambol.domain.ToggleTeamObjectiveUseCase
 import com.sedilant.yambol.domain.ToggleTeamObjectiveUseCaseImpl
 import com.sedilant.yambol.domain.UpdateTeamObjectiveUseCase
 import com.sedilant.yambol.domain.UpdateTeamObjectiveUseCaseImpl
+import com.sedilant.yambol.domain.get.GetAllTrainsByTeamIdUseCase
+import com.sedilant.yambol.domain.get.GetAllTrainsByTeamIdUseCaseImpl
+import com.sedilant.yambol.domain.get.GetTrainWithTrainTaskByTrainIdUseCase
+import com.sedilant.yambol.domain.get.GetTrainWithTrainTaskByTrainIdUseCaseImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -83,4 +87,10 @@ abstract class UseCaseModule {
 
     @Binds
     abstract fun bindGetStatByNameUseCase(impl: GetStatByNameUseCaseImpl): GetStatByNameUseCase
+
+    @Binds
+    abstract fun bindGetAllTrainsByTeamIdUseCase(impl: GetAllTrainsByTeamIdUseCaseImpl): GetAllTrainsByTeamIdUseCase
+
+    @Binds
+    abstract fun bindGetTrainWithTrainTaskByTrainIdUseCase(impl: GetTrainWithTrainTaskByTrainIdUseCaseImpl): GetTrainWithTrainTaskByTrainIdUseCase
 }

@@ -94,13 +94,15 @@ private fun HomeScreenStateless(
                 modifier = modifier.fillMaxSize()
             ) {
                 SectionHeader(title = "Teams")
-                TeamTabs(
-                    currentTeam = homeUiState.currentTeam,
-                    listOfTeams = homeUiState.listOfTeams,
-                    onTeamChange = onTeamChange,
-                    onCreateTeam = onCreateTeam,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
+                homeUiState.currentTeam?.let {
+                    TeamTabs(
+                        currentTeamId = it.id,
+                        listOfTeams = homeUiState.listOfTeams,
+                        onTeamChange = onTeamChange,
+                        onCreateTeam = onCreateTeam,
+                        modifier = Modifier.padding(bottom = 16.dp),
+                    )
+                }
 
                 if (homeUiState.listOfPlayer.isNotEmpty()) {
                     SectionHeader(title = "Players")
@@ -117,7 +119,6 @@ private fun HomeScreenStateless(
                     onDeleteObjective = onDeleteTeamObjective,
                     onUpdateObjective = onUpdateObjective,
                     onSaveNewObjective = onSaveNewObjective,
-                    currentTeamId = homeUiState.currentTeam?.id ?: 0,
                     modifier = Modifier.padding(bottom = 24.dp)
                 )
 
@@ -136,7 +137,7 @@ private fun HomeScreenStateless(
 
 
 @Composable
-private fun SectionHeader(
+fun SectionHeader(
     title: String,
     modifier: Modifier = Modifier
 ) {
@@ -150,11 +151,12 @@ private fun SectionHeader(
 }
 
 @Composable
-private fun TeamTabs(
-    currentTeam: TeamUiModel?,
+fun TeamTabs(
+    currentTeamId: Int,
     listOfTeams: List<TeamUiModel>,
     onTeamChange: (Int) -> Unit,
     onCreateTeam: () -> Unit,
+    isAddTeamShow: Boolean = true,
     modifier: Modifier = Modifier
 ) {
     LazyRow(
@@ -162,26 +164,28 @@ private fun TeamTabs(
         contentPadding = PaddingValues(horizontal = 20.dp),
         modifier = modifier
     ) {
-        item {
-            AssistChip(
-                onClick = onCreateTeam,
-                label = { Text("Add team") },
-                leadingIcon = {
-                    Icon(
-                        Icons.Filled.Add,
-                        contentDescription = "Add team",
-                        Modifier.size(AssistChipDefaults.IconSize)
+        if (isAddTeamShow) {
+            item {
+                AssistChip(
+                    onClick = onCreateTeam,
+                    label = { Text("Add team") },
+                    leadingIcon = {
+                        Icon(
+                            Icons.Filled.Add,
+                            contentDescription = "Add team",
+                            Modifier.size(AssistChipDefaults.IconSize)
+                        )
+                    },
+                    colors = AssistChipDefaults.assistChipColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        labelColor = MaterialTheme.colorScheme.onPrimaryContainer
                     )
-                },
-                colors = AssistChipDefaults.assistChipColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    labelColor = MaterialTheme.colorScheme.onPrimaryContainer
                 )
-            )
+            }
         }
         items(listOfTeams) { team ->
             FilterChip(
-                selected = team == currentTeam,
+                selected = team.id == currentTeamId,
                 onClick = { onTeamChange(team.id) },
                 label = {
                     Text(

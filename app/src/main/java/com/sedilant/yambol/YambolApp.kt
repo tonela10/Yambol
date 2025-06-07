@@ -22,6 +22,7 @@ import com.sedilant.yambol.ui.playerCard.PlayerCardScreen
 import com.sedilant.yambol.ui.profile.ProfileScreen
 import com.sedilant.yambol.ui.statistics.StatisticsScreen
 import com.sedilant.yambol.ui.training.TrainingScreen
+import com.sedilant.yambol.ui.trainingDetails.TrainingDetailsScreen
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -52,6 +53,9 @@ sealed class YambolScreen(@StringRes val route: Int) {
     data class AddTeamStats(val teamId: Int, val statsIds: List<Int>) : YambolScreen(
         route = R.string.add_teams_stats_screen
     )
+
+    @Serializable
+    data class TrainingDetails(val trainId: Int) : YambolScreen(R.string.training_details_screen)
 }
 
 @Composable
@@ -65,6 +69,7 @@ fun YambolApp() {
         currentDestination?.contains("CreateTeam") == true -> false
         currentDestination?.contains("PlayerCardDetails") == true -> false
         currentDestination?.contains("AddTeamStats") == true -> false
+        currentDestination?.contains("TrainingDetails") == true -> false
         else -> true
     }
 
@@ -104,7 +109,15 @@ fun YambolApp() {
             }
 
             composable<YambolScreen.Training> {
-                TrainingScreen()
+                TrainingScreen(
+                    onTrainClicked = { trainId ->
+                        navController.navigate(
+                            YambolScreen.TrainingDetails(
+                                trainId = trainId
+                            )
+                        )
+                    }
+                )
             }
 
             composable<YambolScreen.Statistics> {
@@ -145,6 +158,15 @@ fun YambolApp() {
                     statIds = args.statsIds,
                     onNavigateBack = { navController.popBackStack() },
                     onCompleted = { navController.popBackStack() },
+                )
+            }
+
+            composable<YambolScreen.TrainingDetails> { navBackStackEntry ->
+                val args = navBackStackEntry.toRoute<YambolScreen.TrainingDetails>()
+
+                TrainingDetailsScreen(
+                    trainId = args.trainId,
+                    onNavigateBack = { navController.popBackStack() },
                 )
             }
         }

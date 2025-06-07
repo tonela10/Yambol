@@ -2,9 +2,9 @@ package com.sedilant.yambol.ui.addStats
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sedilant.yambol.domain.GetPlayersByTeamIdUseCase
-import com.sedilant.yambol.domain.GetStatByIdUseCase
-import com.sedilant.yambol.domain.SavePlayerStatUseCase
+import com.sedilant.yambol.domain.get.GetPlayersByTeamIdUseCase
+import com.sedilant.yambol.domain.get.GetStatByIdUseCase
+import com.sedilant.yambol.domain.insert.SavePlayerStatUseCase
 import com.sedilant.yambol.ui.home.models.PlayerUiModel
 import com.sedilant.yambol.ui.playerCard.StatUiModel
 import dagger.assisted.Assisted
