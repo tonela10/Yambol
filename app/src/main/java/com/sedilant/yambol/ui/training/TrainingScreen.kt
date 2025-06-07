@@ -28,15 +28,18 @@ import java.util.Date
 fun TrainingScreen(
     modifier: Modifier = Modifier,
     onTrainClicked: (Int) -> Unit,
+    onNavigateToCreateTraining: (Int) -> Unit,
     trainingViewModel: TrainingViewModel = hiltViewModel<TrainingViewModel>()
 ) {
 
     val uiState = trainingViewModel.uiState.collectAsState().value
 
     TrainingScreenStateless(
+        modifier = Modifier,
         uiState = uiState,
         onTeamChange = { trainingViewModel.onTeamChange(it) },
         onTrainClicked = onTrainClicked,
+        onNavigateToCreateTraining = onNavigateToCreateTraining,
     )
 }
 
@@ -46,6 +49,7 @@ private fun TrainingScreenStateless(
     uiState: TrainingUiState,
     onTeamChange: (Int) -> Unit,
     onTrainClicked: (Int) -> Unit,
+    onNavigateToCreateTraining: (Int) -> Unit,
 ) {
     when (uiState) {
         is TrainingUiState.Error -> {}
@@ -84,7 +88,7 @@ private fun TrainingScreenStateless(
                 }
 
                 FloatingActionButton(
-                    onClick = {}, // TODO Navigate to add train
+                    onClick = { onNavigateToCreateTraining(uiState.currentTeamId) }, // TODO Navigate to add train
                     modifier = modifier
                         .align(Alignment.BottomEnd)
                         .padding(end = 32.dp)
@@ -92,7 +96,7 @@ private fun TrainingScreenStateless(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add,
-                        contentDescription = null
+                        contentDescription = "Add New Train"
                     )
                 }
             }
@@ -150,7 +154,8 @@ private fun TrainingScreenPreview() {
             ),
             modifier = Modifier,
             onTeamChange = {},
-            onTrainClicked = {}
+            onTrainClicked = {},
+            onNavigateToCreateTraining = {},
         )
     }
 }

@@ -12,7 +12,7 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "train")
 data class TrainEntity(
     @PrimaryKey(autoGenerate = true)
-    val trainId: Int, // TODO change with just --> id
+    val trainId: Int = 0, // TODO change with just --> id
     val date: Long,
     val time: Float,
     val concepts: List<String>,

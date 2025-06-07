@@ -9,4 +9,15 @@
     <string name="player_card_screen">Player info Card Screen</string>
     <string name="add_teams_stats_screen">Add teams stats screen</string>
     <string name="training_details_screen">Training Details Screen</string>
+    <string name="create_train_screen">Create Train Screen</string>
+    <string name="training_basic_information">Training Basic Information</string>
+    <string name="training_date">Training Date</string>
+    <string name="select_date">Select Date</string>
+    <string name="training_duration">Training Duration</string>
+    <string name="hours">Hours</string>
+    <string name="minutes">Minutes</string>
+    <string name="select_team">Select Team</string>
+    <string name="loading_teams">Loading teams…</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
 </resources>

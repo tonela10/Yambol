@@ -34,6 +34,10 @@ import com.sedilant.yambol.domain.get.GetAllTrainsByTeamIdUseCase
 import com.sedilant.yambol.domain.get.GetAllTrainsByTeamIdUseCaseImpl
 import com.sedilant.yambol.domain.get.GetTrainWithTrainTaskByTrainIdUseCase
 import com.sedilant.yambol.domain.get.GetTrainWithTrainTaskByTrainIdUseCaseImpl
+import com.sedilant.yambol.domain.insert.CreateTrainTaskUseCase
+import com.sedilant.yambol.domain.insert.CreateTrainTaskUseCaseImpl
+import com.sedilant.yambol.domain.insert.CreateTrainUseCase
+import com.sedilant.yambol.domain.insert.CreateTrainUseCaseImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -93,4 +97,10 @@ abstract class UseCaseModule {
 
     @Binds
     abstract fun bindGetTrainWithTrainTaskByTrainIdUseCase(impl: GetTrainWithTrainTaskByTrainIdUseCaseImpl): GetTrainWithTrainTaskByTrainIdUseCase
+
+    @Binds
+    abstract fun bindCreateTrainUseCase(impl: CreateTrainUseCaseImpl): CreateTrainUseCase
+
+    @Binds
+    abstract fun bindCreateTrainTaskUseCase(impl: CreateTrainTaskUseCaseImpl): CreateTrainTaskUseCase
 }

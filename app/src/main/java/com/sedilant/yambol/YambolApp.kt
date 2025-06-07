@@ -17,6 +17,7 @@ import com.sedilant.yambol.ui.NavigationBottomBar
 import com.sedilant.yambol.ui.addStats.AddTeamStatsScreen
 import com.sedilant.yambol.ui.board.BoardScreen
 import com.sedilant.yambol.ui.createTeam.CreateTeamScreen
+import com.sedilant.yambol.ui.createTrain.CreateTrainScreen
 import com.sedilant.yambol.ui.home.HomeScreen
 import com.sedilant.yambol.ui.playerCard.PlayerCardScreen
 import com.sedilant.yambol.ui.profile.ProfileScreen
@@ -56,6 +57,9 @@ sealed class YambolScreen(@StringRes val route: Int) {
 
     @Serializable
     data class TrainingDetails(val trainId: Int) : YambolScreen(R.string.training_details_screen)
+
+    @Serializable
+    data class CreateTrain(val currentTeam: Int) : YambolScreen(R.string.create_train_screen)
 }
 
 @Composable
@@ -70,6 +74,7 @@ fun YambolApp() {
         currentDestination?.contains("PlayerCardDetails") == true -> false
         currentDestination?.contains("AddTeamStats") == true -> false
         currentDestination?.contains("TrainingDetails") == true -> false
+        currentDestination?.contains("CreateTrain") == true -> false
         else -> true
     }
 
@@ -114,6 +119,13 @@ fun YambolApp() {
                         navController.navigate(
                             YambolScreen.TrainingDetails(
                                 trainId = trainId
+                            )
+                        )
+                    },
+                    onNavigateToCreateTraining = { currentTeamId ->
+                        navController.navigate(
+                            YambolScreen.CreateTrain(
+                                currentTeam = currentTeamId
                             )
                         )
                     }
@@ -167,6 +179,16 @@ fun YambolApp() {
                 TrainingDetailsScreen(
                     trainId = args.trainId,
                     onNavigateBack = { navController.popBackStack() },
+                )
+            }
+
+            composable<YambolScreen.CreateTrain> { navBackStackEntry ->
+                val args = navBackStackEntry.toRoute<YambolScreen.CreateTrain>()
+
+                CreateTrainScreen(
+                    defaultTeamId = args.currentTeam,
+                    onNavigateBack = { navController.popBackStack() },
+                    onTrainCreated = { navController.popBackStack() },
                 )
             }
         }
