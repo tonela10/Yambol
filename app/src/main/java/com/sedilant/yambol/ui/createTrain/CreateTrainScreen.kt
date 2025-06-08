@@ -25,7 +25,6 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -107,23 +106,22 @@ fun CreateTrainScreenStateless(
     canProceedFromConcepts: () -> Boolean = { true },
     onErrorDismissed: () -> Unit = {}
 ) {
-    Column(modifier = modifier.fillMaxSize()) {
-        TopAppBar(
-            title = {
-                Text(
-                    text = "Create Training - ${uiState.currentStep.title}",
-                    style = MaterialTheme.typography.titleMedium
+    Column(modifier = Modifier.fillMaxSize()) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            IconButton(onClick = onNavigateBack) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = "Navigate back"
                 )
-            },
-            navigationIcon = {
-                IconButton(onClick = onNavigateBack) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowBack,
-                        contentDescription = "Navigate back"
-                    )
-                }
             }
-        )
+            Text(
+                text = "Create Training - ${uiState.currentStep.title}",
+                style = MaterialTheme.typography.titleMedium
+            )
+        }
 
         LinearProgressIndicator(
             progress = { (uiState.currentStep.stepNumber / 4f) },
@@ -302,7 +300,7 @@ fun NavigationButtons(
 
 @Preview(showBackground = true)
 @Composable
-private fun CreateTrainScreenPreview() {
+private fun CreateTrainScreenBasicInfoPreview() {
     YambolTheme {
         CreateTrainScreenStateless(
             uiState = CreateTrainUiState(
@@ -311,6 +309,66 @@ private fun CreateTrainScreenPreview() {
                     TeamDomainModel("Team A", 1),
                     TeamDomainModel("Team B", 2)
                 ),
+                selectedDate = Date(),
+                selectedTeamId = 1,
+                isLoading = false
+            )
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun CreateTrainScreenConceptsPreview() {
+    YambolTheme {
+        CreateTrainScreenStateless(
+            uiState = CreateTrainUiState(
+                currentStep = CreateTrainStep.CONCEPTS,
+                teams = listOf(
+                    TeamDomainModel("Team A", 1),
+                    TeamDomainModel("Team B", 2)
+                ),
+                concepts = listOf("One hand pass", "Drill without looking the ball"),
+                selectedDate = Date(),
+                selectedTeamId = 1,
+                isLoading = false
+            )
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun CreateTrainScreenTasksPreview() {
+    YambolTheme {
+        CreateTrainScreenStateless(
+            uiState = CreateTrainUiState(
+                currentStep = CreateTrainStep.TASKS,
+                teams = listOf(
+                    TeamDomainModel("Team A", 1),
+                    TeamDomainModel("Team B", 2)
+                ),
+                concepts = listOf("One hand pass", "Drill without looking the ball"),
+                selectedDate = Date(),
+                selectedTeamId = 1,
+                isLoading = false
+            )
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun CreateTrainScreenReviewPreview() {
+    YambolTheme {
+        CreateTrainScreenStateless(
+            uiState = CreateTrainUiState(
+                currentStep = CreateTrainStep.REVIEW,
+                teams = listOf(
+                    TeamDomainModel("Team A", 1),
+                    TeamDomainModel("Team B", 2)
+                ),
+                concepts = listOf("One hand pass", "Drill without looking the ball"),
                 selectedDate = Date(),
                 selectedTeamId = 1,
                 isLoading = false

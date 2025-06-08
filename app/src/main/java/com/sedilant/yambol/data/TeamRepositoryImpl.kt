@@ -87,7 +87,7 @@ class TeamRepositoryImpl @Inject constructor(
     }
 
     override suspend fun insertTrain(trainEntity: TrainEntity): Int {
-        return withContext(Dispatchers.IO){
+        return withContext(Dispatchers.IO) {
             trainingDao.insertTrain(trainEntity).toInt() // TODO undo this ñapa
         }
     }
@@ -99,8 +99,14 @@ class TeamRepositoryImpl @Inject constructor(
     }
 
     override suspend fun insertTrainCrossTrainTask(trainCrossTrainTaskEntity: TrainCrossTrainTaskEntity) {
-        withContext(Dispatchers.IO){
+        withContext(Dispatchers.IO) {
             trainingDao.insertTrainCrossTrainTask(trainCrossTrainTaskEntity)
+        }
+    }
+
+    override suspend fun getLastTrainWithTrainTaskByTeamId(teamId: Int): Long {
+        return withContext(Dispatchers.IO) {
+            trainingDao.getLastTrainWithTrainTaskByTeamId(teamId)
         }
     }
 }

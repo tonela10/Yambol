@@ -33,10 +33,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.sedilant.yambol.R
 import com.sedilant.yambol.ui.createTrain.TrainTaskData
+import com.sedilant.yambol.ui.theme.YambolTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,12 +62,7 @@ fun TasksStep(
     ) {
         item {
             Text(
-                text = "Training Tasks",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                text = "Add specific tasks and drills for this training (optional)",
+                text = stringResource(R.string.add_specific_tasks_and_drills_for_this_training_optional),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -114,12 +113,12 @@ fun TasksStep(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = "No tasks added yet",
+                            text = stringResource(R.string.no_tasks_added_yet),
                             style = MaterialTheme.typography.bodyLarge,
                             textAlign = TextAlign.Center
                         )
                         Text(
-                            text = "Tasks are optional but help structure your training",
+                            text = stringResource(R.string.tasks_are_optional_but_help_structure_your_training),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center
@@ -240,5 +239,19 @@ fun TaskCard(
                 }
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun TasksStepPreview() {
+    YambolTheme {
+        TasksStep(
+            tasks = mutableListOf(),
+            concepts = listOf("Shooting form", "Test concepts"),
+            onTaskAdded = {},
+            onTaskRemoved = {},
+            onTaskUpdated = { _, _ -> },
+        )
     }
 }

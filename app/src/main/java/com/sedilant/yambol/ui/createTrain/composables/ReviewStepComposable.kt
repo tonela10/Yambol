@@ -21,9 +21,14 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.sedilant.yambol.R
 import com.sedilant.yambol.ui.createTrain.CreateTrainUiState
+import com.sedilant.yambol.ui.createTrain.TrainTaskData
+import com.sedilant.yambol.ui.theme.YambolTheme
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -40,12 +45,7 @@ fun ReviewStep(
     ) {
         item {
             Text(
-                text = "Review Training",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                text = "Review all details before saving your training",
+                text = stringResource(R.string.review_all_details_before_saving_your_training),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -59,14 +59,14 @@ fun ReviewStep(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
-                        text = "Basic Information",
+                        text = stringResource(R.string.basic_information),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary
                     )
 
                     Row {
-                        Text("Date: ", fontWeight = FontWeight.Medium)
+                        Text(stringResource(R.string.date), fontWeight = FontWeight.Medium)
                         Text(
                             uiState.selectedDate?.let {
                                 SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(it)
@@ -75,12 +75,12 @@ fun ReviewStep(
                     }
 
                     Row {
-                        Text("Duration: ", fontWeight = FontWeight.Medium)
+                        Text(stringResource(R.string.duration), fontWeight = FontWeight.Medium)
                         Text("${uiState.selectedHours}h ${uiState.selectedMinutes}m")
                     }
 
                     Row {
-                        Text("Team: ", fontWeight = FontWeight.Medium)
+                        Text(stringResource(R.string.team), fontWeight = FontWeight.Medium)
                         Text(
                             uiState.teams.find { it.id == uiState.selectedTeamId }?.name
                                 ?: "Unknown"
@@ -140,7 +140,7 @@ fun ReviewStep(
 
                     if (uiState.tasks.isEmpty()) {
                         Text(
-                            text = "No tasks added",
+                            text = stringResource(R.string.no_tasks_added),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -198,5 +198,26 @@ fun ReviewStep(
                 Text("Save Training")
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ReviewStepPreview() {
+    YambolTheme {
+        ReviewStep(
+            uiState = CreateTrainUiState(
+                tasks = mutableListOf(
+                    TrainTaskData(
+                        name = "Mata pollos",
+                        numberOfPlayer = 2,
+                        concept = "Precisión pase",
+                        description = "Hit the partners ball in the air",
+                        variables = listOf()
+                    )
+                ),
+                concepts = listOf("Pass precision")
+            )
+        ) { }
     }
 }

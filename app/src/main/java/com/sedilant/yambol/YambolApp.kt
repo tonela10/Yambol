@@ -110,6 +110,13 @@ fun YambolApp() {
                             )
                         )
                     },
+                    onLastTrainClick = { trainId ->
+                        navController.navigate(
+                            YambolScreen.TrainingDetails(
+                                trainId = trainId
+                            )
+                        )
+                    }
                 )
             }
 

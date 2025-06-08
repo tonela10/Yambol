@@ -35,4 +35,5 @@ interface TeamRepository {
     suspend fun insertTrain(trainEntity: TrainEntity): Int
     suspend fun insertTrainTask(trainTaskEntity: TrainTaskEntity): Int
     suspend fun insertTrainCrossTrainTask(trainCrossTrainTaskEntity: TrainCrossTrainTaskEntity)
+    suspend fun getLastTrainWithTrainTaskByTeamId(teamId: Int): Long?
 }

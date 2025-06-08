@@ -28,7 +28,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.sedilant.yambol.ui.theme.YambolTheme
 
 @Composable
 fun ConceptsStep(
@@ -45,11 +47,6 @@ fun ConceptsStep(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         item {
-            Text(
-                text = "Training Concepts",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
-            )
             Text(
                 text = "Add the main concepts this training will focus on",
                 style = MaterialTheme.typography.bodyMedium,
@@ -159,5 +156,17 @@ fun ConceptsStep(
                 }
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ConceptStepPreview() {
+    YambolTheme {
+        ConceptsStep(
+            concepts = listOf("One hand pass", "Drill without looking the ball"),
+            onConceptAdded = {},
+            onConceptRemoved = {}
+        )
     }
 }

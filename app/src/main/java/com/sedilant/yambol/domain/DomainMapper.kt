@@ -43,7 +43,7 @@ fun AbilityRecordWithName.mapToDomain(): AbilityDomainModel {
 
 fun TrainTaskEntity.mapToDomain(): TrainTaskDomainModel {
     return TrainTaskDomainModel(
-        trainingTaskId = trainingTaskId,
+        trainingTaskId = trainingTaskId.toInt(),
         name = name,
         numberOfPlayer = numberOfPlayers,
         concept = concept,

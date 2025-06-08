@@ -19,6 +19,9 @@ interface TrainingDao {
     @Query("SELECT * FROM train WHERE trainId = :trainId")
     fun getTrainWithTrainTaskByTrainId(trainId: Int): TrainWithTrainTask
 
+    @Query("SELECT trainId FROM train WHERE teamId = :teamId ORDER BY trainId DESC LIMIT 1")
+    fun getLastTrainWithTrainTaskByTeamId(teamId: Int): Long
+
     @Insert
     fun insertTrain(trainEntity: TrainEntity): Long
 
