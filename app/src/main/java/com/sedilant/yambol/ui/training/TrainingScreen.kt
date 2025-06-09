@@ -91,7 +91,7 @@ private fun TrainingScreenStateless(
                         onTeamChange = onTeamChange,
                         onCreateTeam = {},
                         isAddTeamShow = false,
-                        modifier = Modifier.padding(bottom = 16.dp, start = 0.dp, end = 0.dp)
+                        modifier = Modifier.padding(bottom = 16.dp, start = 0.dp, end = 0.dp),
                     )
 
                     SectionHeader(

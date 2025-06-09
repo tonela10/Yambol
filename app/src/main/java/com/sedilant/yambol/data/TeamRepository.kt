@@ -18,6 +18,7 @@ interface TeamRepository {
     suspend fun getTeamId(teamName: String): Int?
     suspend fun insertTeam(teamEntity: TeamEntity)
     suspend fun insertPlayer(playerEntity: PlayerEntity)
+    suspend fun updateTeam(teamId: Int, newName: String)
 
     // team objectives related methods
     suspend fun getTeamObjectives(teamId: Int): Flow<List<TeamObjectivesEntity>>

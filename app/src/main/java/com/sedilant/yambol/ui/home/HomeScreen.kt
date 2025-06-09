@@ -18,12 +18,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -55,9 +57,14 @@ fun HomeScreen(
     val homeUiState = homeViewModel.uiState.collectAsState(
         initial = HomeUiState.Loading
     ).value
+
+    // TODO fusion this in one uiState
+    val editTeamState = homeViewModel.editTeamState.collectAsState().value
+
     HomeScreenStateless(
         modifier = modifier,
         homeUiState = homeUiState,
+        editTeamState = editTeamState,
         onTeamChange = { homeViewModel.onTeamChange(it) },
         onCreateTeam = onCreateTeam,
         onPlayerClicked = { id -> onPlayerClicked(id) },
@@ -66,7 +73,10 @@ fun HomeScreen(
         onUpdateObjective = homeViewModel::onUpdateObjective,
         onDeleteTeamObjective = homeViewModel::onDeleteObjective,
         onRegisterTrain = { teamId, statsId -> onRegisterTrain(teamId, statsId) },
-        onLastTrainClick = onLastTrainClick
+        onLastTrainClick = onLastTrainClick,
+        onEditTeam = homeViewModel::showEditTeamDialog,
+        onUpdateTeamName = homeViewModel::updateTeamName,
+        onDismissEditTeam = homeViewModel::hideEditTeamDialog
     )
 }
 
@@ -74,6 +84,7 @@ fun HomeScreen(
 private fun HomeScreenStateless(
     modifier: Modifier = Modifier,
     homeUiState: HomeUiState,
+    editTeamState: EditTeamState,
     onTeamChange: (Int) -> Unit,
     onCreateTeam: () -> Unit,
     onPlayerClicked: (Int) -> Unit,
@@ -82,7 +93,10 @@ private fun HomeScreenStateless(
     onUpdateObjective: (Int, String) -> Unit,
     onDeleteTeamObjective: (Int, String, Boolean) -> Unit,
     onRegisterTrain: (Int, List<Int>) -> Unit,
-    onLastTrainClick: (Int) -> Unit
+    onLastTrainClick: (Int) -> Unit,
+    onEditTeam: (String) -> Unit,
+    onUpdateTeamName: (String) -> Unit,
+    onDismissEditTeam: () -> Unit,
 ) {
 
     when (homeUiState) {
@@ -96,7 +110,27 @@ private fun HomeScreenStateless(
             Column(
                 modifier = modifier.fillMaxSize()
             ) {
-                SectionHeader(title = "Teams")
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(end = 20.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    SectionHeader(title = "Teams")
+                    IconButton(
+                        onClick = { homeUiState.currentTeam?.let { onEditTeam(it.name) } },
+                        modifier = Modifier
+                            .size(32.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = "Edit team name",
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+                }
                 homeUiState.currentTeam?.let {
                     TeamTabs(
                         currentTeamId = it.id,
@@ -138,6 +172,21 @@ private fun HomeScreenStateless(
                     }
                 )
             }
+        }
+    }
+
+    when (editTeamState) {
+        is EditTeamState.Visible -> {
+            EditTeamDialog(
+                currentTeamName = editTeamState.currentTeamName,
+                onSave = onUpdateTeamName,
+                onDismiss = onDismissEditTeam,
+                isLoading = editTeamState.isLoading,
+                errorMessage = editTeamState.errorMessage
+            )
+        }
+
+        EditTeamState.Hidden -> { /* Dialog is hidden */
         }
     }
 }
@@ -436,6 +485,10 @@ private fun HomeScreenPreview() {
             onPlayerClicked = {},
             onRegisterTrain = { _, _ -> },
             onLastTrainClick = { },
+            editTeamState = EditTeamState.Hidden,
+            onEditTeam = {},
+            onUpdateTeamName = {},
+            onDismissEditTeam = {},
         )
     }
 }
