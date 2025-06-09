@@ -73,6 +73,12 @@ class TeamRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun updateTeam(teamId: Int, newName: String) {
+        withContext(Dispatchers.IO) {
+            playerDao.updateTeam(teamId, newName)
+        }
+    }
+
     // TRAIN DAO METHODS
     override suspend fun getAllTrainingsByTeamId(teamId: Int): List<TrainEntity> {
         return withContext(Dispatchers.IO) {

@@ -1,7 +1,17 @@
 package com.sedilant.yambol.di
 
+import com.sedilant.yambol.UpdateTeamUseCaseImpl
 import com.sedilant.yambol.domain.DeleteTeamObjectiveUseCase
 import com.sedilant.yambol.domain.DeleteTeamObjectiveUseCaseImpl
+import com.sedilant.yambol.domain.ToggleTeamObjectiveUseCase
+import com.sedilant.yambol.domain.ToggleTeamObjectiveUseCaseImpl
+import com.sedilant.yambol.domain.UpdateTeamObjectiveUseCase
+import com.sedilant.yambol.domain.UpdateTeamObjectiveUseCaseImpl
+import com.sedilant.yambol.domain.UpdateTeamUseCase
+import com.sedilant.yambol.domain.get.GetAllTrainsByTeamIdUseCase
+import com.sedilant.yambol.domain.get.GetAllTrainsByTeamIdUseCaseImpl
+import com.sedilant.yambol.domain.get.GetLastTrainOfTeamUseCase
+import com.sedilant.yambol.domain.get.GetLastTrainOfTeamUseCaseImpl
 import com.sedilant.yambol.domain.get.GetPlayerByIdUseCase
 import com.sedilant.yambol.domain.get.GetPlayerByIdUseCaseImpl
 import com.sedilant.yambol.domain.get.GetPlayerStatsUseCase
@@ -18,6 +28,12 @@ import com.sedilant.yambol.domain.get.GetTeamObjectivesUseCase
 import com.sedilant.yambol.domain.get.GetTeamObjectivesUseCaseImpl
 import com.sedilant.yambol.domain.get.GetTeamsUseCase
 import com.sedilant.yambol.domain.get.GetTeamsUseCaseImpl
+import com.sedilant.yambol.domain.get.GetTrainWithTrainTaskByTrainIdUseCase
+import com.sedilant.yambol.domain.get.GetTrainWithTrainTaskByTrainIdUseCaseImpl
+import com.sedilant.yambol.domain.insert.CreateTrainTaskUseCase
+import com.sedilant.yambol.domain.insert.CreateTrainTaskUseCaseImpl
+import com.sedilant.yambol.domain.insert.CreateTrainUseCase
+import com.sedilant.yambol.domain.insert.CreateTrainUseCaseImpl
 import com.sedilant.yambol.domain.insert.InsertPlayerUseCase
 import com.sedilant.yambol.domain.insert.InsertPlayerUseCaseImpl
 import com.sedilant.yambol.domain.insert.InsertTeamObjectiveUseCase
@@ -26,20 +42,6 @@ import com.sedilant.yambol.domain.insert.InsertTeamUseCase
 import com.sedilant.yambol.domain.insert.InsertTeamUseCaseImpl
 import com.sedilant.yambol.domain.insert.SavePlayerStatUseCase
 import com.sedilant.yambol.domain.insert.SavePlayerStatUseCaseImpl
-import com.sedilant.yambol.domain.ToggleTeamObjectiveUseCase
-import com.sedilant.yambol.domain.ToggleTeamObjectiveUseCaseImpl
-import com.sedilant.yambol.domain.UpdateTeamObjectiveUseCase
-import com.sedilant.yambol.domain.UpdateTeamObjectiveUseCaseImpl
-import com.sedilant.yambol.domain.get.GetAllTrainsByTeamIdUseCase
-import com.sedilant.yambol.domain.get.GetAllTrainsByTeamIdUseCaseImpl
-import com.sedilant.yambol.domain.get.GetLastTrainOfTeamUseCase
-import com.sedilant.yambol.domain.get.GetLastTrainOfTeamUseCaseImpl
-import com.sedilant.yambol.domain.get.GetTrainWithTrainTaskByTrainIdUseCase
-import com.sedilant.yambol.domain.get.GetTrainWithTrainTaskByTrainIdUseCaseImpl
-import com.sedilant.yambol.domain.insert.CreateTrainTaskUseCase
-import com.sedilant.yambol.domain.insert.CreateTrainTaskUseCaseImpl
-import com.sedilant.yambol.domain.insert.CreateTrainUseCase
-import com.sedilant.yambol.domain.insert.CreateTrainUseCaseImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -108,4 +110,7 @@ abstract class UseCaseModule {
 
     @Binds
     abstract fun bindGetLastTrainOfTeamUseCase(impl: GetLastTrainOfTeamUseCaseImpl): GetLastTrainOfTeamUseCase
+
+    @Binds
+    abstract fun bindUpdateTeamUseCase(impl: UpdateTeamUseCaseImpl): UpdateTeamUseCase
 }

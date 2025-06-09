@@ -6,6 +6,7 @@ import com.sedilant.yambol.data.DataStoreManager
 import com.sedilant.yambol.domain.DeleteTeamObjectiveUseCase
 import com.sedilant.yambol.domain.ToggleTeamObjectiveUseCase
 import com.sedilant.yambol.domain.UpdateTeamObjectiveUseCase
+import com.sedilant.yambol.domain.UpdateTeamUseCase
 import com.sedilant.yambol.domain.get.GetLastTrainOfTeamUseCase
 import com.sedilant.yambol.domain.get.GetPlayersByTeamIdUseCase
 import com.sedilant.yambol.domain.get.GetStatByNameUseCase
@@ -21,6 +22,7 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
@@ -41,7 +43,8 @@ class HomeViewModel @Inject constructor(
     private val deleteTeamObjectiveUseCase: DeleteTeamObjectiveUseCase,
     private val dataStoreManager: DataStoreManager,
     private val getStatByNameUseCase: GetStatByNameUseCase,
-    private val getLastTrainOfTeamUseCase: GetLastTrainOfTeamUseCase
+    private val getLastTrainOfTeamUseCase: GetLastTrainOfTeamUseCase,
+    private val updateTeamUseCase: UpdateTeamUseCase,
 ) : ViewModel() {
     // MeanWhile trigger
     private val trigger = MutableSharedFlow<Unit>(
@@ -51,6 +54,9 @@ class HomeViewModel @Inject constructor(
     )
     private val currentTeamFlow = MutableStateFlow<Int?>(null)
     private var lastTrainId: Int? = null
+
+    private val _editTeamState = MutableStateFlow<EditTeamState>(EditTeamState.Hidden)
+    val editTeamState: StateFlow<EditTeamState> = _editTeamState.asStateFlow()
 
     private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.Loading)
     val uiState: StateFlow<HomeUiState> = _uiState
@@ -98,6 +104,53 @@ class HomeViewModel @Inject constructor(
             )
         }
     }
+
+    fun showEditTeamDialog(teamName: String) {
+        _editTeamState.value =
+            EditTeamState.Visible(teamName, isLoading = false, errorMessage = null)
+    }
+
+    fun hideEditTeamDialog() {
+        _editTeamState.value = EditTeamState.Hidden
+    }
+
+    fun updateTeamName(newName: String) {
+        val currentState = _editTeamState.value as? EditTeamState.Visible ?: return
+
+        viewModelScope.launch {
+            try {
+                _editTeamState.value = currentState.copy(isLoading = true, errorMessage = null)
+
+                val currentTeamId = currentTeamFlow.value ?: return@launch
+
+                // Check if name already exists (exclude current team)
+                val teams = getTeamsUseCase().first()
+                val nameExists = teams.any {
+                    it.name.equals(newName, ignoreCase = true) && it.id != currentTeamId
+                }
+
+                if (nameExists) {
+                    _editTeamState.value = currentState.copy(
+                        isLoading = false,
+                        errorMessage = "Team name already exists"
+                    )
+                    return@launch
+                }
+
+                updateTeamUseCase(currentTeamId, newName)
+
+                _editTeamState.value = EditTeamState.Hidden
+                refreshData()
+
+            } catch (exception: Exception) {
+                _editTeamState.value = currentState.copy(
+                    isLoading = false,
+                    errorMessage = exception.message ?: "Failed to update team name"
+                )
+            }
+        }
+    }
+
 
     private fun setupUiStateFlow() {
         viewModelScope.launch {
@@ -226,4 +279,13 @@ sealed interface HomeUiState {
 
     data object Loading : HomeUiState
     data object CreateTeam : HomeUiState
+}
+
+sealed interface EditTeamState {
+    data object Hidden : EditTeamState
+    data class Visible(
+        val currentTeamName: String,
+        val isLoading: Boolean = false,
+        val errorMessage: String? = null
+    ) : EditTeamState
 }

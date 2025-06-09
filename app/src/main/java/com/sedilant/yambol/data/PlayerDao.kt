@@ -27,4 +27,7 @@ interface PlayerDao {
 
     @Query("SELECT * FROM player WHERE id = :playerId")
     fun getPlayer(playerId: Int): PlayerEntity
+
+    @Query("UPDATE team SET name = :newName WHERE id = :teamId")
+    suspend fun updateTeam(teamId: Int, newName: String)
 }
