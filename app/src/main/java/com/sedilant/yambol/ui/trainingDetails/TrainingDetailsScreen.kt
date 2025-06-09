@@ -14,32 +14,27 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Create
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.sedilant.yambol.R
 import com.sedilant.yambol.domain.models.TrainDomainModel
 import com.sedilant.yambol.domain.models.TrainTaskDomainModel
 import com.sedilant.yambol.ui.theme.YambolTheme
@@ -49,7 +44,6 @@ import java.util.Locale
 
 @Composable
 fun TrainingDetailsScreen(
-    modifier: Modifier = Modifier,
     trainId: Int,
     onNavigateBack: () -> Unit,
     trainingDetailsViewModel: TrainingDetailsViewModel = hiltViewModel(
@@ -63,38 +57,34 @@ fun TrainingDetailsScreen(
     val uiState by trainingDetailsViewModel.uiState.collectAsState()
 
     TrainingDetailsScreenStateless(
-        modifier = modifier,
         uiState = uiState,
         onNavigateBack = onNavigateBack
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TrainingDetailsScreenStateless(
-    modifier: Modifier = Modifier,
     uiState: TrainingDetailsUiState,
     onNavigateBack: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        TopAppBar(
-            title = {
-                Text(
-                    text = "Training Details",
-                    style = MaterialTheme.typography.titleLarge
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(onClick = onNavigateBack) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = "Navigate back"
                 )
-            },
-            navigationIcon = {
-                IconButton(onClick = onNavigateBack) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowBack,
-                        contentDescription = "Navigate back"
-                    )
-                }
             }
-        )
+            Text(
+                text = "Training Details",
+                style = MaterialTheme.typography.titleLarge
+            )
+        }
 
         when (uiState) {
             TrainingDetailsUiState.Loading -> {
@@ -130,21 +120,11 @@ fun TrainingDetailsScreenStateless(
                         )
                     }
                     item {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.ThumbUp, // TODO add SportSoccer Icon
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                            Text(
-                                text = "Training Tasks (${uiState.taskList.size})",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
+                        Text(
+                            text = "Training Tasks (${uiState.taskList.size})",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
                     if (uiState.taskList.isEmpty()) {
                         item {
@@ -188,7 +168,7 @@ fun TrainingInfoCard(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Icon(
-                    imageVector = Icons.Default.DateRange,
+                    painter = painterResource(R.drawable.calendar_month_24dp),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(20.dp)
@@ -205,7 +185,7 @@ fun TrainingInfoCard(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Icon(
-                    imageVector = Icons.Default.ArrowDropDown, // TODO: Use AccessTime icon when available
+                    painter = painterResource(R.drawable.schedule_24dp),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(20.dp)
@@ -289,7 +269,7 @@ fun TaskCard(task: TrainTaskDomainModel) {
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Icon(
-                    imageVector = Icons.Default.Person,
+                    painter = painterResource(R.drawable.group_24dp),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(16.dp)
@@ -356,7 +336,7 @@ fun EmptyTasksCard() {
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Icon(
-                imageVector = Icons.Default.Create, // TODO SportSoccer Icon
+                painter = painterResource(R.drawable.lightbulb_2_72d),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(48.dp)
@@ -394,7 +374,6 @@ private fun formatDuration(hours: Float): String {
 private fun TrainingDetailsScreenPreview() {
     YambolTheme {
         TrainingDetailsScreenStateless(
-            modifier = Modifier,
             uiState = TrainingDetailsUiState.Success(
                 train = TrainDomainModel(
                     id = 1,
@@ -432,7 +411,6 @@ private fun TrainingDetailsScreenPreview() {
 private fun TrainingDetailsScreenEmptyPreview() {
     YambolTheme {
         TrainingDetailsScreenStateless(
-            modifier = Modifier,
             uiState = TrainingDetailsUiState.Success(
                 train = TrainDomainModel(
                     id = 1,

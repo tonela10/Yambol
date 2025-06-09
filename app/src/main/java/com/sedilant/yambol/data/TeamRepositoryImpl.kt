@@ -3,7 +3,9 @@ package com.sedilant.yambol.data
 import com.sedilant.yambol.data.entities.PlayerEntity
 import com.sedilant.yambol.data.entities.TeamEntity
 import com.sedilant.yambol.data.entities.TeamObjectivesEntity
+import com.sedilant.yambol.data.entities.TrainCrossTrainTaskEntity
 import com.sedilant.yambol.data.entities.TrainEntity
+import com.sedilant.yambol.data.entities.TrainTaskEntity
 import com.sedilant.yambol.data.queries.TrainWithTrainTask
 import com.sedilant.yambol.domain.mapToDomain
 import com.sedilant.yambol.ui.home.models.PlayerUiModel
@@ -81,6 +83,30 @@ class TeamRepositoryImpl @Inject constructor(
     override suspend fun getTrainWithTrainTaskByTrainId(trainId: Int): TrainWithTrainTask {
         return withContext(Dispatchers.IO) {
             trainingDao.getTrainWithTrainTaskByTrainId(trainId)
+        }
+    }
+
+    override suspend fun insertTrain(trainEntity: TrainEntity): Int {
+        return withContext(Dispatchers.IO) {
+            trainingDao.insertTrain(trainEntity).toInt() // TODO undo this ñapa
+        }
+    }
+
+    override suspend fun insertTrainTask(trainTaskEntity: TrainTaskEntity): Int {
+        return withContext(Dispatchers.IO) {
+            trainingDao.insertTrainTask(trainTaskEntity).toInt() // TODO undo this ñapa
+        }
+    }
+
+    override suspend fun insertTrainCrossTrainTask(trainCrossTrainTaskEntity: TrainCrossTrainTaskEntity) {
+        withContext(Dispatchers.IO) {
+            trainingDao.insertTrainCrossTrainTask(trainCrossTrainTaskEntity)
+        }
+    }
+
+    override suspend fun getLastTrainWithTrainTaskByTeamId(teamId: Int): Long {
+        return withContext(Dispatchers.IO) {
+            trainingDao.getLastTrainWithTrainTaskByTeamId(teamId)
         }
     }
 }

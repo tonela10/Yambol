@@ -9,4 +9,25 @@
     <string name="player_card_screen">Player info Card Screen</string>
     <string name="add_teams_stats_screen">Add teams stats screen</string>
     <string name="training_details_screen">Training Details Screen</string>
+    <string name="create_train_screen">Create Train Screen</string>
+    <string name="training_basic_information">Training Basic Information</string>
+    <string name="training_date">Training Date</string>
+    <string name="select_date">Select Date</string>
+    <string name="training_duration">Training Duration</string>
+    <string name="hours">Hours</string>
+    <string name="minutes">Minutes</string>
+    <string name="select_team">Select Team</string>
+    <string name="loading_teams">Loading teams…</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="add_specific_tasks_and_drills_for_this_training_optional">Add specific tasks and drills for this training (optional)</string>
+    <string name="no_tasks_added_yet">No tasks added yet</string>
+    <string name="tasks_are_optional_but_help_structure_your_training">Tasks are optional but help structure your training</string>
+    <string name="review_all_details_before_saving_your_training">Review all details before saving your training</string>
+    <string name="basic_information">Basic Information</string>
+    <string name="date">"Date: "</string>
+    <string name="duration">"Duration: "</string>
+    <string name="team">"Team: "</string>
+    <string name="no_tasks_added">No tasks added</string>
+    <string name="sessions">Sessions</string>
 </resources>

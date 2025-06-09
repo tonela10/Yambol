@@ -6,6 +6,7 @@ import com.sedilant.yambol.data.DataStoreManager
 import com.sedilant.yambol.domain.DeleteTeamObjectiveUseCase
 import com.sedilant.yambol.domain.ToggleTeamObjectiveUseCase
 import com.sedilant.yambol.domain.UpdateTeamObjectiveUseCase
+import com.sedilant.yambol.domain.get.GetLastTrainOfTeamUseCase
 import com.sedilant.yambol.domain.get.GetPlayersByTeamIdUseCase
 import com.sedilant.yambol.domain.get.GetStatByNameUseCase
 import com.sedilant.yambol.domain.get.GetTeamObjectivesUseCase
@@ -40,6 +41,7 @@ class HomeViewModel @Inject constructor(
     private val deleteTeamObjectiveUseCase: DeleteTeamObjectiveUseCase,
     private val dataStoreManager: DataStoreManager,
     private val getStatByNameUseCase: GetStatByNameUseCase,
+    private val getLastTrainOfTeamUseCase: GetLastTrainOfTeamUseCase
 ) : ViewModel() {
     // MeanWhile trigger
     private val trigger = MutableSharedFlow<Unit>(
@@ -48,6 +50,7 @@ class HomeViewModel @Inject constructor(
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
     private val currentTeamFlow = MutableStateFlow<Int?>(null)
+    private var lastTrainId: Int? = null
 
     private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.Loading)
     val uiState: StateFlow<HomeUiState> = _uiState
@@ -57,14 +60,53 @@ class HomeViewModel @Inject constructor(
         setupUiStateFlow()
     }
 
+    fun onTeamChange(newTeamId: Int) {
+        viewModelScope.launch {
+            currentTeamFlow.update { newTeamId }
+            dataStoreManager.saveCurrentTeam(newTeamId)
+            lastTrainId = getLastTrainOfTeamUseCase(newTeamId)?.toInt()
+        }
+    }
+
+    fun onSaveNewObjective(input: String) {
+        viewModelScope.launch {
+            val teamId = currentTeamFlow.value ?: return@launch
+            insertTeamObjectiveUseCase(input, teamId)
+        }
+    }
+
+    fun onToggleObjectiveStatus(objectiveId: Int) {
+        viewModelScope.launch {
+            toggleTeamObjectiveUseCase(objectiveId)
+        }
+    }
+
+    fun onUpdateObjective(objectiveId: Int, newDescription: String) {
+        viewModelScope.launch {
+            updateTeamObjectiveUseCase(objectiveId, description = newDescription)
+        }
+    }
+
+    fun onDeleteObjective(objectiveId: Int, description: String, isFinished: Boolean) {
+        viewModelScope.launch {
+            val teamId = currentTeamFlow.value ?: return@launch
+            deleteTeamObjectiveUseCase(
+                objectiveId,
+                description = description,
+                isFinish = isFinished,
+                teamId = teamId,
+            )
+        }
+    }
+
     private fun setupUiStateFlow() {
         viewModelScope.launch {
-
             val statIds =
                 listOf(
                     getStatByNameUseCase("physical_state"),
                     getStatByNameUseCase("mental_state")
                 ).map { it.id }
+
             trigger.flatMapLatest { _ ->
                 val teamsFlow = getTeamsUseCase()
                 combine(
@@ -100,6 +142,7 @@ class HomeViewModel @Inject constructor(
                         )
                     }
 
+                    // TODO remove this part because we already do it in the loadSavedTeam
                     // If currentTeamId is null but there are teams, use the first one
                     val safeCurrentTeamId = currentTeamId ?: if (listOfTeams.isNotEmpty()) {
                         val firstTeamId = listOfTeams.first().id
@@ -127,6 +170,7 @@ class HomeViewModel @Inject constructor(
                             )
                         },
                         statIds = statIds,
+                        lastTrainId = lastTrainId
                     )
                 }
             }.collect { state ->
@@ -143,6 +187,7 @@ class HomeViewModel @Inject constructor(
                 val savedTeamId = dataStoreManager.currentTeam.first()
                 if (savedTeamId != null) {
                     currentTeamFlow.update { savedTeamId }
+                    lastTrainId = getLastTrainOfTeamUseCase(savedTeamId)?.toInt()
                 } else {
                     val teams = getTeamsUseCase().first()
 
@@ -152,50 +197,13 @@ class HomeViewModel @Inject constructor(
                     } else {
                         val firstTeamId = teams.first().id
                         currentTeamFlow.update { firstTeamId }
+                        lastTrainId = getLastTrainOfTeamUseCase(savedTeamId)?.toInt()
                         dataStoreManager.saveCurrentTeam(firstTeamId)
                     }
                 }
             } finally {
                 refreshData()
             }
-        }
-    }
-
-    fun onTeamChange(newTeamId: Int) {
-        viewModelScope.launch {
-            currentTeamFlow.update { newTeamId }
-            dataStoreManager.saveCurrentTeam(newTeamId)
-        }
-    }
-
-    fun onSaveNewObjective(input: String) {
-        viewModelScope.launch {
-            val teamId = currentTeamFlow.value ?: return@launch
-            insertTeamObjectiveUseCase(input, teamId)
-        }
-    }
-
-    fun onToggleObjectiveStatus(objectiveId: Int) {
-        viewModelScope.launch {
-            toggleTeamObjectiveUseCase(objectiveId)
-        }
-    }
-
-    fun onUpdateObjective(objectiveId: Int, newDescription: String) {
-        viewModelScope.launch {
-            updateTeamObjectiveUseCase(objectiveId, description = newDescription)
-        }
-    }
-
-    fun onDeleteObjective(objectiveId: Int, description: String, isFinished: Boolean) {
-        viewModelScope.launch {
-            val teamId = currentTeamFlow.value ?: return@launch
-            deleteTeamObjectiveUseCase(
-                objectiveId,
-                description = description,
-                isFinish = isFinished,
-                teamId = teamId,
-            )
         }
     }
 
@@ -212,7 +220,8 @@ sealed interface HomeUiState {
         val listOfPlayer: List<PlayerUiModel>,
         val currentTeam: TeamUiModel?,
         val listOfObjectives: List<TeamObjectivesUiModel>,
-        val statIds: List<Int>
+        val statIds: List<Int>,
+        val lastTrainId: Int? = null
     ) : HomeUiState
 
     data object Loading : HomeUiState

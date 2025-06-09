@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey
 )
 data class TrainTaskEntity(
     @PrimaryKey(autoGenerate = true)
-    val trainingTaskId: Int = 0,
+    val trainingTaskId: Long = 0,
     val name: String,
     val numberOfPlayers: Int,
     val concept: String,

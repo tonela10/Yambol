@@ -28,11 +28,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -92,25 +89,22 @@ private fun AddTeamStatsScreenStateless(
     onRetry: () -> Unit,
     onCompleted: () -> Unit,
 ) {
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text("Rate Players")
-                },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-                    }
-                }
+    Column(modifier = modifier.fillMaxSize()) {
+        Row(
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(onClick = onNavigateBack) {
+                Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+            }
+            Text(
+                "Rate Players",
+                style = MaterialTheme.typography.titleLarge
             )
         }
-    ) { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
         ) {
             when (uiState) {
                 is AddTeamStatsUiState.Loading -> {
@@ -166,7 +160,9 @@ private fun TeamRatingContent(
 
         // Players list
         LazyColumn(
-            modifier = Modifier.weight(1f).padding(top = 24.dp),
+            modifier = Modifier
+                .weight(1f)
+                .padding(top = 24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(state.players) { player ->
@@ -199,7 +195,7 @@ private fun ProgressSection(
 ) {
     Column {
         Text(
-            text = "Rating: $statName",
+            text = statName,
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold
         )

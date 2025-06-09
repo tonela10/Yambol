@@ -12,10 +12,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -25,9 +21,11 @@ import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.sedilant.yambol.R
 import com.sedilant.yambol.domain.models.TrainDomainModel
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -35,9 +33,9 @@ import java.util.Locale
 
 @Composable
 fun TrainingList(
+    modifier: Modifier = Modifier,
     trainings: List<TrainDomainModel>,
     onTrainingClick: (Int) -> Unit = {},
-    modifier: Modifier = Modifier
 ) {
     LazyColumn(
         modifier = modifier.fillMaxSize(),
@@ -47,7 +45,7 @@ fun TrainingList(
         items(trainings) { training ->
             TrainingItem(
                 training = training,
-                onClick = { onTrainingClick(training.id) }
+                onClick = { onTrainingClick(training.id.toInt()) }
             )
         }
     }
@@ -81,7 +79,7 @@ private fun TrainingItem(
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     Icon(
-                        imageVector = Icons.Default.AccountCircle, // TODO Change with calendar icon
+                        painter = painterResource(R.drawable.calendar_month_24dp),
                         contentDescription = "Date",
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(18.dp)
@@ -98,7 +96,7 @@ private fun TrainingItem(
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Home, // TODO Clock icon
+                        painter = painterResource(R.drawable.schedule_24dp), // TODO Clock icon
                         contentDescription = "Duration",
                         tint = MaterialTheme.colorScheme.secondary,
                         modifier = Modifier.size(16.dp)
@@ -118,7 +116,7 @@ private fun TrainingItem(
                     verticalAlignment = Alignment.Top
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Email, // TODO SportsSoccer icon
+                        painter = painterResource(R.drawable.target_24dp), // TODO SportsSoccer icon
                         contentDescription = "Concepts",
                         tint = MaterialTheme.colorScheme.tertiary,
                         modifier = Modifier.size(18.dp)
@@ -143,6 +141,7 @@ private fun TrainingItem(
     }
 }
 
+// TODO fix when the concepts does not fit in a row. LazyGrid?
 @Composable
 private fun ConceptsRow(
     concepts: List<String>,
@@ -194,7 +193,12 @@ private fun TrainingListPreview() {
                 id = 1,
                 date = Date(),
                 time = 1.5f,
-                concepts = listOf("Dribbling", "Ball handling", "Basic moves", "Footwork"),
+                concepts = listOf(
+                    "Dribbling",
+                    "Ball handling",
+                    "Basic moves",
+                    "Footwork so fast that anyone can see"
+                ),
                 teamId = 1
             ),
             TrainDomainModel(

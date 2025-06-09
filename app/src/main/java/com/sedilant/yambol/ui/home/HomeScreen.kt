@@ -49,7 +49,8 @@ fun HomeScreen(
     homeViewModel: HomeViewModel = hiltViewModel<HomeViewModel>(),
     onCreateTeam: () -> Unit,
     onPlayerClicked: (Int) -> Unit,
-    onRegisterTrain: (Int, List<Int>) -> Unit
+    onRegisterTrain: (Int, List<Int>) -> Unit,
+    onLastTrainClick: (Int) -> Unit
 ) {
     val homeUiState = homeViewModel.uiState.collectAsState(
         initial = HomeUiState.Loading
@@ -64,7 +65,8 @@ fun HomeScreen(
         onToggleObjectiveStatus = homeViewModel::onToggleObjectiveStatus,
         onUpdateObjective = homeViewModel::onUpdateObjective,
         onDeleteTeamObjective = homeViewModel::onDeleteObjective,
-        onRegisterTrain = { teamId, statsId -> onRegisterTrain(teamId, statsId) }
+        onRegisterTrain = { teamId, statsId -> onRegisterTrain(teamId, statsId) },
+        onLastTrainClick = onLastTrainClick
     )
 }
 
@@ -80,6 +82,7 @@ private fun HomeScreenStateless(
     onUpdateObjective: (Int, String) -> Unit,
     onDeleteTeamObjective: (Int, String, Boolean) -> Unit,
     onRegisterTrain: (Int, List<Int>) -> Unit,
+    onLastTrainClick: (Int) -> Unit
 ) {
 
     when (homeUiState) {
@@ -123,7 +126,11 @@ private fun HomeScreenStateless(
                 )
 
                 ActionButtonsSection(
-                    onLastTrainClick = { },
+                    onLastTrainClick = {
+                        if (homeUiState.lastTrainId != null) {
+                            onLastTrainClick(homeUiState.lastTrainId)
+                        }
+                    },
                     onRegisterTrainClick = {
                         homeUiState.currentTeam?.let {
                             onRegisterTrain(it.id, homeUiState.statIds)
@@ -152,12 +159,12 @@ fun SectionHeader(
 
 @Composable
 fun TeamTabs(
+    modifier: Modifier = Modifier,
     currentTeamId: Int,
     listOfTeams: List<TeamUiModel>,
     onTeamChange: (Int) -> Unit,
     onCreateTeam: () -> Unit,
     isAddTeamShow: Boolean = true,
-    modifier: Modifier = Modifier
 ) {
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -419,7 +426,7 @@ private fun HomeScreenPreview() {
                 ),
                 currentTeam = TeamUiModel("Utebo", 1),
                 listOfObjectives = listOf(),
-                statIds = listOf()
+                statIds = listOf(),
             ),
             onTeamChange = {},
             onSaveNewObjective = {},
@@ -428,6 +435,7 @@ private fun HomeScreenPreview() {
             onDeleteTeamObjective = { _, _, _ -> },
             onPlayerClicked = {},
             onRegisterTrain = { _, _ -> },
+            onLastTrainClick = { },
         )
     }
 }
