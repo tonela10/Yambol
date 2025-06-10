@@ -29,6 +29,13 @@ interface TeamRepository {
 
     // player information related methods
     suspend fun getPlayer(id: Int): PlayerUiModel // TODO create a PlayerDomainModel
+    suspend fun updatePlayer(playerId: Int, newName: String, newNumber: Int, newPosition: Int)
+    suspend fun getPlayerTeamId(playerId: Int): Int
+    suspend fun isJerseyNumberTaken(
+        teamId: Int,
+        jerseyNumber: Int,
+        excludePlayerId: Int? = null
+    ): Boolean
 
     // team trainings related info
     suspend fun getAllTrainingsByTeamId(teamId: Int): List<TrainEntity>
