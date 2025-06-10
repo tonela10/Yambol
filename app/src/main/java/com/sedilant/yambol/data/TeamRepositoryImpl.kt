@@ -57,6 +57,12 @@ class TeamRepositoryImpl @Inject constructor(
             playerDao.isJerseyNumberTaken(teamId, jerseyNumber, excludePlayerId)
         }
     }
+
+    override suspend fun deletePlayer(playerId: Int) {
+        withContext(Dispatchers.IO) {
+            playerDao.deletePlayerById(playerId)
+        }
+    }
     // TEAM OBJECTIVES DAO METHODS
     override suspend fun insertTeamObjective(teamObjectivesEntity: TeamObjectivesEntity) {
         teamObjectivesDao.insertTeamObjective(teamObjectivesEntity)

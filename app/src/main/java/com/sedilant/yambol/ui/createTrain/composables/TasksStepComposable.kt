@@ -26,6 +26,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -128,12 +129,12 @@ fun TasksStep(
             }
         }
     }
-
     // Task creation/edit bottom sheet
     if (showTaskBottomSheet) {
         val taskToEdit = editingTaskIndex?.let { tasks[it] }
         ModalBottomSheet(
             onDismissRequest = { showTaskBottomSheet = false },
+            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
             modifier = Modifier.fillMaxHeight()
         ) {
             TaskBottomSheetContent(
