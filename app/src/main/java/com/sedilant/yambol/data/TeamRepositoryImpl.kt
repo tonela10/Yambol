@@ -40,6 +40,23 @@ class TeamRepositoryImpl @Inject constructor(
         playerDao.insertPlayer(playerEntity)
     }
 
+    override suspend fun updatePlayer(playerId: Int, newName: String, newNumber: Int, newPosition: Int) {
+        withContext(Dispatchers.IO) {
+            playerDao.updatePlayer(playerId, newName, newNumber, newPosition)
+        }
+    }
+
+    override suspend fun getPlayerTeamId(playerId: Int): Int {
+        return withContext(Dispatchers.IO) {
+            playerDao.getPlayerTeamId(playerId)
+        }
+    }
+
+    override suspend fun isJerseyNumberTaken(teamId: Int, jerseyNumber: Int, excludePlayerId: Int?): Boolean {
+        return withContext(Dispatchers.IO) {
+            playerDao.isJerseyNumberTaken(teamId, jerseyNumber, excludePlayerId)
+        }
+    }
     // TEAM OBJECTIVES DAO METHODS
     override suspend fun insertTeamObjective(teamObjectivesEntity: TeamObjectivesEntity) {
         teamObjectivesDao.insertTeamObjective(teamObjectivesEntity)

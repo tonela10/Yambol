@@ -27,12 +27,13 @@ import com.sedilant.yambol.ui.theme.YambolTheme
 
 @Composable
 fun PlayerActionsCard(
+    onEditPlayer: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     ElevatedCard(
         modifier = modifier.fillMaxWidth(),
         elevation = CardDefaults.elevatedCardElevation(4.dp),
-      // colors = CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer)
+        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
@@ -47,7 +48,7 @@ fun PlayerActionsCard(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Button(
-                    onClick = {},
+                    onClick = onEditPlayer,
                     modifier = Modifier.weight(1f)
                 ) {
                     Icon(
@@ -59,12 +60,12 @@ fun PlayerActionsCard(
                     Text("Edit")
                 }
 
-                OutlinedButton(
-                    onClick = {},
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text("History")
-                }
+//                OutlinedButton(
+//                    onClick = {},
+//                    modifier = Modifier.weight(1f)
+//                ) {
+//                    Text("History")
+//                }
             }
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -83,6 +84,9 @@ fun PlayerActionsCard(
 @Composable
 private fun PlayerActionsCardPreview() {
     YambolTheme {
-        PlayerActionsCard()
+        PlayerActionsCard(
+            onEditPlayer = {},
+            modifier = Modifier,
+        )
     }
 }
