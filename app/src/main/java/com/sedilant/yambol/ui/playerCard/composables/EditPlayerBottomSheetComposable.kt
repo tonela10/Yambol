@@ -6,13 +6,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Person
@@ -35,9 +36,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -69,15 +67,6 @@ fun EditPlayerBottomSheet(
     var isNameError by remember { mutableStateOf(false) }
     var isNumberError by remember { mutableStateOf(false) }
     var numberErrorMessage by remember { mutableStateOf("") }
-    var showPositionDropdown by remember { mutableStateOf(false) }
-
-    val focusRequester = remember { FocusRequester() }
-    val focusManager = LocalFocusManager.current
-
-    // Focus the text field when bottom sheet opens
-    LaunchedEffect(Unit) {
-        focusRequester.requestFocus()
-    }
 
     // Update error states when errorMessage changes
     LaunchedEffect(errorMessage) {
@@ -135,9 +124,9 @@ fun EditPlayerBottomSheet(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .imePadding()
             .padding(24.dp)
-            .padding(bottom = 32.dp), // Extra padding for better bottom sheet appearance
+            .padding(bottom = 32.dp)// Extra padding for better bottom sheet appearance
+            .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
         // Header
@@ -219,8 +208,7 @@ fun EditPlayerBottomSheet(
                 label = { Text("Player Name") },
                 placeholder = { Text("Enter player name") },
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .focusRequester(focusRequester),
+                    .fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Next,
                     capitalization = KeyboardCapitalization.Words
@@ -253,7 +241,6 @@ fun EditPlayerBottomSheet(
                 ),
                 keyboardActions = KeyboardActions(
                     onDone = {
-                        focusManager.clearFocus()
                         validateAndSave()
                     }
                 ),

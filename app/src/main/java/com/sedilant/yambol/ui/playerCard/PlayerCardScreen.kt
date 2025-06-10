@@ -68,6 +68,10 @@ fun PlayerCardScreen(
         onEditPlayer = playerCardViewModel::showEditPlayerDialog,
         onUpdatePlayer = playerCardViewModel::updatePlayer,
         onDismissEditPlayer = playerCardViewModel::hideEditPlayerDialog,
+        onDeletePlayer = {
+            playerCardViewModel.deletePlayer()
+            onNavigateBack()
+        }
     )
 }
 
@@ -75,11 +79,12 @@ fun PlayerCardScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun PlayerCardScreenStateless(
+    modifier: Modifier = Modifier,
     uiState: PlayerCardDetailsUiState,
     onEditPlayer: () -> Unit,
     onUpdatePlayer: (EditPlayerData) -> Unit,
     onDismissEditPlayer: () -> Unit,
-    modifier: Modifier = Modifier,
+    onDeletePlayer: () -> Unit = {},
 ) {
     val scrollState = rememberScrollState()
     val bottomSheetState = rememberModalBottomSheetState(
@@ -119,7 +124,7 @@ private fun PlayerCardScreenStateless(
 
                 PlayerObjectivesCard()
 
-                PlayerActionsCard(onEditPlayer = onEditPlayer)
+                PlayerActionsCard(onEditPlayer = onEditPlayer, onDeletePlayer = onDeletePlayer)
             }
 
             // Show edit bottom sheet when visible

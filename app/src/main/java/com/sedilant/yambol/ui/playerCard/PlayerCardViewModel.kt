@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sedilant.yambol.domain.CheckJerseyNumberUseCase
 import com.sedilant.yambol.domain.UpdatePlayerUseCase
+import com.sedilant.yambol.domain.delete.DeletePlayerUseCase
 import com.sedilant.yambol.domain.get.GetPlayerByIdUseCase
 import com.sedilant.yambol.domain.get.GetPlayerStatsUseCase
 import com.sedilant.yambol.domain.get.GetPlayerTeamIdUseCase
@@ -27,6 +28,7 @@ class PlayerCardViewModel @AssistedInject constructor(
     private val updatePlayerUseCase: UpdatePlayerUseCase,
     private val getPlayerTeamIdUseCase: GetPlayerTeamIdUseCase,
     private val checkJerseyNumberUseCase: CheckJerseyNumberUseCase,
+    private val deletePlayerUseCase: DeletePlayerUseCase,
 ) : ViewModel() {
 
     private val _uiState =
@@ -35,41 +37,6 @@ class PlayerCardViewModel @AssistedInject constructor(
 
     init {
         loadPlayerData()
-    }
-
-    private fun loadPlayerData() {
-        if (playerId == null) {
-            _uiState.value = PlayerCardDetailsUiState.Error("Invalid player ID")
-            return
-        }
-
-        viewModelScope.launch {
-            try {
-                // Get player data (assuming this is a suspend function)
-                val player = getPlayerByIdUseCase(playerId)
-
-                // Get player stats flow and combine with player data
-                getPlayerStatsUseCase(playerId)
-                    .catch { exception ->
-                        _uiState.value = PlayerCardDetailsUiState.Error(
-                            exception.message ?: "Failed to load player stats"
-                        )
-                    }
-                    .collect { playerStatsList ->
-                        _uiState.value = PlayerCardDetailsUiState.Success(
-                            player = player,
-                            abilityList = playerStatsList.map { it.toUi() },
-                            isEditBottomSheetVisible = false,
-                            editBottomSheetLoading = false,
-                            editBottomSheetError = null
-                        )
-                    }
-            } catch (exception: Exception) {
-                _uiState.value = PlayerCardDetailsUiState.Error(
-                    exception.message ?: "Failed to load player data"
-                )
-            }
-        }
     }
 
     fun showEditPlayerDialog() {
@@ -146,9 +113,53 @@ class PlayerCardViewModel @AssistedInject constructor(
         }
     }
 
-    fun retry() {
-        _uiState.value = PlayerCardDetailsUiState.Loading
-        loadPlayerData()
+    fun deletePlayer() {
+        if (playerId == null) return
+
+        viewModelScope.launch {
+            try {
+                deletePlayerUseCase(playerId)
+            } catch (exception: Exception) {
+                _uiState.value = PlayerCardDetailsUiState.Error(
+                    exception.message ?: "Failed to delete player"
+                )
+            }
+        }
+    }
+
+    private fun loadPlayerData() {
+        if (playerId == null) {
+            _uiState.value = PlayerCardDetailsUiState.Error("Invalid player ID")
+            return
+        }
+
+        viewModelScope.launch {
+            try {
+                // Get player data (assuming this is a suspend function)
+                val player = getPlayerByIdUseCase(playerId)
+
+                // Get player stats flow and combine with player data
+                getPlayerStatsUseCase(playerId)
+                    .catch { exception ->
+                        _uiState.value = PlayerCardDetailsUiState.Error(
+                            exception.message ?: "Failed to load player stats"
+                        )
+                    }
+                    .collect { playerStatsList ->
+                        _uiState.value = PlayerCardDetailsUiState.Success(
+                            player = player,
+                            abilityList = playerStatsList.map { it.toUi() },
+                            isEditBottomSheetVisible = false,
+                            editBottomSheetLoading = false,
+                            editBottomSheetError = null
+                        )
+                    }
+            } catch (exception: Exception) {
+                _uiState.value = PlayerCardDetailsUiState.Error(
+                    exception.message ?: "Failed to load player data"
+                )
+            }
+        }
     }
 }
 

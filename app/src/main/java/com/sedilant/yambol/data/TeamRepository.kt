@@ -36,6 +36,7 @@ interface TeamRepository {
         jerseyNumber: Int,
         excludePlayerId: Int? = null
     ): Boolean
+    suspend fun deletePlayer(playerId: Int)
 
     // team trainings related info
     suspend fun getAllTrainingsByTeamId(teamId: Int): List<TrainEntity>

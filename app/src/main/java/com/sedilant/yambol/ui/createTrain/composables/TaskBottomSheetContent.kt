@@ -11,8 +11,10 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
@@ -70,12 +72,15 @@ fun TaskBottomSheetContent(
     }
     var showConceptDropdown by remember { mutableStateOf(false) }
 
+
     // Header
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
             .systemBarsPadding()
+            .verticalScroll(rememberScrollState())
+
     ) {
 
         Row(

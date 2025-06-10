@@ -1,6 +1,7 @@
 package com.sedilant.yambol.data
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import com.sedilant.yambol.data.entities.PlayerEntity
@@ -46,4 +47,7 @@ interface PlayerDao {
 """
     )
     suspend fun isJerseyNumberTaken(teamId: Int, jerseyNumber: Int, excludePlayerId: Int?): Boolean
+
+    @Query("DELETE FROM player WHERE id = :playerId")
+    suspend fun deletePlayerById(playerId: Int)
 }
