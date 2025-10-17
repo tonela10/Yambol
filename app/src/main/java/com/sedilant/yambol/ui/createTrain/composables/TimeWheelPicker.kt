@@ -27,33 +27,43 @@ fun TimeWheelPicker(
     onTimeChange: (hour: Int, minute: Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Row(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        // Hour picker
-        WheelPicker(
-            items = (0..23).toList(),
-            selectedIndex = selectedHour,
-            onItemSelected = { onTimeChange(it, selectedMinute) },
-            modifier = Modifier.width(60.dp)
-        )
+    Box(modifier = modifier) {
+        Row(
+            modifier = Modifier
+                .clip(RoundedCornerShape(12.dp))
+                .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Hour picker
+            WheelPicker(
+                items = (0..23).toList(),
+                selectedIndex = selectedHour,
+                onItemSelected = { onTimeChange(it, selectedMinute) },
+                modifier = Modifier.width(60.dp)
+            )
 
-        Text(
-            text = ":",
-            color = MaterialTheme.colorScheme.primary,
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(horizontal = 4.dp)
-        )
+            Spacer(modifier = Modifier.width(8.dp))
 
-        // Minute picker
-        WheelPicker(
-            items = (0..59).toList(),
-            selectedIndex = selectedMinute,
-            onItemSelected = { onTimeChange(selectedHour, it) },
-            modifier = Modifier.width(60.dp)
+            // Minute picker
+            WheelPicker(
+                items = (0..59).toList(),
+                selectedIndex = selectedMinute,
+                onItemSelected = { onTimeChange(selectedHour, it) },
+                modifier = Modifier.width(60.dp)
+            )
+        }
+
+        // Selection indicator overlay
+        Box(
+            modifier = Modifier
+                .width(128.dp) // 60dp + 8dp + 60dp = 128dp
+                .height(40.dp)
+                .align(Alignment.Center)
+                .background(
+                    MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
+                    RoundedCornerShape(8.dp)
+                )
         )
     }
 }
@@ -111,9 +121,9 @@ fun <T> WheelPicker(
 
     Box(
         modifier = modifier
-            .height(150.dp)
+            .height(120.dp)
             .clip(RoundedCornerShape(12.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
+            //   .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
             .pointerInput(Unit) {
                 detectDragGestures(
                     onDrag = { change, offset ->
@@ -141,40 +151,25 @@ fun <T> WheelPicker(
                 )
             }
     ) {
-        // Selection indicator
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(40.dp)
-                .align(Alignment.Center)
-                .background(
-                    MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
-                    RoundedCornerShape(8.dp)
-                )
-        )
-
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(vertical = 8.dp),
+                .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Show 2 items before
-            for (i in -2..-1) {
-                val index = currentIndex + i
-                if (index in items.indices) {
-                    WheelPickerItem(
-                        text = displayText(items[index]),
-                        isSelected = false,
-                        alpha = 1f - abs(i) * 0.35f
-                    )
-                } else {
-                    Spacer(modifier = Modifier.height(40.dp))
-                }
+            // Show 1 item before (if exists)
+            val prevIndex = currentIndex - 1
+            if (prevIndex in items.indices) {
+                WheelPickerItem(
+                    text = displayText(items[prevIndex]),
+                    isSelected = false,
+                    alpha = 0.5f
+                )
+            } else {
+                Spacer(modifier = Modifier.height(40.dp))
             }
 
-            // Selected item
+            // Selected item (center)
             if (currentIndex in items.indices) {
                 WheelPickerItem(
                     text = displayText(items[currentIndex]),
@@ -183,18 +178,16 @@ fun <T> WheelPicker(
                 )
             }
 
-            // Show 2 items after
-            for (i in 1..2) {
-                val index = currentIndex + i
-                if (index in items.indices) {
-                    WheelPickerItem(
-                        text = displayText(items[index]),
-                        isSelected = false,
-                        alpha = 1f - abs(i) * 0.35f
-                    )
-                } else {
-                    Spacer(modifier = Modifier.height(40.dp))
-                }
+            // Show 1 item after (if exists)
+            val nextIndex = currentIndex + 1
+            if (nextIndex in items.indices) {
+                WheelPickerItem(
+                    text = displayText(items[nextIndex]),
+                    isSelected = false,
+                    alpha = 0.5f
+                )
+            } else {
+                Spacer(modifier = Modifier.height(40.dp))
             }
         }
     }
@@ -227,30 +220,14 @@ fun WheelPickerItem(
 @Preview(showBackground = true)
 @Composable
 fun TimeWheelPickerPreview() {
-    var hour by remember { mutableStateOf(10) }
-    var minute by remember { mutableStateOf(30) }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF1A1F2E))
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = "Hora",
-            color = Color.White,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium
-        )
-        Spacer(modifier = Modifier.height(8.dp))
+    Box(modifier = Modifier.fillMaxSize()) {
         TimeWheelPicker(
-            selectedHour = hour,
-            selectedMinute = minute,
+            modifier = Modifier
+                .padding(16.dp)
+                .align(Alignment.Center),
+            selectedHour = 10,
+            selectedMinute = 11,
             onTimeChange = { h, m ->
-                hour = h
-                minute = m
             }
         )
     }
@@ -259,94 +236,11 @@ fun TimeWheelPickerPreview() {
 @Preview(showBackground = true)
 @Composable
 fun DurationWheelPickerPreview() {
-    var value by remember { mutableStateOf(2) }
-    var unit by remember { mutableStateOf("Horas") }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF1A1F2E))
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = "Duración",
-            color = Color.White,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        DurationWheelPicker(
-            selectedValue = value,
-            selectedUnit = unit,
-            onDurationChange = { v, u ->
-                value = v
-                unit = u
-            }
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun CombinedPickersPreview() {
-    var hour by remember { mutableStateOf(10) }
-    var minute by remember { mutableStateOf(0) }
-    var duration by remember { mutableStateOf(2) }
-    var durationUnit by remember { mutableStateOf("Horas") }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF1A1F2E))
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "Hora",
-                    color = Color.White,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                TimeWheelPicker(
-                    selectedHour = hour,
-                    selectedMinute = minute,
-                    onTimeChange = { h, m ->
-                        hour = h
-                        minute = m
-                    }
-                )
-            }
-
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "Duración",
-                    color = Color.White,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                DurationWheelPicker(
-                    selectedValue = duration,
-                    selectedUnit = durationUnit,
-                    onDurationChange = { v, u ->
-                        duration = v
-                        durationUnit = u
-                    }
-                )
-            }
+    DurationWheelPicker(
+        selectedValue = 1,
+        selectedUnit = "Minutos",
+        onDurationChange = { v, u ->
         }
-    }
+    )
+
 }

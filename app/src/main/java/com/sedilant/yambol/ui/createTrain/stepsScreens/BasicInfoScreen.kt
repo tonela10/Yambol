@@ -40,8 +40,8 @@ fun BasicInfoScreen(
 ) {
     var selectedHour by remember { mutableStateOf(22) }
     var selectedMinute by remember { mutableStateOf(0) }
-    var selectedDuration by remember { mutableStateOf(2) }
-    var selectedDurationType by remember { mutableStateOf("Horas") }
+    var selectedHour2 by remember { mutableStateOf(22) }
+    var selectedMinute2 by remember { mutableStateOf(0) }
     var expandedEquipo by remember { mutableStateOf(false) }
     var selectedTeam by remember { mutableStateOf("") }
 
@@ -119,12 +119,12 @@ fun BasicInfoScreen(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    DurationWheelPicker(
-                        selectedValue = selectedDuration,
-                        selectedUnit = selectedDurationType,
-                        onDurationChange = { value, unit ->
-                            selectedDuration = value
-                            selectedDurationType = unit
+                    TimeWheelPicker(
+                        selectedHour = selectedHour2,
+                        selectedMinute = selectedMinute2,
+                        onTimeChange = { hour, minute ->
+                            selectedHour2 = hour
+                            selectedMinute2 = minute
                         }
                     )
                 }
