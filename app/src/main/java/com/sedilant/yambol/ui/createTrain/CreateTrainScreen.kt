@@ -27,13 +27,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sedilant.yambol.domain.models.TeamDomainModel
 import com.sedilant.yambol.ui.createTrain.composables.BasicInfoStep
 import com.sedilant.yambol.ui.createTrain.composables.ConceptsStep
@@ -54,7 +54,7 @@ fun CreateTrainScreen(
         }
     )
 ) {
-    val uiState by createTrainViewModel.uiState.collectAsState()
+    val uiState by createTrainViewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(uiState.isTrainSaved) {
         if (uiState.isTrainSaved) {
@@ -106,7 +106,7 @@ fun CreateTrainScreenStateless(
     canProceedFromConcepts: () -> Boolean = { true },
     onErrorDismissed: () -> Unit = {}
 ) {
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(modifier = modifier.fillMaxSize()) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceEvenly
@@ -117,6 +117,8 @@ fun CreateTrainScreenStateless(
                     contentDescription = "Navigate back"
                 )
             }
+            Spacer(modifier = Modifier.width(16.dp))
+
             Text(
                 text = "Create Training - ${uiState.currentStep.title}",
                 style = MaterialTheme.typography.titleMedium
