@@ -28,6 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -40,6 +41,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.room.util.convertUUIDToByte
 import com.sedilant.yambol.domain.models.TeamDomainModel
 import com.sedilant.yambol.ui.createTrain.CreateTrainUiState
 import com.sedilant.yambol.ui.createTrain.commonComposables.CreateTrainScaffold
@@ -50,14 +54,40 @@ import java.time.format.TextStyle
 import java.util.Locale
 
 @Composable
-fun BasicInfoScreen(
+public fun CreateTrainBasicInfoScreen(
     onDismiss: () -> Unit,
     onNext: () -> Unit,
-    uiState: CreateTrainUiState,
-    onTeamSelected: (Int) -> Unit,
+    viewModel: CreateTrainBasicInfoViewModel = hiltViewModel()
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    CreateTrainBasicInfoScreenStateless(
+        onDismiss = onDismiss,
+        onNext = {
+            viewModel::onSaveInfo
+            onNext()
+        },
+        uiState = uiState,
+        onTeamSelected = viewModel::onTeamSelected,
+        onTimeChange = { _, _ -> }, // TO DECIDE if I keep it in compose or move it to the viewModel
+        onDurationChange = { _, _ -> }
+    )
+}
+
+@Composable
+private fun CreateTrainBasicInfoScreenStateless(
+    onDismiss: () -> Unit,
+    onNext: () -> Unit,
+    uiState: CreateTrainBasicInfoViewModel.UiState,
+    onTeamSelected: (String) -> Unit,
     onTimeChange: (Int, Int) -> Unit,
     onDurationChange: (Int, Int) -> Unit
 ) {
+    var selectedHours by remember { mutableIntStateOf(5) } // GET TIME TIME
+    var selectedMinute by remember { mutableIntStateOf(5) } // GET CURRENT TIME
+    var durationHours by remember { mutableIntStateOf(1) }
+    var durationMinute by remember { mutableIntStateOf(30) }
+
     CreateTrainScaffold(
         title = "Nuevo entrenamiento",
         onCloseClick = onDismiss,
@@ -95,26 +125,32 @@ fun BasicInfoScreen(
                 TimeSelector(
                     title = "Hora",
                     modifier = Modifier.weight(1f),
-                    selectedHour = uiState.selectedHours,
-                    selectedMinute = uiState.selectedMinutes,
-                    onTimeChange = onTimeChange
+                    selectedHour = selectedHours,
+                    selectedMinute = selectedMinute,
+                    onTimeChange = { hour, minute ->
+                        selectedHours = hour
+                        selectedMinute = minute
+                    }
                 )
 
                 // Duración
                 TimeSelector(
                     title = "Duración",
                     modifier = Modifier.weight(1f),
-                    selectedHour = uiState.selectedHours,
-                    selectedMinute = uiState.selectedMinutes,
-                    onTimeChange = onDurationChange
+                    selectedHour = durationHours,
+                    selectedMinute = durationMinute,
+                    onTimeChange = { hour, minute ->
+                        durationHours = hour
+                        durationMinute = minute
+                    }
                 )
             }
 
             // Team Selection
             TeamSelectionDropdown(
-                teams = uiState.teams,
-                selectedTeamId = uiState.selectedTeamId,
-                onTeamSelected = onTeamSelected
+                teams = emptyList(), // TODO pass the ui Team Model, in this case a String
+                selectedTeamId = 0,
+                onTeamSelected = {}
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -179,7 +215,17 @@ private fun DateSelector() {
                 )
             }
             Text(
-                text = "${currentMonth.month.getDisplayName(TextStyle.FULL, Locale("es", "ES")).replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale("es", "ES")) else it.toString() }} ${currentMonth.year}",
+                text = "${
+                    currentMonth.month.getDisplayName(TextStyle.FULL, Locale("es", "ES"))
+                        .replaceFirstChar {
+                            if (it.isLowerCase()) it.titlecase(
+                                Locale(
+                                    "es",
+                                    "ES"
+                                )
+                            ) else it.toString()
+                        }
+                } ${currentMonth.year}",
                 color = MaterialTheme.colorScheme.primary,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium
@@ -274,14 +320,10 @@ fun CalendarGrid(
 @Composable
 fun BasicInfoScreenPreview() {
     MaterialTheme {
-        BasicInfoScreen(
+        CreateTrainBasicInfoScreenStateless(
             onDismiss = {},
             onNext = {},
-            uiState = CreateTrainUiState(
-                teams = listOf(
-                    TeamDomainModel(id = 1, name = "Team 1")
-                )
-            ),
+            uiState = CreateTrainBasicInfoViewModel.UiState(),
             onTeamSelected = {},
             onTimeChange = { _, _ -> },
             onDurationChange = { _, _ -> }
