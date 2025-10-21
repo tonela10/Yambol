@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.rememberScrollState
@@ -23,9 +22,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -45,6 +41,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sedilant.yambol.domain.models.TeamDomainModel
+import com.sedilant.yambol.ui.createTrain.CreateTrainUiState
+import com.sedilant.yambol.ui.createTrain.composables.CreateTrainScaffold
 import com.sedilant.yambol.ui.createTrain.composables.TeamSelectionDropdown
 import com.sedilant.yambol.ui.createTrain.composables.TimeWheelPicker
 import java.time.YearMonth
@@ -53,28 +51,26 @@ import java.util.Locale
 
 @Composable
 fun BasicInfoScreen(
-    onDismiss: () -> Unit = {},
-    onNext: () -> Unit = {}
+    onDismiss: () -> Unit,
+    onNext: () -> Unit,
+    uiState: CreateTrainUiState,
+    onTeamSelected: (Int) -> Unit,
+    onTimeChange: (Int, Int) -> Unit,
+    onDurationChange: (Int, Int) -> Unit
 ) {
-    var selectedHour by remember { mutableStateOf(22) }
-    var selectedMinute by remember { mutableStateOf(0) }
-    var selectedHour2 by remember { mutableStateOf(22) }
-    var selectedMinute2 by remember { mutableStateOf(0) }
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .systemBarsPadding()
-    ) {
+    CreateTrainScaffold(
+        title = "Nuevo entrenamiento",
+        onCloseClick = onDismiss,
+        onBottomButtonClick = onNext,
+        bottomButtonText = "Siguiente",
+        showBackButton = false
+    ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(paddingValues)
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.SpaceBetween,
         ) {
-            // Header
-            Header(onDismiss)
             // Date Section
             Text(
                 modifier = Modifier.padding(horizontal = 16.dp),
@@ -83,8 +79,11 @@ fun BasicInfoScreen(
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
             )
+
+            // Calendar
             DateSelector()
 
+            // Time and Duration Section
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -92,49 +91,31 @@ fun BasicInfoScreen(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalAlignment = Alignment.Top
             ) {
+                // Hora
                 TimeSelector(
+                    title = "Hora",
                     modifier = Modifier.weight(1f),
-                    selectedHour = selectedHour,
-                    selectedMinute = selectedMinute
-                ) { hour, minute ->
-                    selectedHour = hour
-                    selectedMinute = minute
-                }
-                TimeSelector(
-                    modifier = Modifier.weight(1f),
-                    selectedHour = selectedHour2,
-                    selectedMinute = selectedMinute2
-                ) { hour, minute ->
-                    selectedHour2 = hour
-                    selectedMinute2 = minute
-                }
-            }
-            // Team Selection
-            TeamSelectionDropdown(
-                teams = listOf(TeamDomainModel(name = "Equipo 1", id = 1)), // Just an exmaple
-                selectedTeamId = 0,
-                onTeamSelected = {}
-            )
+                    selectedHour = uiState.selectedHours,
+                    selectedMinute = uiState.selectedMinutes,
+                    onTimeChange = onTimeChange
+                )
 
-            // Next Button
-            Button(
-                onClick = onNext,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-                    .height(48.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary
-                ),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Text(
-                    text = "Siguiente",
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium
+                // Duración
+                TimeSelector(
+                    title = "Duración",
+                    modifier = Modifier.weight(1f),
+                    selectedHour = uiState.selectedHours,
+                    selectedMinute = uiState.selectedMinutes,
+                    onTimeChange = onDurationChange
                 )
             }
+
+            // Team Selection
+            TeamSelectionDropdown(
+                teams = uiState.teams,
+                selectedTeamId = uiState.selectedTeamId,
+                onTeamSelected = onTeamSelected
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
         }
@@ -143,6 +124,7 @@ fun BasicInfoScreen(
 
 @Composable
 private fun TimeSelector(
+    title: String,
     modifier: Modifier = Modifier,
     selectedHour: Int,
     selectedMinute: Int,
@@ -153,7 +135,7 @@ private fun TimeSelector(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Hora",
+            text = title,
             color = MaterialTheme.colorScheme.primary,
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium
@@ -163,38 +145,7 @@ private fun TimeSelector(
         TimeWheelPicker(
             selectedHour = selectedHour,
             selectedMinute = selectedMinute,
-            onTimeChange = { hour, minute ->
-                onTimeChange(hour, minute)
-            }
-        )
-    }
-}
-
-@Composable
-private fun Header(onDismiss: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 24.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Spacer(modifier = Modifier.size(24.dp))
-
-        Text(
-            text = "Nuevo entrenamiento",
-            color = MaterialTheme.colorScheme.primary,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            lineHeight = 22.sp
-        )
-        Icon(
-            imageVector = Icons.Default.Close,
-            contentDescription = "Close",
-            tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier
-                .size(24.dp)
-                .clickable { onDismiss() }
+            onTimeChange = onTimeChange
         )
     }
 }
@@ -228,16 +179,7 @@ private fun DateSelector() {
                 )
             }
             Text(
-                text = "${
-                    currentMonth.month.getDisplayName(
-                        TextStyle.FULL,
-                        Locale("es", "ES")
-                    ).replaceFirstChar {
-                        if (it.isLowerCase()) it.titlecase(
-                            Locale("es", "ES")
-                        ) else it.toString()
-                    }
-                } ${currentMonth.year}",
+                text = "${currentMonth.month.getDisplayName(TextStyle.FULL, Locale("es", "ES")).replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale("es", "ES")) else it.toString() }} ${currentMonth.year}",
                 color = MaterialTheme.colorScheme.primary,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium
@@ -276,6 +218,7 @@ private fun DateSelector() {
             selectedDay = selectedDate,
             onDaySelected = { selectedDate = it },
             primaryBlue = MaterialTheme.colorScheme.primary,
+            textSecondary = MaterialTheme.colorScheme.secondary
         )
     }
 }
@@ -287,6 +230,7 @@ fun CalendarGrid(
     selectedDay: Int,
     onDaySelected: (Int) -> Unit,
     primaryBlue: Color,
+    textSecondary: Color
 ) {
     val firstDayOfMonth = yearMonth.atDay(1)
     val daysInMonth = yearMonth.lengthOfMonth()
@@ -318,8 +262,7 @@ fun CalendarGrid(
             ) {
                 Text(
                     text = day.toString(),
-                    color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary,
-                    fontSize = 14.sp,
+                    color = if (isSelected) Color.White else textSecondary,
                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
                 )
             }
@@ -331,6 +274,17 @@ fun CalendarGrid(
 @Composable
 fun BasicInfoScreenPreview() {
     MaterialTheme {
-        BasicInfoScreen()
+        BasicInfoScreen(
+            onDismiss = {},
+            onNext = {},
+            uiState = CreateTrainUiState(
+                teams = listOf(
+                    TeamDomainModel(id = 1, name = "Team 1")
+                )
+            ),
+            onTeamSelected = {},
+            onTimeChange = { _, _ -> },
+            onDurationChange = { _, _ -> }
+        )
     }
 }
