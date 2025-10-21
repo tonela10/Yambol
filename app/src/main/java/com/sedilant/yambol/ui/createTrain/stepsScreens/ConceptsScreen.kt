@@ -15,11 +15,15 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,16 +37,19 @@ import androidx.compose.ui.unit.dp
 import com.sedilant.yambol.ui.createTrain.CreateTrainUiState
 import com.sedilant.yambol.ui.createTrain.composables.CreateTrainScaffold
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConceptsScreen(
     onBack: () -> Unit,
     onNext: () -> Unit,
     uiState: CreateTrainUiState,
     onConceptSelected: (String) -> Unit,
-    onAddConcept: () -> Unit,
+    onAddConcept: (String) -> Unit,
     onDismiss: () -> Unit
 ) {
     var searchQuery by remember { mutableStateOf("") }
+    var showBottomSheet by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState()
 
     CreateTrainScaffold(
         title = "Crear entrenamiento",
@@ -50,7 +57,7 @@ fun ConceptsScreen(
         onBottomButtonClick = onNext,
         bottomButtonText = "Siguiente",
         showBackButton = true,
-        onBackClick = onBack
+        onBackClick = onBack,
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -58,6 +65,21 @@ fun ConceptsScreen(
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {
+
+            if (showBottomSheet) {
+                ModalBottomSheet(
+                    onDismissRequest = { showBottomSheet = false },
+                    sheetState = sheetState
+                ) {
+                    AddConceptBottomSheet(
+                        onAddConcept = {
+                            onAddConcept(it)
+                            showBottomSheet = false
+                        }
+                    )
+                }
+            }
+
             Text(
                 text = "¿Qué conceptos quieres trabajar?",
                 style = MaterialTheme.typography.headlineMedium,
@@ -92,7 +114,7 @@ fun ConceptsScreen(
                     text = "Añadir concepto",
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.clickable { onAddConcept() }
+                    modifier = Modifier.clickable { showBottomSheet = true }
                 )
             }
             Spacer(modifier = Modifier.height(16.dp))
@@ -107,6 +129,37 @@ fun ConceptsScreen(
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun AddConceptBottomSheet(onAddConcept: (String) -> Unit) {
+    var conceptName by remember { mutableStateOf("") }
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        Text(
+            text = "Añadir concepto",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        OutlinedTextField(
+            value = conceptName,
+            onValueChange = { conceptName = it },
+            label = { Text("Nombre del concepto") },
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(
+            onClick = { onAddConcept(conceptName) },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = conceptName.isNotBlank()
+        ) {
+            Text(text = "Guardar")
         }
     }
 }
@@ -168,7 +221,10 @@ fun ConceptsScreenPreview() {
             }
             uiState = uiState.copy(concepts = currentConcepts)
         },
-        onAddConcept = {},
+        onAddConcept = { newConcept ->
+            val updatedConcepts = uiState.concepts + newConcept
+            uiState = uiState.copy(concepts = updatedConcepts)
+        },
         onDismiss = {}
     )
 }
