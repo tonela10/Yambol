@@ -35,12 +35,15 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sedilant.yambol.domain.models.TeamDomainModel
-import com.sedilant.yambol.ui.createTrain.composables.BasicInfoStep
-import com.sedilant.yambol.ui.createTrain.composables.ConceptsStep
-import com.sedilant.yambol.ui.createTrain.composables.ReviewStep
-import com.sedilant.yambol.ui.createTrain.composables.TasksStep
+import com.sedilant.yambol.ui.createTrain.commonComposables.BasicInfoStep
+import com.sedilant.yambol.ui.createTrain.commonComposables.ConceptsStep
+import com.sedilant.yambol.ui.createTrain.commonComposables.ReviewStep
+import com.sedilant.yambol.ui.createTrain.commonComposables.TasksStep
 import com.sedilant.yambol.ui.theme.YambolTheme
 import java.util.Date
+
+/* TODO this will be modify to be a wrapper with a NavHost for all the screen included in
+ the create train flow */
 
 @Composable
 fun CreateTrainScreen(
