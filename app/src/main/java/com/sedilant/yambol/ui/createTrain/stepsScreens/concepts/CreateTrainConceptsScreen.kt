@@ -1,4 +1,4 @@
-package com.sedilant.yambol.ui.createTrain.stepsScreens
+package com.sedilant.yambol.ui.createTrain.stepsScreens.concepts
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -34,15 +34,37 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sedilant.yambol.ui.createTrain.CreateTrainUiState
-import com.sedilant.yambol.ui.createTrain.composables.CreateTrainScaffold
+import com.sedilant.yambol.ui.createTrain.commonComposables.CreateTrainScaffold
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConceptsScreen(
     onBack: () -> Unit,
     onNext: () -> Unit,
-    uiState: CreateTrainUiState,
+    onDismiss: () -> Unit,
+    viewModel: CreateTrainConceptsViewModel = hiltViewModel()
+) {
+
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    CreateTrainConceptsScreenStateless(
+        uiState = uiState,
+        onBack = onBack,
+        onNext = onNext,
+        onDismiss = onDismiss,
+        onConceptSelected = viewModel::onConceptSelected,
+        onAddConcept = viewModel::onAddConcept
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun CreateTrainConceptsScreenStateless(
+    uiState: CreateTrainConceptsViewModel.UiState,
+    onBack: () -> Unit,
+    onNext: () -> Unit,
     onConceptSelected: (String) -> Unit,
     onAddConcept: (String) -> Unit,
     onDismiss: () -> Unit
@@ -121,11 +143,11 @@ fun ConceptsScreen(
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(uiState.concepts) { concept ->
+                items(uiState.conceptsList) { concept ->
                     ConceptItem(
-                        concept = concept,
-                        isSelected = uiState.concepts.contains(concept),
-                        onConceptSelected = { onConceptSelected(concept) }
+                        concept = concept.conceptName,
+                        isSelected = uiState.conceptsList.contains(concept),
+                        onConceptSelected = { onConceptSelected(concept.conceptName) }
                     )
                 }
             }
@@ -201,30 +223,19 @@ fun ConceptsScreenPreview() {
         "Transición defensa-ataque"
     )
 
-    var uiState by remember {
-        mutableStateOf(
-            CreateTrainUiState(
-                concepts = concepts
-            )
-        )
-    }
-    ConceptsScreen(
+    CreateTrainConceptsScreenStateless(
+        uiState = CreateTrainConceptsViewModel.UiState(
+            conceptsList = concepts.map {
+                Concept(
+                    conceptName = it,
+                    isSelected = true
+                )
+            }
+        ),
         onBack = {},
         onNext = {},
-        uiState = uiState,
-        onConceptSelected = { selectedConcept ->
-            val currentConcepts = uiState.concepts.toMutableList()
-            if (currentConcepts.contains(selectedConcept)) {
-                currentConcepts.remove(selectedConcept)
-            } else {
-                currentConcepts.add(selectedConcept)
-            }
-            uiState = uiState.copy(concepts = currentConcepts)
-        },
-        onAddConcept = { newConcept ->
-            val updatedConcepts = uiState.concepts + newConcept
-            uiState = uiState.copy(concepts = updatedConcepts)
-        },
+        onConceptSelected = { _ -> },
+        onAddConcept = { _ -> },
         onDismiss = {}
     )
 }
