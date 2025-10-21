@@ -1,4 +1,4 @@
-package com.sedilant.yambol.ui.createTrain.composables
+package com.sedilant.yambol.ui.createTrain.commonComposables
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

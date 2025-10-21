@@ -1,4 +1,4 @@
-package com.sedilant.yambol.ui.createTrain.stepsScreens
+package com.sedilant.yambol.ui.createTrain.stepsScreens.basicInfo
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
@@ -42,9 +42,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sedilant.yambol.domain.models.TeamDomainModel
 import com.sedilant.yambol.ui.createTrain.CreateTrainUiState
-import com.sedilant.yambol.ui.createTrain.composables.CreateTrainScaffold
-import com.sedilant.yambol.ui.createTrain.composables.TeamSelectionDropdown
-import com.sedilant.yambol.ui.createTrain.composables.TimeWheelPicker
+import com.sedilant.yambol.ui.createTrain.commonComposables.CreateTrainScaffold
+import com.sedilant.yambol.ui.createTrain.commonComposables.TeamSelectionDropdown
+import com.sedilant.yambol.ui.createTrain.commonComposables.TimeWheelPicker
 import java.time.YearMonth
 import java.time.format.TextStyle
 import java.util.Locale

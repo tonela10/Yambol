@@ -1,4 +1,4 @@
-package com.sedilant.yambol.ui.createTrain.composables
+package com.sedilant.yambol.ui.createTrain.commonComposables
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
