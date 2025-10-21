@@ -24,7 +24,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -45,12 +44,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.sedilant.yambol.domain.models.TeamDomainModel
+import com.sedilant.yambol.ui.createTrain.composables.TeamSelectionDropdown
 import com.sedilant.yambol.ui.createTrain.composables.TimeWheelPicker
 import java.time.YearMonth
 import java.time.format.TextStyle
 import java.util.Locale
 
-@SuppressLint("NewApi")
 @Composable
 fun BasicInfoScreen(
     onDismiss: () -> Unit = {},
@@ -60,8 +60,6 @@ fun BasicInfoScreen(
     var selectedMinute by remember { mutableStateOf(0) }
     var selectedHour2 by remember { mutableStateOf(22) }
     var selectedMinute2 by remember { mutableStateOf(0) }
-    var expandedEquipo by remember { mutableStateOf(false) }
-    var selectedTeam by remember { mutableStateOf("") }
 
     Box(
         modifier = Modifier
@@ -77,7 +75,6 @@ fun BasicInfoScreen(
         ) {
             // Header
             Header(onDismiss)
-
             // Date Section
             Text(
                 modifier = Modifier.padding(horizontal = 16.dp),
@@ -86,11 +83,8 @@ fun BasicInfoScreen(
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
             )
-
-            // Calendar
             DateSelector()
 
-            // Time and Duration Section
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -98,88 +92,29 @@ fun BasicInfoScreen(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalAlignment = Alignment.Top
             ) {
-                // Hora
-                Column(
+                TimeSelector(
                     modifier = Modifier.weight(1f),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = "Hora",
-                        color = MaterialTheme.colorScheme.primary,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    TimeWheelPicker(
-                        selectedHour = selectedHour,
-                        selectedMinute = selectedMinute,
-                        onTimeChange = { hour, minute ->
-                            selectedHour = hour
-                            selectedMinute = minute
-                        }
-                    )
+                    selectedHour = selectedHour,
+                    selectedMinute = selectedMinute
+                ) { hour, minute ->
+                    selectedHour = hour
+                    selectedMinute = minute
                 }
-
-                // Duración
-                Column(
+                TimeSelector(
                     modifier = Modifier.weight(1f),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = "Duración",
-                        color = MaterialTheme.colorScheme.primary,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    TimeWheelPicker(
-                        selectedHour = selectedHour2,
-                        selectedMinute = selectedMinute2,
-                        onTimeChange = { hour, minute ->
-                            selectedHour2 = hour
-                            selectedMinute2 = minute
-                        }
-                    )
+                    selectedHour = selectedHour2,
+                    selectedMinute = selectedMinute2
+                ) { hour, minute ->
+                    selectedHour2 = hour
+                    selectedMinute2 = minute
                 }
             }
-
             // Team Selection
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 16.dp)
-            ) {
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
-                        .clickable { expandedEquipo = !expandedEquipo }
-                        .padding(16.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = if (selectedTeam.isEmpty()) "Seleccionar equipo" else selectedTeam,
-                            color = MaterialTheme.colorScheme.primary,
-                            fontSize = 14.sp
-                        )
-                        Icon(
-                            imageVector = Icons.Default.KeyboardArrowDown,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
-                }
-            }
+            TeamSelectionDropdown(
+                teams = listOf(TeamDomainModel(name = "Equipo 1", id = 1)), // Just an exmaple
+                selectedTeamId = 0,
+                onTeamSelected = {}
+            )
 
             // Next Button
             Button(
@@ -207,6 +142,35 @@ fun BasicInfoScreen(
 }
 
 @Composable
+private fun TimeSelector(
+    modifier: Modifier = Modifier,
+    selectedHour: Int,
+    selectedMinute: Int,
+    onTimeChange: (Int, Int) -> Unit
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "Hora",
+            color = MaterialTheme.colorScheme.primary,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Medium
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+
+        TimeWheelPicker(
+            selectedHour = selectedHour,
+            selectedMinute = selectedMinute,
+            onTimeChange = { hour, minute ->
+                onTimeChange(hour, minute)
+            }
+        )
+    }
+}
+
+@Composable
 private fun Header(onDismiss: () -> Unit) {
     Row(
         modifier = Modifier
@@ -215,6 +179,15 @@ private fun Header(onDismiss: () -> Unit) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
+        Spacer(modifier = Modifier.size(24.dp))
+
+        Text(
+            text = "Nuevo entrenamiento",
+            color = MaterialTheme.colorScheme.primary,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            lineHeight = 22.sp
+        )
         Icon(
             imageVector = Icons.Default.Close,
             contentDescription = "Close",
@@ -223,14 +196,6 @@ private fun Header(onDismiss: () -> Unit) {
                 .size(24.dp)
                 .clickable { onDismiss() }
         )
-        Text(
-            text = "Nuevo entrenamiento",
-            color = MaterialTheme.colorScheme.primary,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            lineHeight = 22.sp
-        )
-        Spacer(modifier = Modifier.size(24.dp))
     }
 }
 
@@ -311,7 +276,6 @@ private fun DateSelector() {
             selectedDay = selectedDate,
             onDaySelected = { selectedDate = it },
             primaryBlue = MaterialTheme.colorScheme.primary,
-            textSecondary = MaterialTheme.colorScheme.secondary
         )
     }
 }
@@ -323,7 +287,6 @@ fun CalendarGrid(
     selectedDay: Int,
     onDaySelected: (Int) -> Unit,
     primaryBlue: Color,
-    textSecondary: Color
 ) {
     val firstDayOfMonth = yearMonth.atDay(1)
     val daysInMonth = yearMonth.lengthOfMonth()
