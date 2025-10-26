@@ -9,12 +9,12 @@ plugins {
 
 android {
     namespace = "com.sedilant.yambol"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.sedilant.yambol"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
@@ -56,12 +56,12 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.ui.text.google.fonts)
+    implementation(libs.androidx.material.icons.extended)
     implementation(libs.kotlinx.serialization.json)
 
     // Room
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.media3.common.ktx)
-    implementation(libs.ui.text.google.fonts)
     ksp(libs.androidx.room.compiler)
 
     // Hilt
