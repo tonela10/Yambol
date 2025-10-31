@@ -18,6 +18,7 @@ roomCompiler = "2.8.3"
 roomKtx = "2.8.3"
 media3CommonKtx = "1.8.0"
 uiTextGoogleFonts = "1.9.4"
+reorderable = "3.0.0"
 firebaseBom = "32.5.0"
 
 [libraries]
@@ -51,8 +52,7 @@ firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.r
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth-ktx" }
 firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics-ktx" }
 firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx" }
-
-
+reorderable = { module = "sh.calvin.reorderable:reorderable", version.ref = "reorderable" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
