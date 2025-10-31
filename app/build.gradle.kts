@@ -59,6 +59,7 @@ dependencies {
     implementation(libs.androidx.ui.text.google.fonts)
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.reorderable)
 
     // Firebase
     implementation(platform("com.google.firebase:firebase-bom:34.5.0"))
