@@ -19,47 +19,73 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sedilant.yambol.ui.createTrain.commonComposables.CreateTrainScaffold
 import com.sedilant.yambol.ui.createTrain.stepsScreens.tasks.Task
 
 @Composable
-public fun CreateTrainDetailsScreenV2S() {
-    CreateTrainDetailsScreenV2Stateless()
+public fun CreateTrainDetailsScreenV2(
+    onBack: () -> Unit,
+    onClose: () -> Unit,
+    viewModel: CreateTrainDetailsViewModel = hiltViewModel()
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    CreateTrainDetailsScreenStateless(
+        onBack = onBack,
+        onClose = onClose,
+        uiState = uiState
+    )
 }
 
 @Composable
-public fun CreateTrainDetailsScreenV2Stateless() {
-    CreateTrainScaffold(
-        onBackClick = { /*TODO*/ },
-        title = "Detalles del entrenamiento",
-        onCloseClick = { /*TODO*/ },
-        onBottomButtonClick = { /*TODO*/ },
-        bottomButtonText = "Guardar entrenamiento",
-        showBackButton = true
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(paddingValues)
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState())
-        ) {
-            // General Information
-            GeneralInfo()
+public fun CreateTrainDetailsScreenStateless(
+    onBack: () -> Unit,
+    onClose: () -> Unit,
+    uiState: CreateTrainDetailsUiState
+) {
+    when (uiState) {
+        is CreateTrainDetailsUiState.Loading -> {
 
-            Spacer(modifier = Modifier.height(16.dp))
+        }
 
-            // Concepts Information
-            ConceptsInfo()
+        is CreateTrainDetailsUiState.Error -> {}
+        is CreateTrainDetailsUiState.Success -> {
+            CreateTrainScaffold(
+                onBackClick = onBack,
+                title = "Detalles del entrenamiento",
+                onCloseClick = onClose,
+                onBottomButtonClick = onClose,
+                bottomButtonText = "Guardar entrenamiento",
+                showBackButton = true
+            ) { paddingValues ->
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(paddingValues)
+                        .padding(16.dp)
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    // General Information
+                    GeneralInfo()
 
-            Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
 
-            // Tasks Information
-            TasksInfo()
+                    // Concepts Information
+                    ConceptsInfo()
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Tasks Information
+                    TasksInfo()
+                }
+            }
         }
     }
 }
@@ -189,6 +215,14 @@ private fun InfoRow(modifier: Modifier = Modifier, field: String, data: String) 
 
 @Preview
 @Composable
-private fun CreateTrainDetailsScreenV2Preview() {
-    CreateTrainDetailsScreenV2Stateless()
+private fun CreateTrainDetailsScreenPreview() {
+    CreateTrainDetailsScreenStateless(
+        uiState = CreateTrainDetailsUiState.Success(
+            trainInfo = TrainInfo(),
+            listOfTasks = listOf(),
+            listOfConcepts = listOf()
+        ),
+        onBack = {},
+        onClose = {}
+    )
 }

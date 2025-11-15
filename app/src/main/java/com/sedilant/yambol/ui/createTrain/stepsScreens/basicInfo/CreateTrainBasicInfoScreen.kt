@@ -41,11 +41,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.room.util.convertUUIDToByte
-import com.sedilant.yambol.domain.models.TeamDomainModel
-import com.sedilant.yambol.ui.createTrain.CreateTrainUiState
 import com.sedilant.yambol.ui.createTrain.commonComposables.CreateTrainScaffold
 import com.sedilant.yambol.ui.createTrain.commonComposables.TeamSelectionDropdown
 import com.sedilant.yambol.ui.createTrain.commonComposables.TimeWheelPicker
@@ -55,16 +52,15 @@ import java.util.Locale
 
 @Composable
 public fun CreateTrainBasicInfoScreen(
-    onDismiss: () -> Unit,
+    onClose: () -> Unit,
     onNext: () -> Unit,
     viewModel: CreateTrainBasicInfoViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     CreateTrainBasicInfoScreenStateless(
-        onDismiss = onDismiss,
+        onClose = onClose,
         onNext = {
-            viewModel::onSaveInfo
             onNext()
         },
         uiState = uiState,
@@ -76,7 +72,7 @@ public fun CreateTrainBasicInfoScreen(
 
 @Composable
 private fun CreateTrainBasicInfoScreenStateless(
-    onDismiss: () -> Unit,
+    onClose: () -> Unit,
     onNext: () -> Unit,
     uiState: CreateTrainBasicInfoViewModel.UiState,
     onTeamSelected: (String) -> Unit,
@@ -90,7 +86,7 @@ private fun CreateTrainBasicInfoScreenStateless(
 
     CreateTrainScaffold(
         title = "Nuevo entrenamiento",
-        onCloseClick = onDismiss,
+        onCloseClick = onClose,
         onBottomButtonClick = onNext,
         bottomButtonText = "Siguiente",
         showBackButton = false
@@ -321,7 +317,7 @@ fun CalendarGrid(
 fun BasicInfoScreenPreview() {
     MaterialTheme {
         CreateTrainBasicInfoScreenStateless(
-            onDismiss = {},
+            onClose = {},
             onNext = {},
             uiState = CreateTrainBasicInfoViewModel.UiState(),
             onTeamSelected = {},

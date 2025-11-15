@@ -46,6 +46,9 @@ import sh.calvin.reorderable.rememberReorderableLazyListState
 
 @Composable
 fun CreateTrainTasksScreen(
+    onBack: () -> Unit,
+    onNext: () -> Unit,
+    onClose: () -> Unit,
     viewModel: CreateTrainTasksViewModel = hiltViewModel()
 ) {
 
@@ -53,13 +56,19 @@ fun CreateTrainTasksScreen(
 
     CreateTrainTasksScreenStateless(
         tasks = uiState.tasksList,
-        onMove = viewModel::onTasksMove
+        onMove = viewModel::onTasksMove,
+        onBack = onBack,
+        onNext = onNext,
+        onClose = onClose
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CreateTrainTasksScreenStateless(
+    onBack: () -> Unit,
+    onNext: () -> Unit,
+    onClose: () -> Unit,
     tasks: List<Task> = emptyList(),
     onMove: (from: Int, to: Int) -> Unit
 ) {
@@ -69,11 +78,11 @@ private fun CreateTrainTasksScreenStateless(
 
     CreateTrainScaffold(
         title = "Nuevo Entrenamiento",
-        onCloseClick = {},
-        onBottomButtonClick = {},
+        onCloseClick = onClose,
+        onBottomButtonClick = onNext,
         bottomButtonText = "CREAR ENTRENAMIENTO",
         showBackButton = true,
-        onBackClick = {},
+        onBackClick = onBack,
     ) { innerPadding ->
 
         Column(
@@ -110,7 +119,7 @@ private fun CreateTrainTasksScreenStateless(
                     .background(
                         MaterialTheme.colorScheme.primaryContainer
                     )
-                    .clickable(onClick = {showBottomSheet = true}),
+                    .clickable(onClick = { showBottomSheet = true }),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -224,21 +233,6 @@ private fun AddTaskBottomSheet(onAddTask: (String) -> Unit) {
         }
     }
 }
-
-
-//@Preview(showBackground = true)
-//@Composable
-//fun CreateTrainTasksScreenPreview() {
-//    val tasks = listOf(
-//        Task("1", "Sentadillas", "3x12"),
-//        Task("2", "Press Banca", "3x10"),
-//        Task("3", "Dominadas", "3x8")
-//    )
-//    CreateTrainTasksScreenStateless(
-//        tasks = tasks,
-//        onMove = { _, _ -> }
-//    )
-//}
 
 @Preview(showBackground = true)
 @Composable
