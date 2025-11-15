@@ -34,16 +34,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.sedilant.yambol.ui.createTrain.CreateTrainUiState
 import com.sedilant.yambol.ui.createTrain.commonComposables.CreateTrainScaffold
 
 @Composable
-fun ConceptsScreen(
+fun CreateTrainConceptsScreen(
     onBack: () -> Unit,
     onNext: () -> Unit,
-    onDismiss: () -> Unit,
+    onClose: () -> Unit,
     viewModel: CreateTrainConceptsViewModel = hiltViewModel()
 ) {
 
@@ -53,7 +52,7 @@ fun ConceptsScreen(
         uiState = uiState,
         onBack = onBack,
         onNext = onNext,
-        onDismiss = onDismiss,
+        onClose = onClose,
         onConceptSelected = viewModel::onConceptSelected,
         onAddConcept = viewModel::onAddConcept
     )
@@ -67,7 +66,7 @@ private fun CreateTrainConceptsScreenStateless(
     onNext: () -> Unit,
     onConceptSelected: (String) -> Unit,
     onAddConcept: (String) -> Unit,
-    onDismiss: () -> Unit
+    onClose: () -> Unit
 ) {
     var searchQuery by remember { mutableStateOf("") }
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -75,7 +74,7 @@ private fun CreateTrainConceptsScreenStateless(
 
     CreateTrainScaffold(
         title = "Crear entrenamiento",
-        onCloseClick = onDismiss,
+        onCloseClick = onClose,
         onBottomButtonClick = onNext,
         bottomButtonText = "Siguiente",
         showBackButton = true,
@@ -236,6 +235,6 @@ fun ConceptsScreenPreview() {
         onNext = {},
         onConceptSelected = { _ -> },
         onAddConcept = { _ -> },
-        onDismiss = {}
+        onClose = {}
     )
 }
