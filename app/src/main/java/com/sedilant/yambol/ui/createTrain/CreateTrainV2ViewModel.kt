@@ -34,6 +34,10 @@ class CreateTrainV2ViewModel @Inject constructor() : ViewModel() {
     fun onCancel() {
         _uiState.value = CreateTrainUiStateV2()
     }
+
+    fun onSave(){
+
+    }
 }
 
 data class CreateTrainUiStateV2(

@@ -12,6 +12,10 @@ import com.sedilant.yambol.data.TeamObjectivesDao
 import com.sedilant.yambol.data.TeamRepository
 import com.sedilant.yambol.data.TeamRepositoryImpl
 import com.sedilant.yambol.data.TrainingDao
+import com.sedilant.yambol.data.draftTrain.TrainingDatabase
+import com.sedilant.yambol.data.draftTrain.TrainingDraftDao
+import com.sedilant.yambol.data.draftTrain.TrainingDraftRepository
+import com.sedilant.yambol.data.draftTrain.TrainingDraftRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -28,6 +32,9 @@ abstract class DataModule {
 
     @Binds
     abstract fun bindStatsRecordRepository(impl: StatsRecordRepositoryImpl): StatsRecordRepository
+
+    @Binds
+    abstract fun bindTrainingDraftRepository(impl: TrainingDraftRepositoryImpl): TrainingDraftRepository
 
     companion object {
 
@@ -55,6 +62,11 @@ abstract class DataModule {
         @Provides
         fun provideTrainingDao(context: Context): TrainingDao {
             return TeamDatabase.getDatabase(context).trainingDao()
+        }
+
+        @Provides
+        fun providesTrainingDraftDao(context: Context): TrainingDraftDao {
+            return TrainingDatabase.getDatabase(context).trainingDraftDao()
         }
 
         @Provides

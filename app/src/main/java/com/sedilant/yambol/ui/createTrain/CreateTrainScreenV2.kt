@@ -14,6 +14,12 @@ import com.sedilant.yambol.ui.createTrain.stepsScreens.concepts.CreateTrainConce
 import com.sedilant.yambol.ui.createTrain.stepsScreens.tasks.CreateTrainTasksScreen
 import com.sedilant.yambol.ui.createTrain.stepsScreens.trainDetails.CreateTrainDetailsScreenV2
 
+
+/**
+ * Each screen should add into a Data store the values of the current train. When the user arrives
+ * to the final screen he will save the train. So the app use the information of the data stores to
+ * create a new train and leave the data store empty.
+ */
 @Composable
 fun CreateTrainScreenV2() {
     val viewModel: CreateTrainV2ViewModel = hiltViewModel()
@@ -23,7 +29,8 @@ fun CreateTrainScreenV2() {
         uiState = uiState,
         onNextStep = viewModel::onNextStep,
         onBack = viewModel::onBack,
-        onCancel = viewModel::onCancel
+        onCancel = viewModel::onCancel,
+        onSave = {}
     )
 }
 
@@ -32,40 +39,46 @@ private fun CreateTrainScreenV2Stateless(
     uiState: CreateTrainUiStateV2,
     onNextStep: () -> Unit,
     onBack: () -> Unit,
-    onCancel: () -> Unit
+    onCancel: () -> Unit,
+    onSave: () -> Unit,
 ) {
     val pagerState = rememberPagerState(pageCount = { Step.entries.size })
+    val size = Step.entries.size
 
     LaunchedEffect(uiState.currentStep) {
         pagerState.animateScrollToPage(uiState.currentStep.ordinal)
     }
-        HorizontalPager(
-            state = pagerState,
-            modifier = Modifier
-                .fillMaxSize(),
-            userScrollEnabled = false
-        ) { page ->
-            when (Step.entries[page]) {
-                Step.BASIC_INFO -> CreateTrainBasicInfoScreen(
-                    onClose = onCancel,
-                    onNext = onNextStep,
-                )
+    HorizontalPager(
+        state = pagerState,
+        modifier = Modifier
+            .fillMaxSize(),
+        userScrollEnabled = false
+    ) { page ->
+        when (Step.entries[page]) {
+            Step.BASIC_INFO -> CreateTrainBasicInfoScreen(
+                onClose = onCancel,
+                onNext = onNextStep,
+            )
 
-                Step.CONCEPTS -> CreateTrainConceptsScreen(
-                    onBack = onBack,
-                    onNext = onNextStep,
-                    onClose = onCancel,
-                )
+            Step.CONCEPTS -> CreateTrainConceptsScreen(
+                onBack = onBack,
+                onNext = onNextStep,
+                onClose = onCancel,
+            )
 
-                Step.TASKS -> CreateTrainTasksScreen(
-                    onBack = onBack,
-                    onNext = onNextStep,
-                    onClose = onCancel,
-                )
-                Step.TRAIN_DETAIL -> CreateTrainDetailsScreenV2(
-                    onBack = onBack,
-                    onClose = onCancel,
-                )
-            }
+            Step.TASKS -> CreateTrainTasksScreen(
+                onBack = onBack,
+                onNext = onNextStep,
+                onClose = onCancel,
+            )
+
+            Step.TRAIN_DETAIL -> CreateTrainDetailsScreenV2(
+                onBack = onBack,
+                onClose = {
+                    onCancel()
+                    onSave()
+                }
+            )
         }
+    }
 }

@@ -3,8 +3,9 @@ package com.sedilant.yambol.data.draftTrain
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.util.Date
+import javax.inject.Inject
 
-class TrainingDraftRepositoryImpl(
+class TrainingDraftRepositoryImpl @Inject constructor(
     private val dao: TrainingDraftDao
 ) : TrainingDraftRepository {
 
