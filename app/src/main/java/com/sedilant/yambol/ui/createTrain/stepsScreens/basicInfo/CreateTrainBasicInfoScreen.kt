@@ -2,6 +2,7 @@ package com.sedilant.yambol.ui.createTrain.stepsScreens.basicInfo
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,13 +23,14 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -46,8 +48,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sedilant.yambol.ui.createTrain.commonComposables.CreateTrainScaffold
 import com.sedilant.yambol.ui.createTrain.commonComposables.TeamSelectionDropdown
 import com.sedilant.yambol.ui.createTrain.commonComposables.TimeWheelPicker
+import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.TextStyle
+import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 
 @Composable
@@ -58,15 +63,31 @@ public fun CreateTrainBasicInfoScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    // Inicializar el borrador cuando se monta la pantalla
+    LaunchedEffect(Unit) {
+        viewModel.initializeDraft()
+    }
+
+    // Mostrar error si existe
+    uiState.error?.let { error ->
+        LaunchedEffect(error) {
+            // Aquí puedes mostrar un Snackbar o Toast
+            // Por ahora solo limpiamos el error después de mostrarlo
+            viewModel.clearError()
+        }
+    }
+
     CreateTrainBasicInfoScreenStateless(
         onClose = onClose,
         onNext = {
+            viewModel.saveStepData() // Guardar antes de avanzar
             onNext()
         },
         uiState = uiState,
         onTeamSelected = viewModel::onTeamSelected,
-        onTimeChange = { _, _ -> }, // TO DECIDE if I keep it in compose or move it to the viewModel
-        onDurationChange = { _, _ -> }
+        onDateSelected = viewModel::onDateSelected,
+        onTimeChange = viewModel::onTimeChanged,
+        onDurationChange = viewModel::onDurationChanged
     )
 }
 
@@ -76,13 +97,16 @@ private fun CreateTrainBasicInfoScreenStateless(
     onNext: () -> Unit,
     uiState: CreateTrainBasicInfoViewModel.UiState,
     onTeamSelected: (String) -> Unit,
+    onDateSelected: (Date) -> Unit,
     onTimeChange: (Int, Int) -> Unit,
     onDurationChange: (Int, Int) -> Unit
 ) {
-    var selectedHours by remember { mutableIntStateOf(5) } // GET TIME TIME
-    var selectedMinute by remember { mutableIntStateOf(5) } // GET CURRENT TIME
-    var durationHours by remember { mutableIntStateOf(1) }
-    var durationMinute by remember { mutableIntStateOf(30) }
+    // Convertir Float a horas y minutos para la UI
+    val selectedHours = uiState.selectedHour.toInt()
+    val selectedMinutes = ((uiState.selectedHour - selectedHours) * 60).toInt()
+
+    val durationHours = (uiState.selectedDuration / 60).toInt()
+    val durationMinutes = (uiState.selectedDuration % 60).toInt()
 
     CreateTrainScaffold(
         title = "Nuevo entrenamiento",
@@ -97,6 +121,18 @@ private fun CreateTrainBasicInfoScreenStateless(
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState()),
         ) {
+            // Loading indicator
+            if (uiState.isLoading) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+
             // Date Section
             Text(
                 modifier = Modifier.padding(horizontal = 16.dp),
@@ -107,7 +143,10 @@ private fun CreateTrainBasicInfoScreenStateless(
             )
 
             // Calendar
-            DateSelector()
+            DateSelector(
+                selectedDate = uiState.selectedDate,
+                onDateSelected = onDateSelected
+            )
 
             // Time and Duration Section
             Row(
@@ -117,16 +156,13 @@ private fun CreateTrainBasicInfoScreenStateless(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalAlignment = Alignment.Top
             ) {
-                // Hora
+                // Hora TODO check how the time pickers works
                 TimeSelector(
                     title = "Hora",
                     modifier = Modifier.weight(1f),
                     selectedHour = selectedHours,
-                    selectedMinute = selectedMinute,
-                    onTimeChange = { hour, minute ->
-                        selectedHours = hour
-                        selectedMinute = minute
-                    }
+                    selectedMinute = selectedMinutes,
+                    onTimeChange = onTimeChange
                 )
 
                 // Duración
@@ -134,19 +170,16 @@ private fun CreateTrainBasicInfoScreenStateless(
                     title = "Duración",
                     modifier = Modifier.weight(1f),
                     selectedHour = durationHours,
-                    selectedMinute = durationMinute,
-                    onTimeChange = { hour, minute ->
-                        durationHours = hour
-                        durationMinute = minute
-                    }
+                    selectedMinute = durationMinutes,
+                    onTimeChange = onDurationChange
                 )
             }
 
             // Team Selection
             TeamSelectionDropdown(
-                teams = emptyList(), // TODO pass the ui Team Model, in this case a String
+                teams = listOf(), // TODO uiState.teamsList,
                 selectedTeamId = 0,
-                onTeamSelected = {}
+                onTeamSelected = {} // TODO onTeamSelected
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -182,11 +215,24 @@ private fun TimeSelector(
     }
 }
 
+
 @SuppressLint("NewApi")
 @Composable
-private fun DateSelector() {
-    var selectedDate by remember { mutableStateOf(5) }
-    var currentMonth by remember { mutableStateOf(YearMonth.now()) }
+fun DateSelector(
+    selectedDate: Date,
+    onDateSelected: (Date) -> Unit
+) {
+    // Convertir Date a LocalDate para trabajar con YearMonth
+    val calendar = Calendar.getInstance().apply { time = selectedDate }
+    val selectedLocalDate = LocalDate.of(
+        calendar.get(Calendar.YEAR),
+        calendar.get(Calendar.MONTH) + 1,
+        calendar.get(Calendar.DAY_OF_MONTH)
+    )
+
+    var currentMonth by remember(selectedLocalDate) {
+        mutableStateOf(YearMonth.from(selectedLocalDate))
+    }
 
     Column(
         modifier = Modifier
@@ -196,6 +242,7 @@ private fun DateSelector() {
             .background(MaterialTheme.colorScheme.primaryContainer)
             .padding(16.dp)
     ) {
+        // Month Navigation Header
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -210,16 +257,13 @@ private fun DateSelector() {
                     tint = MaterialTheme.colorScheme.primary
                 )
             }
+
             Text(
                 text = "${
                     currentMonth.month.getDisplayName(TextStyle.FULL, Locale("es", "ES"))
                         .replaceFirstChar {
-                            if (it.isLowerCase()) it.titlecase(
-                                Locale(
-                                    "es",
-                                    "ES"
-                                )
-                            ) else it.toString()
+                            if (it.isLowerCase()) it.titlecase(Locale("es", "ES"))
+                            else it.toString()
                         }
                 } ${currentMonth.year}",
                 color = MaterialTheme.colorScheme.primary,
@@ -236,7 +280,7 @@ private fun DateSelector() {
             }
         }
 
-        // Days of week
+        // Days of week header
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
@@ -257,8 +301,22 @@ private fun DateSelector() {
         // Calendar Grid
         CalendarGrid(
             yearMonth = currentMonth,
-            selectedDay = selectedDate,
-            onDaySelected = { selectedDate = it },
+            selectedDate = selectedLocalDate,
+            onDaySelected = { day ->
+                // Convertir el día seleccionado a Date
+                val newDate = currentMonth.atDay(day)
+                val newCalendar = Calendar.getInstance().apply {
+                    set(Calendar.YEAR, newDate.year)
+                    set(Calendar.MONTH, newDate.monthValue - 1)
+                    set(Calendar.DAY_OF_MONTH, newDate.dayOfMonth)
+                    // Mantener la hora actual
+                    set(Calendar.HOUR_OF_DAY, calendar.get(Calendar.HOUR_OF_DAY))
+                    set(Calendar.MINUTE, calendar.get(Calendar.MINUTE))
+                    set(Calendar.SECOND, 0)
+                    set(Calendar.MILLISECOND, 0)
+                }
+                onDateSelected(newCalendar.time)
+            },
             primaryBlue = MaterialTheme.colorScheme.primary,
             textSecondary = MaterialTheme.colorScheme.secondary
         )
@@ -269,7 +327,7 @@ private fun DateSelector() {
 @Composable
 fun CalendarGrid(
     yearMonth: YearMonth,
-    selectedDay: Int,
+    selectedDate: LocalDate,
     onDaySelected: (Int) -> Unit,
     primaryBlue: Color,
     textSecondary: Color
@@ -277,6 +335,17 @@ fun CalendarGrid(
     val firstDayOfMonth = yearMonth.atDay(1)
     val daysInMonth = yearMonth.lengthOfMonth()
     val firstDayOfWeek = firstDayOfMonth.dayOfWeek.value % 7
+
+    // Verificar si la fecha seleccionada está en el mes actual
+    val selectedDay = if (selectedDate.year == yearMonth.year &&
+        selectedDate.month == yearMonth.month) {
+        selectedDate.dayOfMonth
+    } else {
+        null
+    }
+
+    val today = LocalDate.now()
+    val isCurrentMonth = yearMonth.year == today.year && yearMonth.month == today.month
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(7),
@@ -293,23 +362,75 @@ fun CalendarGrid(
         items(daysInMonth) { index ->
             val day = index + 1
             val isSelected = day == selectedDay
+            val isToday = isCurrentMonth && day == today.dayOfMonth
 
             Box(
                 modifier = Modifier
                     .size(40.dp)
                     .clip(CircleShape)
-                    .background(if (isSelected) primaryBlue else Color.Transparent)
+                    .background(
+                        when {
+                            isSelected -> primaryBlue
+                            isToday -> primaryBlue.copy(alpha = 0.2f)
+                            else -> Color.Transparent
+                        }
+                    )
+                    .border(
+                        width = if (isToday && !isSelected) 1.dp else 0.dp,
+                        color = if (isToday && !isSelected) primaryBlue else Color.Transparent,
+                        shape = CircleShape
+                    )
                     .clickable { onDaySelected(day) },
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = day.toString(),
-                    color = if (isSelected) Color.White else textSecondary,
-                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                    color = when {
+                        isSelected -> Color.White
+                        isToday -> primaryBlue
+                        else -> textSecondary
+                    },
+                    fontWeight = when {
+                        isSelected || isToday -> FontWeight.Bold
+                        else -> FontWeight.Normal
+                    }
                 )
             }
         }
     }
+}
+
+// ============================================
+// HELPER EXTENSIONS
+// ============================================
+
+/**
+ * Extension para convertir Date a LocalDate de forma segura
+ */
+@SuppressLint("NewApi")
+fun Date.toLocalDate(): LocalDate {
+    val calendar = Calendar.getInstance().apply { time = this@toLocalDate }
+    return LocalDate.of(
+        calendar.get(Calendar.YEAR),
+        calendar.get(Calendar.MONTH) + 1,
+        calendar.get(Calendar.DAY_OF_MONTH)
+    )
+}
+
+/**
+ * Extension para convertir LocalDate a Date
+ */
+@SuppressLint("NewApi")
+fun LocalDate.toDate(): Date {
+    return Calendar.getInstance().apply {
+        set(Calendar.YEAR, this@toDate.year)
+        set(Calendar.MONTH, this@toDate.monthValue - 1)
+        set(Calendar.DAY_OF_MONTH, this@toDate.dayOfMonth)
+        set(Calendar.HOUR_OF_DAY, 0)
+        set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0)
+        set(Calendar.MILLISECOND, 0)
+    }.time
 }
 
 @Preview(showBackground = true)
@@ -322,7 +443,8 @@ fun BasicInfoScreenPreview() {
             uiState = CreateTrainBasicInfoViewModel.UiState(),
             onTeamSelected = {},
             onTimeChange = { _, _ -> },
-            onDurationChange = { _, _ -> }
+            onDurationChange = { _, _ -> },
+            onDateSelected = {}
         )
     }
 }
