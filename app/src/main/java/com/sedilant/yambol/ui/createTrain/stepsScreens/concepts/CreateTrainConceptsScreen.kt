@@ -3,6 +3,7 @@ package com.sedilant.yambol.ui.createTrain.stepsScreens.concepts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -25,6 +27,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,13 +48,22 @@ fun CreateTrainConceptsScreen(
     onClose: () -> Unit,
     viewModel: CreateTrainConceptsViewModel = hiltViewModel()
 ) {
-
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    uiState.error?.let { error ->
+        LaunchedEffect(error) {
+            // TODO we can show here a snackBar or someting
+            viewModel.clearError()
+        }
+    }
 
     CreateTrainConceptsScreenStateless(
         uiState = uiState,
         onBack = onBack,
-        onNext = onNext,
+        onNext = {
+            viewModel.saveStepData()
+            onNext()
+        },
         onClose = onClose,
         onConceptSelected = viewModel::onConceptSelected,
         onAddConcept = viewModel::onAddConcept
@@ -72,6 +84,17 @@ private fun CreateTrainConceptsScreenStateless(
     var showBottomSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
 
+    // TODO filter the concepts, we have two show all the concepts the app have
+    val filteredConcepts = remember(uiState.conceptsList, searchQuery) {
+        if (searchQuery.isBlank()) {
+            uiState.conceptsList
+        } else {
+            uiState.conceptsList.filter {
+                it.conceptName.contains(searchQuery, ignoreCase = true)
+            }
+        }
+    }
+
     CreateTrainScaffold(
         title = "Crear entrenamiento",
         onCloseClick = onClose,
@@ -86,7 +109,6 @@ private fun CreateTrainConceptsScreenStateless(
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {
-
             if (showBottomSheet) {
                 ModalBottomSheet(
                     onDismissRequest = { showBottomSheet = false },
@@ -101,12 +123,25 @@ private fun CreateTrainConceptsScreenStateless(
                 }
             }
 
+            // Loading indicator
+            if (uiState.isLoading) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+
             Text(
                 text = "¿Qué conceptos quieres trabajar?",
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold
             )
             Spacer(modifier = Modifier.height(16.dp))
+
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
@@ -120,7 +155,9 @@ private fun CreateTrainConceptsScreenStateless(
                 },
                 shape = RoundedCornerShape(8.dp)
             )
+
             Spacer(modifier = Modifier.height(24.dp))
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -138,16 +175,66 @@ private fun CreateTrainConceptsScreenStateless(
                     modifier = Modifier.clickable { showBottomSheet = true }
                 )
             }
+
             Spacer(modifier = Modifier.height(16.dp))
+
+            // Show selected concepts coutner
+            if (uiState.selectedConcepts.isNotEmpty()) {
+                Text(
+                    text = "${uiState.selectedConcepts.size} concepto(s) seleccionado(s)",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+            }
+
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(uiState.conceptsList) { concept ->
+                items(filteredConcepts) { concept ->
                     ConceptItem(
                         concept = concept.conceptName,
-                        isSelected = uiState.conceptsList.contains(concept),
+                        isSelected = concept.isSelected,
                         onConceptSelected = { onConceptSelected(concept.conceptName) }
                     )
+                }
+
+                // Message if there are no results from the search
+                if (filteredConcepts.isEmpty() && searchQuery.isNotBlank()) {
+                    item {
+                        Text(
+                            text = "No se encontraron conceptos",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+
+                // Message if there are no concepts created
+                if (uiState.conceptsList.isEmpty() && !uiState.isLoading) {
+                    item {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(32.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = "No hay conceptos todavía",
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "Añade tu primer concepto",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -157,6 +244,7 @@ private fun CreateTrainConceptsScreenStateless(
 @Composable
 private fun AddConceptBottomSheet(onAddConcept: (String) -> Unit) {
     var conceptName by remember { mutableStateOf("") }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -172,11 +260,15 @@ private fun AddConceptBottomSheet(onAddConcept: (String) -> Unit) {
             value = conceptName,
             onValueChange = { conceptName = it },
             label = { Text("Nombre del concepto") },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true
         )
         Spacer(modifier = Modifier.height(16.dp))
         Button(
-            onClick = { onAddConcept(conceptName) },
+            onClick = {
+                onAddConcept(conceptName)
+                conceptName = "" // Clean after add something
+            },
             modifier = Modifier.fillMaxWidth(),
             enabled = conceptName.isNotBlank()
         ) {
@@ -184,7 +276,6 @@ private fun AddConceptBottomSheet(onAddConcept: (String) -> Unit) {
         }
     }
 }
-
 
 @Composable
 fun ConceptItem(
@@ -199,6 +290,7 @@ fun ConceptItem(
                 color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
                 shape = RoundedCornerShape(8.dp)
             )
+            .clickable { onConceptSelected() }
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween

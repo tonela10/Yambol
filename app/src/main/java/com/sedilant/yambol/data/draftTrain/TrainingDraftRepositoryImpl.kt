@@ -1,11 +1,12 @@
 package com.sedilant.yambol.data.draftTrain
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import java.util.Date
-import javax.inject.Inject
 
-class TrainingDraftRepositoryImpl @Inject constructor(
+// TODO Change to English
+class TrainingDraftRepositoryImpl(
     private val dao: TrainingDraftDao
 ) : TrainingDraftRepository {
 
@@ -22,10 +23,51 @@ class TrainingDraftRepositoryImpl @Inject constructor(
         return entity.id
     }
 
+    // Obtener o crear el borrador activo (solo puede haber uno)
+    override suspend fun getOrCreateActiveDraft(): String {
+        // Buscar si existe algún borrador
+        return try {
+            // Intentar obtener el primer borrador
+            val drafts = mutableListOf<TrainingDraftEntity>()
+            dao.getAllDrafts().first().also { drafts.addAll(it) }
+
+            if (drafts.isNotEmpty()) {
+                drafts.first().id
+            } else {
+                // Crear un nuevo borrador
+                val newTraining = Training(
+                    date = Date(),
+                    duration = 90f,
+                    hour = getCurrentHourAsFloat(),
+                    concepts = emptyList(),
+                    tasks = emptyList()
+                )
+                createDraft(newTraining)
+            }
+        } catch (e: Exception) {
+            // Si hay error, crear un nuevo borrador
+            val newTraining = Training(
+                date = Date(),
+                duration = 90f,
+                hour = getCurrentHourAsFloat(),
+                concepts = emptyList(),
+                tasks = emptyList()
+            )
+            createDraft(newTraining)
+        }
+    }
+
+    private fun getCurrentHourAsFloat(): Float {
+        val calendar = java.util.Calendar.getInstance()
+        val hour = calendar.get(java.util.Calendar.HOUR_OF_DAY)
+        val minute = calendar.get(java.util.Calendar.MINUTE)
+        return hour + (minute / 60f)
+    }
+
     // Actualizar datos del training (sin tasks)
     override suspend fun updateTrainingData(
         id: String,
-        date: Date?,
+        date: Date? ,
         duration: Float?,
         hour: Float?,
         concepts: List<String>?
