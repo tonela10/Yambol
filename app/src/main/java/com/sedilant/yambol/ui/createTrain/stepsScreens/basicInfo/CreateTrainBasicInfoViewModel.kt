@@ -3,7 +3,6 @@ package com.sedilant.yambol.ui.createTrain.stepsScreens.basicInfo
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sedilant.yambol.data.draftTrain.Training
 import com.sedilant.yambol.data.draftTrain.TrainingDraftRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,7 +22,6 @@ class CreateTrainBasicInfoViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(UiState())
     public val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
-    // ID del borrador actual - se guarda en SavedStateHandle para sobrevivir a process death
     private var draftId: String?
         get() = savedStateHandle.get<String>(KEY_DRAFT_ID)
         set(value) {
@@ -31,53 +29,21 @@ class CreateTrainBasicInfoViewModel @Inject constructor(
         }
 
     init {
-        // Si ya existe un borrador, cargar sus datos
-        draftId?.let { draftId ->
-            loadDraft(draftId)
-        }
+        loadOrCreateActiveDraft()
     }
 
     /**
-     * Inicializa un nuevo borrador de entrenamiento
-     * Se llama desde el NavGraph cuando se inicia el flow
+     * Carga el borrador activo o crea uno nuevo si no existe
      */
-    public fun initializeDraft() {
-        if (draftId != null) return // Ya existe un borrador
-
-        viewModelScope.launch {
-            try {
-                val newTraining = Training(
-                    date = Date(), // Fecha actual por defecto
-                    duration = 90f, // 1h 30min por defecto
-                    hour = getCurrentHourAsFloat(),
-                    concepts = emptyList(),
-                    tasks = emptyList()
-                )
-
-                val draftId = repository.createDraft(newTraining)
-                this@CreateTrainBasicInfoViewModel.draftId = draftId
-
-                _uiState.update { it.copy(isLoading = false) }
-            } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        error = "Error al crear el borrador: ${e.message}"
-                    )
-                }
-            }
-        }
-    }
-
-    /**
-     * Carga un borrador existente
-     */
-    private fun loadDraft(draftId: String) {
+    private fun loadOrCreateActiveDraft() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 
             try {
-                val draft = repository.getDraft(draftId)
+                val id = repository.getOrCreateActiveDraft()
+                draftId = id
+
+                val draft = repository.getDraft(id)
                 if (draft != null) {
                     _uiState.update {
                         it.copy(
@@ -88,9 +54,7 @@ class CreateTrainBasicInfoViewModel @Inject constructor(
                         )
                     }
                 } else {
-                    // El borrador no existe, crear uno nuevo
-                    this@CreateTrainBasicInfoViewModel.draftId = null
-                    initializeDraft()
+                    _uiState.update { it.copy(isLoading = false) }
                 }
             } catch (e: Exception) {
                 _uiState.update {
@@ -141,12 +105,12 @@ class CreateTrainBasicInfoViewModel @Inject constructor(
      * Guarda todos los datos del paso actual antes de avanzar
      */
     public fun saveStepData() {
-        val draftId = draftId ?: return
+        val id = draftId ?: return
 
         viewModelScope.launch {
             try {
                 repository.updateTrainingData(
-                    id = draftId,
+                    id = id,
                     date = _uiState.value.selectedDate,
                     hour = _uiState.value.selectedHour,
                     duration = _uiState.value.selectedDuration
@@ -159,15 +123,22 @@ class CreateTrainBasicInfoViewModel @Inject constructor(
         }
     }
 
-    // Métodos privados para guardar en Repository de forma reactiva
+    /**
+     * Limpia el error mostrado
+     */
+    public fun clearError() {
+        _uiState.update { it.copy(error = null) }
+    }
+
+    // Private methods
 
     private fun saveDateToRepository(date: Date) {
-        val draftId = draftId ?: return
+        val id = draftId ?: return
 
         viewModelScope.launch {
             try {
                 repository.updateTrainingData(
-                    id = draftId,
+                    id = id,
                     date = date
                 )
             } catch (e: Exception) {
@@ -177,12 +148,12 @@ class CreateTrainBasicInfoViewModel @Inject constructor(
     }
 
     private fun saveTimeToRepository(hour: Float) {
-        val draftId = draftId ?: return
+        val id = draftId ?: return
 
         viewModelScope.launch {
             try {
                 repository.updateTrainingData(
-                    id = draftId,
+                    id = id,
                     hour = hour
                 )
             } catch (e: Exception) {
@@ -192,25 +163,18 @@ class CreateTrainBasicInfoViewModel @Inject constructor(
     }
 
     private fun saveDurationToRepository(duration: Float) {
-        val draftId = draftId ?: return
+        val id = draftId ?: return
 
         viewModelScope.launch {
             try {
                 repository.updateTrainingData(
-                    id = draftId,
+                    id = id,
                     duration = duration
                 )
             } catch (e: Exception) {
                 // Log error silently
             }
         }
-    }
-
-    /**
-     * Limpia el error mostrado
-     */
-    public fun clearError() {
-        _uiState.update { it.copy(error = null) }
     }
 
     private fun getCurrentHourAsFloat(): Float {

@@ -3,10 +3,14 @@ package com.sedilant.yambol.data.draftTrain
 import kotlinx.coroutines.flow.Flow
 import java.util.Date
 
+// TODO change to English
 interface TrainingDraftRepository {
 
     // Crear nuevo borrador
     suspend fun createDraft(training: Training): String
+
+    // Obtener o crear el borrador activo (solo puede haber uno)
+    suspend fun getOrCreateActiveDraft(): String
 
     // Actualizar datos del training (sin tasks)
     suspend fun updateTrainingData(

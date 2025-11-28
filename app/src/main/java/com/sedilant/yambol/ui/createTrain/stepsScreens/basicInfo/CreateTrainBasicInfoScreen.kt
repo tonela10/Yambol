@@ -62,17 +62,9 @@ public fun CreateTrainBasicInfoScreen(
     viewModel: CreateTrainBasicInfoViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-    // Inicializar el borrador cuando se monta la pantalla
-    LaunchedEffect(Unit) {
-        viewModel.initializeDraft()
-    }
-
-    // Mostrar error si existe
     uiState.error?.let { error ->
         LaunchedEffect(error) {
-            // Aquí puedes mostrar un Snackbar o Toast
-            // Por ahora solo limpiamos el error después de mostrarlo
+            // TODO here we can show a snackBar or something
             viewModel.clearError()
         }
     }
@@ -156,7 +148,7 @@ private fun CreateTrainBasicInfoScreenStateless(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalAlignment = Alignment.Top
             ) {
-                // Hora TODO check how the time pickers works
+                // Hour
                 TimeSelector(
                     title = "Hora",
                     modifier = Modifier.weight(1f),
@@ -165,7 +157,7 @@ private fun CreateTrainBasicInfoScreenStateless(
                     onTimeChange = onTimeChange
                 )
 
-                // Duración
+                // Duration
                 TimeSelector(
                     title = "Duración",
                     modifier = Modifier.weight(1f),
@@ -177,9 +169,9 @@ private fun CreateTrainBasicInfoScreenStateless(
 
             // Team Selection
             TeamSelectionDropdown(
-                teams = listOf(), // TODO uiState.teamsList,
+                teams = listOf(),
                 selectedTeamId = 0,
-                onTeamSelected = {} // TODO onTeamSelected
+                onTeamSelected = {}
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -399,10 +391,6 @@ fun CalendarGrid(
         }
     }
 }
-
-// ============================================
-// HELPER EXTENSIONS
-// ============================================
 
 /**
  * Extension para convertir Date a LocalDate de forma segura
