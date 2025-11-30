@@ -4,9 +4,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import java.util.Date
+import javax.inject.Inject
 
 // TODO Change to English
-class TrainingDraftRepositoryImpl(
+class TrainingDraftRepositoryImpl @Inject constructor(
     private val dao: TrainingDraftDao
 ) : TrainingDraftRepository {
 
