@@ -76,7 +76,7 @@ class CreateTrainTasksViewModel @Inject constructor(
     fun onAddTask(
         name: String,
         description: String = "",
-        variation: String = "",
+        variation: List<String> = emptyList(),
         concepts: List<String> = emptyList()
     ) {
         val id = draftId ?: return
@@ -88,7 +88,7 @@ class CreateTrainTasksViewModel @Inject constructor(
                     name = name.trim(),
                     concepts = concepts,
                     description = description.trim(),
-                    variation = variation.trim()
+                    variation = variation.toCommaSeparatedString().trim(),
                 )
 
                 repository.addTask(id, newTask)
@@ -205,4 +205,8 @@ class CreateTrainTasksViewModel @Inject constructor(
         val error: String? = null,
         val tasksList: List<TaskUI> = emptyList()
     )
+}
+
+private fun List<String>.toCommaSeparatedString(): String {
+    return this.joinToString(separator = ",")
 }

@@ -77,9 +77,9 @@ internal fun TaskItem(
                 maxLines = 1
             )
 
-            // Duration
+            // Description
             Text(
-                text = task.duration,
+                text = task.description,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
