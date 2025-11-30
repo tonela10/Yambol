@@ -12,9 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
@@ -25,7 +23,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -38,7 +36,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.sedilant.yambol.ui.createTrain.commonComposables.CreateTrainScaffold
@@ -84,11 +81,14 @@ private fun CreateTrainTasksScreenStateless(
     tasks: List<TaskUI> = emptyList(),
     isLoading: Boolean = false,
     onMove: (from: Int, to: Int) -> Unit,
-    onAddTask: (name: String, description: String, variation: String, concepts: List<String>) -> Unit,
+    onAddTask: (name: String, description: String, variation: List<String>, concepts: List<String>) -> Unit,
     onDeleteTask: (taskId: String) -> Unit
 ) {
     var showBottomSheet by remember { mutableStateOf(false) }
-    val sheetState = rememberModalBottomSheetState()
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true,
+        confirmValueChange = { it != SheetValue.Hidden }
+    )
 
     CreateTrainScaffold(
         title = "Nuevo Entrenamiento",
@@ -113,7 +113,8 @@ private fun CreateTrainTasksScreenStateless(
                         onAddTask = { name, description, variation, concepts ->
                             onAddTask(name, description, variation, concepts)
                             showBottomSheet = false
-                        }
+                        },
+                        onDismiss = { showBottomSheet = false }
                     )
                 }
             }
@@ -207,75 +208,6 @@ private fun AddTaskButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
                     .clip(RoundedCornerShape(size = 8.dp))
                     .background(MaterialTheme.colorScheme.inversePrimary)
             )
-        }
-    }
-}
-
-@Composable
-private fun AddTaskBottomSheet(
-    onAddTask: (name: String, description: String, variation: String, concepts: List<String>) -> Unit
-) {
-    var taskName by remember { mutableStateOf("") }
-    var taskDescription by remember { mutableStateOf("") }
-    var taskVariation by remember { mutableStateOf("") }
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp)
-    ) {
-        Text(
-            text = "Añadir ejercicio",
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-
-        OutlinedTextField(
-            value = taskName,
-            onValueChange = { taskName = it },
-            label = { Text("Nombre del ejercicio") },
-            placeholder = { Text("Ej: Sentadillas") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        OutlinedTextField(
-            value = taskDescription,
-            onValueChange = { taskDescription = it },
-            label = { Text("Descripción") },
-            placeholder = { Text("Ej: 3x12 con descanso de 90s") },
-            modifier = Modifier.fillMaxWidth(),
-            maxLines = 3
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        OutlinedTextField(
-            value = taskVariation,
-            onValueChange = { taskVariation = it },
-            label = { Text("Variación") },
-            placeholder = { Text("Ej: Con barra libre") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = {
-                onAddTask(taskName, taskDescription, taskVariation, emptyList())
-                taskName = ""
-                taskDescription = ""
-                taskVariation = ""
-            },
-            modifier = Modifier.fillMaxWidth(),
-            enabled = taskName.isNotBlank()
-        ) {
-            Text(text = "Guardar")
         }
     }
 }
