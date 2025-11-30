@@ -1,7 +1,10 @@
 package com.sedilant.yambol.ui.createTrain.stepsScreens.tasks
 
-data class Task(
+data class TaskUI(
     val id: String,
     val name: String,
-    val duration: String
+    val concepts: List<String> = emptyList(),
+    val description: String = "",
+    val variation: String = "",
+    val duration: String = ""
 )
