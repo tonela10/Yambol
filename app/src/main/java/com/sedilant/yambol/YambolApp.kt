@@ -1,6 +1,5 @@
 package com.sedilant.yambol
 
-import android.annotation.SuppressLint
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -27,6 +26,7 @@ import com.sedilant.yambol.ui.training.TrainingScreen
 import com.sedilant.yambol.ui.trainingDetails.TrainingDetailsScreen
 import kotlinx.serialization.Serializable
 
+// TODO Create an issue to move this code to another file. Add the issue url when created
 @Serializable
 sealed class YambolScreen(@StringRes val route: Int) {
     @Serializable
@@ -63,7 +63,6 @@ sealed class YambolScreen(@StringRes val route: Int) {
     data class CreateTrain(val currentTeam: Int) : YambolScreen(R.string.create_train_screen)
 }
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun YambolApp() {
     val navController = rememberNavController()
@@ -81,7 +80,6 @@ fun YambolApp() {
     }
 
     Scaffold(
-        //contentWindowInsets = WindowInsets(0.dp),
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
             if (shouldShowBottomBar) {
@@ -92,7 +90,9 @@ fun YambolApp() {
         NavHost(
             navController = navController,
             startDestination = YambolScreen.Home,
-            modifier = Modifier.padding(paddingValues)
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
         ) {
             composable<YambolScreen.Home> {
                 HomeScreen(
