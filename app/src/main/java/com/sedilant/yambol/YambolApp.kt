@@ -193,12 +193,10 @@ fun YambolApp() {
 
             composable<YambolScreen.CreateTrain> { navBackStackEntry ->
                 val args = navBackStackEntry.toRoute<YambolScreen.CreateTrain>()
-                CreateTrainScreenV2()
-//                CreateTrainScreen(
-//                    defaultTeamId = args.currentTeam,
-//                    onNavigateBack = { navController.popBackStack() },
-//                    onTrainCreated = { navController.popBackStack() },
-//                )
+                CreateTrainScreenV2(
+                    onCancel = { navController.popBackStack() },
+                    teamId = args.currentTeam
+                )
             }
         }
     }
