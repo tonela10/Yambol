@@ -1,5 +1,6 @@
 package com.sedilant.yambol
 
+import android.annotation.SuppressLint
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -17,7 +18,7 @@ import com.sedilant.yambol.ui.NavigationBottomBar
 import com.sedilant.yambol.ui.addStats.AddTeamStatsScreen
 import com.sedilant.yambol.ui.board.BoardScreen
 import com.sedilant.yambol.ui.createTeam.CreateTeamScreen
-import com.sedilant.yambol.ui.createTrain.CreateTrainScreen
+import com.sedilant.yambol.ui.createTrain.CreateTrainScreenV2
 import com.sedilant.yambol.ui.home.HomeScreen
 import com.sedilant.yambol.ui.playerCard.PlayerCardScreen
 import com.sedilant.yambol.ui.profile.ProfileScreen
@@ -62,6 +63,7 @@ sealed class YambolScreen(@StringRes val route: Int) {
     data class CreateTrain(val currentTeam: Int) : YambolScreen(R.string.create_train_screen)
 }
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun YambolApp() {
     val navController = rememberNavController()
@@ -191,11 +193,9 @@ fun YambolApp() {
 
             composable<YambolScreen.CreateTrain> { navBackStackEntry ->
                 val args = navBackStackEntry.toRoute<YambolScreen.CreateTrain>()
-
-                CreateTrainScreen(
-                    defaultTeamId = args.currentTeam,
-                    onNavigateBack = { navController.popBackStack() },
-                    onTrainCreated = { navController.popBackStack() },
+                CreateTrainScreenV2(
+                    onCancel = { navController.popBackStack() },
+                    teamId = args.currentTeam
                 )
             }
         }
