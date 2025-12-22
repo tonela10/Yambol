@@ -1,16 +1,20 @@
 package com.sedilant.yambol.ui.createTrain
 
 import androidx.lifecycle.ViewModel
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import javax.inject.Inject
 
-@HiltViewModel
-class CreateTrainV2ViewModel @Inject constructor() : ViewModel() {
-    private val _uiState = MutableStateFlow(CreateTrainUiStateV2())
+@HiltViewModel(assistedFactory = CreateTrainV2ViewModelFactory::class)
+class CreateTrainV2ViewModel @AssistedInject constructor(
+    @Assisted private val teamId: Int
+) : ViewModel() {
+    private val _uiState = MutableStateFlow(CreateTrainUiStateV2(teamId = teamId))
     val uiState: StateFlow<CreateTrainUiStateV2> = _uiState.asStateFlow()
 
     fun onNextStep() {
@@ -31,17 +35,14 @@ class CreateTrainV2ViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    fun onCancel() {
-        _uiState.value = CreateTrainUiStateV2()
-    }
-
-    fun onSave(){
+    fun onSave() {
 
     }
 }
 
 data class CreateTrainUiStateV2(
-    val currentStep: Step = Step.BASIC_INFO
+    val currentStep: Step = Step.BASIC_INFO,
+    val teamId: Int,
 )
 
 enum class Step {
@@ -49,4 +50,9 @@ enum class Step {
     CONCEPTS,
     TASKS,
     TRAIN_DETAIL
+}
+
+@AssistedFactory
+interface CreateTrainV2ViewModelFactory {
+    fun create(teamId: Int): CreateTrainV2ViewModel
 }

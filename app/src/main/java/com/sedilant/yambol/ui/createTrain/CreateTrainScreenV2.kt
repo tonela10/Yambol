@@ -20,17 +20,24 @@ import com.sedilant.yambol.ui.createTrain.stepsScreens.trainDetails.CreateTrainD
  * to the final screen he will save the train. So the app use the information of the data stores to
  * create a new train and leave the data store empty.
  */
+// TODO add a AssitedInject to pass the current team
 @Composable
-fun CreateTrainScreenV2() {
-    val viewModel: CreateTrainV2ViewModel = hiltViewModel()
+fun CreateTrainScreenV2(
+    onCancel: () -> Unit,
+    teamId: Int,
+) {
+    val viewModel: CreateTrainV2ViewModel = hiltViewModel(
+        creationCallback = { factory: CreateTrainV2ViewModelFactory ->
+            factory.create(teamId)
+        }
+    )
     val uiState by viewModel.uiState.collectAsState()
 
     CreateTrainScreenV2Stateless(
         uiState = uiState,
         onNextStep = viewModel::onNextStep,
         onBack = viewModel::onBack,
-        onCancel = viewModel::onCancel,
-        onSave = {}
+        onCancel = onCancel,
     )
 }
 
@@ -40,7 +47,6 @@ private fun CreateTrainScreenV2Stateless(
     onNextStep: () -> Unit,
     onBack: () -> Unit,
     onCancel: () -> Unit,
-    onSave: () -> Unit,
 ) {
     val pagerState = rememberPagerState(pageCount = { Step.entries.size })
     val size = Step.entries.size
@@ -76,8 +82,9 @@ private fun CreateTrainScreenV2Stateless(
                 onBack = onBack,
                 onClose = {
                     onCancel()
-                    onSave()
-                }
+                },
+                onTrainingSaved = onCancel, //  navigate up
+                teamId = uiState.teamId,
             )
         }
     }
