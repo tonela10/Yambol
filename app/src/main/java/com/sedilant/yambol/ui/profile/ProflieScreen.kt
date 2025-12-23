@@ -47,7 +47,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 
@@ -57,59 +59,86 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
-    modifier: Modifier = Modifier,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val snackbarHostState = remember { SnackbarHostState() }
 
-    // NOTA: Hemos borrado el signInLauncher aquí
+    ProfileScreenStateless(
+        uiState = uiState,
+        clearErrorMessage = viewModel::clearErrorMessage,
+        clearSuccessMessage = viewModel::clearSuccessMessage,
+        onEmailChange = viewModel::onEmailChange,
+        onPasswordChange = viewModel::onPasswordChange,
+        onTogglePasswordVisibility = viewModel::togglePasswordVisibility,
+        onAuthenticate = viewModel::authenticate,
+        onToggleMode = viewModel::toggleLoginMode,
+        onDeleteAccount = viewModel::deleteAccount,
+        onSignOut = viewModel::signOut,
+        showDeleteConfirmation = viewModel::showDeleteConfirmation,
+        hideDeleteConfirmation = viewModel::hideDeleteConfirmation
+    )
+}
 
-    // Show snackbar logic (Mantener igual)
+@Composable
+private fun ProfileScreenStateless(
+    uiState: ProfileUiState,
+    clearErrorMessage: () -> Unit,
+    clearSuccessMessage: () -> Unit,
+    onEmailChange: (String) -> Unit,
+    onPasswordChange: (String) -> Unit,
+    onTogglePasswordVisibility: () -> Unit,
+    onAuthenticate: () -> Unit,
+    onToggleMode: () -> Unit,
+    onDeleteAccount: () -> Unit,
+    onSignOut: () -> Unit,
+    showDeleteConfirmation: () -> Unit,
+    hideDeleteConfirmation: () -> Unit,
+) {
+    val snackBarHostState = remember { SnackbarHostState() }
+
     LaunchedEffect(uiState.errorMessage) {
         uiState.errorMessage?.let { message ->
-            snackbarHostState.showSnackbar(message)
-            viewModel.clearErrorMessage()
+            snackBarHostState.showSnackbar(message)
+            clearErrorMessage()
         }
     }
     LaunchedEffect(uiState.successMessage) {
         uiState.successMessage?.let { message ->
-            snackbarHostState.showSnackbar(message)
-            viewModel.clearSuccessMessage()
+            snackBarHostState.showSnackbar(message)
+            clearSuccessMessage()
         }
     }
 
     Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) },
+        snackbarHost = { SnackbarHost(snackBarHostState) },
     ) { paddingValues ->
         Box(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            // Lógica de visualización
+            // If authenticate
             if (uiState.user != null) {
-                // Si está logueado, mostramos el perfil
                 AuthenticatedContent(
                     uiState = uiState,
-                    viewModel = viewModel
+                    onShowDeleteConfirmation = showDeleteConfirmation,
+                    onSignOutClick = onSignOut,
+                    userDisplayName = "", // TODO uiState when authenticated pass the name
+                    userEmail = "" // TODO uiState when authenticated pass the email
                 )
             } else {
-                // Si NO está logueado, mostramos nuestro Login Personalizado
                 CustomLoginContent(
                     uiState = uiState,
-                    onEmailChange = viewModel::onEmailChange,
-                    onPasswordChange = viewModel::onPasswordChange,
-                    onTogglePasswordVisibility = viewModel::togglePasswordVisibility,
-                    onAuthButtonClick = viewModel::authenticate,
-                    onToggleModeClick = viewModel::toggleLoginMode
+                    onEmailChange = onEmailChange,
+                    onPasswordChange = onPasswordChange,
+                    onTogglePasswordVisibility = onTogglePasswordVisibility,
+                    onAuthButtonClick = onAuthenticate,
+                    onToggleModeClick = onToggleMode,
                 )
             }
 
             // Si quieres un loading global encima de todo:
             if (uiState.isLoading && uiState.user != null) {
-                // Loading overlay solo para operaciones dentro del perfil
-                // El loading del login ya está dentro del botón
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -122,11 +151,10 @@ fun ProfileScreen(
         }
     }
 
-    // Delete confirmation dialog (Mantener igual)
     if (uiState.showDeleteConfirmation) {
         DeleteAccountDialog(
-            onConfirm = { viewModel.deleteAccount() },
-            onDismiss = { viewModel.hideDeleteConfirmation() }
+            onConfirm = onDeleteAccount,
+            onDismiss = hideDeleteConfirmation
         )
     }
 }
@@ -137,7 +165,10 @@ fun ProfileScreen(
 @Composable
 private fun AuthenticatedContent(
     uiState: ProfileUiState,
-    viewModel: ProfileViewModel
+    onShowDeleteConfirmation: () -> Unit,
+    onSignOutClick: () -> Unit,
+    userDisplayName: String,
+    userEmail: String,
 ) {
     Column(
         modifier = Modifier
@@ -168,7 +199,7 @@ private fun AuthenticatedContent(
 
         // User Name
         Text(
-            text = viewModel.getUserDisplayName(),
+            text = userDisplayName,
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface
@@ -178,7 +209,7 @@ private fun AuthenticatedContent(
 
         // User Email
         Text(
-            text = viewModel.getUserEmail(),
+            text = userEmail,
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -192,8 +223,8 @@ private fun AuthenticatedContent(
 
         // Action Buttons
         ActionButtons(
-            onSignOutClick = { viewModel.signOut() },
-            onDeleteAccountClick = { viewModel.showDeleteConfirmation() }
+            onSignOutClick = onSignOutClick,
+            onDeleteAccountClick = onShowDeleteConfirmation
         )
     }
 }
@@ -254,7 +285,7 @@ private fun UserInfoCard(uiState: ProfileUiState) {
  */
 @Composable
 private fun InfoRow(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    icon: ImageVector,
     label: String,
     value: String
 ) {
@@ -382,7 +413,7 @@ private fun UnauthenticatedContent(
             text = "Sign in to access your profile and manage your teams",
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+            textAlign = TextAlign.Center
         )
 
         Spacer(modifier = Modifier.height(48.dp))
@@ -455,20 +486,4 @@ private fun DeleteAccountDialog(
             }
         }
     )
-}
-
-/**
- * Loading indicator
- */
-@Composable
-private fun LoadingIndicator() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        CircularProgressIndicator(
-            modifier = Modifier.size(48.dp),
-            color = MaterialTheme.colorScheme.primary
-        )
-    }
 }
