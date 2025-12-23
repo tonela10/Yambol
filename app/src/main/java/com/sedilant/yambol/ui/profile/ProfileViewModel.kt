@@ -2,7 +2,6 @@ package com.sedilant.yambol.ui.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.auth.FirebaseUser
 import com.sedilant.yambol.data.firebaseAuth.AuthRepository
 import com.sedilant.yambol.data.firebaseAuth.AuthResult
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,31 +15,40 @@ import javax.inject.Inject
 /**
  * UI State for the Profile Screen
  */
-data class ProfileUiState(
-    val user: FirebaseUser? = null,
-    val isLoading: Boolean = false,
-    val errorMessage: String? = null,
-    val successMessage: String? = null,
-    val showDeleteConfirmation: Boolean = false,
+sealed class ProfileUiState {
+    data object Loading : ProfileUiState()
 
-    // Estado del Formulario de Login/Registro Personalizado
-    val emailInput: String = "",
-    val passwordInput: String = "",
-    val isLoginMode: Boolean = true,
-    val isPasswordVisible: Boolean = false
-)
+    data class Authenticated(
+        val userName: String,
+        val userEmail: String,
+        val isEmailVerified: Boolean,
+        val photoUrl: String?,
+        val showDeleteConfirmation: Boolean = false
+    ) : ProfileUiState()
+
+    data class Unauthenticated(
+        val emailInput: String = "",
+        val passwordInput: String = "",
+        val isPasswordVisible: Boolean = false,
+        val isLoginMode: Boolean = true,
+    ) : ProfileUiState()
+
+    data class Error(val message: String) : ProfileUiState()
+}
 
 /**
  * ViewModel for Profile Screen
- * Manages authentication state, user profile operations and login form
  */
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val authRepository: AuthRepository
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(ProfileUiState())
+    private val _uiState = MutableStateFlow<ProfileUiState>(ProfileUiState.Loading)
     val uiState: StateFlow<ProfileUiState> = _uiState.asStateFlow()
+
+    // Temporary storage to restore form if an error occurs (since Error state replaces the Form state)
+    private var lastUnauthenticatedState = ProfileUiState.Unauthenticated()
 
     init {
         observeAuthState()
@@ -48,58 +56,90 @@ class ProfileViewModel @Inject constructor(
 
     /**
      * Observe authentication state changes
+     * This acts as the "Source of Truth" for which major state we are in.
      */
     private fun observeAuthState() {
         viewModelScope.launch {
             authRepository.getAuthStateFlow().collect { user ->
-                _uiState.update { it.copy(user = user) }
+                if (user != null) {
+                    _uiState.update {
+                        ProfileUiState.Authenticated(
+                            userName = user.displayName ?: "User",
+                            userEmail = user.email ?: "No Email",
+                            isEmailVerified = user.isEmailVerified,
+                            photoUrl = user.photoUrl?.toString(),
+                            showDeleteConfirmation = false
+                        )
+                    }
+                } else {
+                    // If we logged out, or started fresh, we show the form
+                    // We try to use the last known form state to keep inputs if this was a quick transition
+                    _uiState.update { lastUnauthenticatedState }
+                }
             }
         }
     }
 
     // =================================================================
-    // MÉTODOS DEL FORMULARIO DE LOGIN / REGISTRO
+    // FORM ACTIONS (Only work when Unauthenticated)
     // =================================================================
 
     fun onEmailChange(newValue: String) {
-        _uiState.update { it.copy(emailInput = newValue, errorMessage = null) }
+        val currentState = _uiState.value
+        if (currentState is ProfileUiState.Unauthenticated) {
+            val newState = currentState.copy(emailInput = newValue)
+            lastUnauthenticatedState = newState // Backup
+            _uiState.update { newState }
+        }
     }
 
     fun onPasswordChange(newValue: String) {
-        _uiState.update { it.copy(passwordInput = newValue, errorMessage = null) }
+        val currentState = _uiState.value
+        if (currentState is ProfileUiState.Unauthenticated) {
+            val newState = currentState.copy(passwordInput = newValue)
+            lastUnauthenticatedState = newState // Backup
+            _uiState.update { newState }
+        }
     }
 
     fun toggleLoginMode() {
-        _uiState.update {
-            it.copy(
-                isLoginMode = !it.isLoginMode,
-                errorMessage = null,
-                successMessage = null
-            )
+        val currentState = _uiState.value
+        if (currentState is ProfileUiState.Unauthenticated) {
+            val newState = currentState.copy(isLoginMode = !currentState.isLoginMode)
+            lastUnauthenticatedState = newState
+            _uiState.update { newState }
         }
     }
 
     fun togglePasswordVisibility() {
-        _uiState.update { it.copy(isPasswordVisible = !it.isPasswordVisible) }
+        val currentState = _uiState.value
+        if (currentState is ProfileUiState.Unauthenticated) {
+            val newState = currentState.copy(isPasswordVisible = !currentState.isPasswordVisible)
+            lastUnauthenticatedState = newState
+            _uiState.update { newState }
+        }
     }
 
-    /**
-     * Ejecuta el inicio de sesión o el registro basado en el modo actual
-     */
+    // =================================================================
+    // AUTHENTICATION LOGIC
+    // =================================================================
+
     fun authenticate() {
-        val email = _uiState.value.emailInput.trim()
-        val password = _uiState.value.passwordInput.trim()
+        // We can only authenticate if we are currently in the Unauthenticated state (form visible)
+        val currentState = _uiState.value as? ProfileUiState.Unauthenticated ?: return
+
+        val email = currentState.emailInput.trim()
+        val password = currentState.passwordInput.trim()
 
         if (email.isBlank() || password.isBlank()) {
-            _uiState.update { it.copy(errorMessage = "Please fill in all fields") }
+            _uiState.update { ProfileUiState.Error("Please fill in all fields") }
             return
         }
 
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            _uiState.update { ProfileUiState.Loading }
 
-            // Elegimos función del repo según el modo (Login o Registro)
-            val result = if (_uiState.value.isLoginMode) {
+            val result = if (currentState.isLoginMode) {
                 authRepository.signInWithEmail(email, password)
             } else {
                 authRepository.signUpWithEmail(email, password)
@@ -107,156 +147,92 @@ class ProfileViewModel @Inject constructor(
 
             when (result) {
                 is AuthResult.Success -> {
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            successMessage = if (it.isLoginMode) "Welcome back!" else "Account created successfully!",
-                            emailInput = "",     // Limpiamos campos por seguridad
-                            passwordInput = ""
-                        )
-                    }
-                    // No hace falta llamar a reloadUser manualmente,
-                    // observeAuthState detectará el cambio automáticamente.
+                    // We do NOT manually set Authenticated state here.
+                    // The observeAuthState() collector will detect the Firebase User change
+                    // and update the UI automatically.
+
+                    // Optional: Reset form inputs for next time
+                    lastUnauthenticatedState = ProfileUiState.Unauthenticated()
                 }
                 is AuthResult.Error -> {
+                    // If failed, show Error screen/dialog
                     _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            errorMessage = result.exception.message ?: "Authentication failed"
-                        )
+                        ProfileUiState.Error(result.exception.message ?: "Authentication failed")
                     }
                 }
-                AuthResult.Loading -> {
-                    // El loading ya se gestionó al inicio
-                }
+                AuthResult.Loading -> { /* Handled by state */ }
             }
         }
     }
 
     // =================================================================
-    // MÉTODOS DE GESTIÓN DE CUENTA (SignOut, Delete, Info)
+    // PROFILE MANAGEMENT (Only work when Authenticated)
     // =================================================================
 
-    /**
-     * Sign out the current user
-     */
     fun signOut() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
-
-            when (val result = authRepository.signOut()) {
-                is AuthResult.Success -> {
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            successMessage = "Successfully signed out",
-                            user = null,
-                            emailInput = "", // Reset inputs
-                            passwordInput = ""
-                        )
-                    }
-                }
-                is AuthResult.Error -> {
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            errorMessage = "Failed to sign out: ${result.exception.message}"
-                        )
-                    }
-                }
-                is AuthResult.Loading -> { }
-            }
+            _uiState.update { ProfileUiState.Loading }
+            authRepository.signOut()
+            // observeAuthState will handle the transition to Unauthenticated
         }
     }
 
-    /**
-     * Show delete account confirmation dialog
-     */
     fun showDeleteConfirmation() {
-        _uiState.update { it.copy(showDeleteConfirmation = true) }
+        val currentState = _uiState.value
+        if (currentState is ProfileUiState.Authenticated) {
+            _uiState.update { currentState.copy(showDeleteConfirmation = true) }
+        }
     }
 
-    /**
-     * Hide delete account confirmation dialog
-     */
     fun hideDeleteConfirmation() {
-        _uiState.update { it.copy(showDeleteConfirmation = false) }
+        val currentState = _uiState.value
+        if (currentState is ProfileUiState.Authenticated) {
+            _uiState.update { currentState.copy(showDeleteConfirmation = false) }
+        }
     }
 
-    /**
-     * Delete the current user account
-     */
     fun deleteAccount() {
         viewModelScope.launch {
-            // Cerramos el diálogo y mostramos loading
-            _uiState.update {
-                it.copy(
-                    isLoading = true,
-                    errorMessage = null,
-                    showDeleteConfirmation = false
-                )
-            }
+            _uiState.update { ProfileUiState.Loading }
 
             when (val result = authRepository.deleteAccount()) {
                 is AuthResult.Success -> {
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            successMessage = "Account deleted successfully",
-                            user = null,
-                            emailInput = "",
-                            passwordInput = ""
-                        )
-                    }
+                    // observeAuthState will handle the transition
                 }
                 is AuthResult.Error -> {
                     _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            errorMessage = "Failed to delete account: ${result.exception.message}"
-                        )
+                        ProfileUiState.Error("Failed to delete account: ${result.exception.message}")
                     }
                 }
-                is AuthResult.Loading -> { }
+                is AuthResult.Loading -> {}
             }
         }
     }
 
     // =================================================================
-    // GETTERS Y UTILIDADES DE UI
+    // ERROR RECOVERY
     // =================================================================
 
-    fun clearErrorMessage() {
-        _uiState.update { it.copy(errorMessage = null) }
-    }
-
-    fun clearSuccessMessage() {
-        _uiState.update { it.copy(successMessage = null) }
-    }
-
     /**
-     * Get user display name or email, or a default string
+     * Call this when the user clicks "OK" on the error dialog/screen.
+     * It restores the previous state based on whether the user is logged in or not.
      */
-    fun getUserDisplayName(): String {
-        val user = _uiState.value.user
-        return when {
-            !user?.displayName.isNullOrBlank() -> user.displayName ?: ""
-            !user?.email.isNullOrBlank() -> user.email ?: ""
-            else -> "User"
+    fun clearError() {
+        if (authRepository.currentUser != null) {
+            // Restore Authenticated State
+            val user = authRepository.currentUser!!
+            _uiState.update {
+                ProfileUiState.Authenticated(
+                    userName = user.displayName ?: "User",
+                    userEmail = user.email ?: "",
+                    isEmailVerified = user.isEmailVerified,
+                    photoUrl = user.photoUrl?.toString(),
+                    showDeleteConfirmation = false
+                )
+            }
+        } else {
+            // Restore Unauthenticated State (The Form) with previous inputs
+            _uiState.update { lastUnauthenticatedState }
         }
-    }
-
-    /**
-     * Get user email safely
-     */
-    fun getUserEmail(): String {
-        return _uiState.value.user?.email ?: "No email"
-    }
-
-    /**
-     * Check if user is signed in
-     */
-    fun isUserSignedIn(): Boolean {
-        return _uiState.value.user != null
     }
 }

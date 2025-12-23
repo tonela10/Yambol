@@ -16,12 +16,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.ExitToApp
-import androidx.compose.material.icons.filled.Login
+import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
@@ -35,27 +34,19 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 
-/**
- * Profile Screen displaying user information and account management options
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
@@ -65,110 +56,107 @@ fun ProfileScreen(
 
     ProfileScreenStateless(
         uiState = uiState,
-        clearErrorMessage = viewModel::clearErrorMessage,
-        clearSuccessMessage = viewModel::clearSuccessMessage,
         onEmailChange = viewModel::onEmailChange,
         onPasswordChange = viewModel::onPasswordChange,
         onTogglePasswordVisibility = viewModel::togglePasswordVisibility,
         onAuthenticate = viewModel::authenticate,
         onToggleMode = viewModel::toggleLoginMode,
-        onDeleteAccount = viewModel::deleteAccount,
         onSignOut = viewModel::signOut,
-        showDeleteConfirmation = viewModel::showDeleteConfirmation,
-        hideDeleteConfirmation = viewModel::hideDeleteConfirmation
+        onShowDeleteConfirmation = viewModel::showDeleteConfirmation,
+        onHideDeleteConfirmation = viewModel::hideDeleteConfirmation,
+        onConfirmDelete = viewModel::deleteAccount,
+        onErrorDismiss = viewModel::clearError
     )
 }
 
 @Composable
 private fun ProfileScreenStateless(
     uiState: ProfileUiState,
-    clearErrorMessage: () -> Unit,
-    clearSuccessMessage: () -> Unit,
     onEmailChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
     onTogglePasswordVisibility: () -> Unit,
     onAuthenticate: () -> Unit,
     onToggleMode: () -> Unit,
-    onDeleteAccount: () -> Unit,
     onSignOut: () -> Unit,
-    showDeleteConfirmation: () -> Unit,
-    hideDeleteConfirmation: () -> Unit,
+    onShowDeleteConfirmation: () -> Unit,
+    onHideDeleteConfirmation: () -> Unit,
+    onConfirmDelete: () -> Unit,
+    onErrorDismiss: () -> Unit
 ) {
-    val snackBarHostState = remember { SnackbarHostState() }
-
-    LaunchedEffect(uiState.errorMessage) {
-        uiState.errorMessage?.let { message ->
-            snackBarHostState.showSnackbar(message)
-            clearErrorMessage()
-        }
-    }
-    LaunchedEffect(uiState.successMessage) {
-        uiState.successMessage?.let { message ->
-            snackBarHostState.showSnackbar(message)
-            clearSuccessMessage()
-        }
-    }
-
-    Scaffold(
-        snackbarHost = { SnackbarHost(snackBarHostState) },
-    ) { paddingValues ->
+    Scaffold { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                .padding(paddingValues),
+            contentAlignment = Alignment.Center
         ) {
-            // If authenticate
-            if (uiState.user != null) {
-                AuthenticatedContent(
-                    uiState = uiState,
-                    onShowDeleteConfirmation = showDeleteConfirmation,
-                    onSignOutClick = onSignOut,
-                    userDisplayName = "", // TODO uiState when authenticated pass the name
-                    userEmail = "" // TODO uiState when authenticated pass the email
-                )
-            } else {
-                CustomLoginContent(
-                    uiState = uiState,
-                    onEmailChange = onEmailChange,
-                    onPasswordChange = onPasswordChange,
-                    onTogglePasswordVisibility = onTogglePasswordVisibility,
-                    onAuthButtonClick = onAuthenticate,
-                    onToggleModeClick = onToggleMode,
-                )
-            }
-
-            // Si quieres un loading global encima de todo:
-            if (uiState.isLoading && uiState.user != null) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.5f)),
-                    contentAlignment = Alignment.Center
-                ) {
+            when (uiState) {
+                is ProfileUiState.Loading -> {
                     CircularProgressIndicator()
+                }
+
+                is ProfileUiState.Authenticated -> {
+                    AuthenticatedContent(
+                        userName = uiState.userName,
+                        userEmail = uiState.userEmail,
+                        isEmailVerified = uiState.isEmailVerified,
+                        onShowDeleteConfirmation = onShowDeleteConfirmation,
+                        onSignOutClick = onSignOut
+                    )
+
+                    if (uiState.showDeleteConfirmation) {
+                        DeleteAccountDialog(
+                            onConfirm = onConfirmDelete,
+                            onDismiss = onHideDeleteConfirmation
+                        )
+                    }
+                }
+
+                is ProfileUiState.Unauthenticated -> {
+                    CustomLoginContent(
+                        email = uiState.emailInput,
+                        password = uiState.passwordInput,
+                        isLoginMode = uiState.isLoginMode,
+                        isPasswordVisible = uiState.isPasswordVisible,
+                        onEmailChange = onEmailChange,
+                        onPasswordChange = onPasswordChange,
+                        onTogglePasswordVisibility = onTogglePasswordVisibility,
+                        onAuthButtonClick = onAuthenticate,
+                        onToggleModeClick = onToggleMode
+                    )
+                }
+
+                is ProfileUiState.Error -> {
+                    AlertDialog(
+                        onDismissRequest = onErrorDismiss,
+                        title = { Text("Error") },
+                        text = { Text(uiState.message) },
+                        confirmButton = {
+                            TextButton(onClick = onErrorDismiss) {
+                                Text("OK")
+                            }
+                        },
+                        icon = {
+                            Icon(
+                                Icons.Default.Error,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.error
+                            )
+                        }
+                    )
                 }
             }
         }
     }
-
-    if (uiState.showDeleteConfirmation) {
-        DeleteAccountDialog(
-            onConfirm = onDeleteAccount,
-            onDismiss = hideDeleteConfirmation
-        )
-    }
 }
 
-/**
- * Content shown when user is authenticated
- */
 @Composable
 private fun AuthenticatedContent(
-    uiState: ProfileUiState,
-    onShowDeleteConfirmation: () -> Unit,
-    onSignOutClick: () -> Unit,
-    userDisplayName: String,
+    userName: String,
     userEmail: String,
+    isEmailVerified: Boolean,
+    onShowDeleteConfirmation: () -> Unit,
+    onSignOutClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -199,7 +187,7 @@ private fun AuthenticatedContent(
 
         // User Name
         Text(
-            text = userDisplayName,
+            text = userName,
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface
@@ -217,7 +205,10 @@ private fun AuthenticatedContent(
         Spacer(modifier = Modifier.height(40.dp))
 
         // Account Information Card
-        UserInfoCard(uiState = uiState)
+        UserInfoCard(
+            email = userEmail,
+            isVerified = isEmailVerified
+        )
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -229,60 +220,42 @@ private fun AuthenticatedContent(
     }
 }
 
-/**
- * Card displaying user information
- */
 @Composable
-private fun UserInfoCard(uiState: ProfileUiState) {
+private fun UserInfoCard(
+    email: String,
+    isVerified: Boolean
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
+        Column(modifier = Modifier.padding(16.dp)) {
             Text(
                 text = "Account Information",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary
             )
-
             Spacer(modifier = Modifier.height(16.dp))
 
             InfoRow(
                 icon = Icons.Default.Email,
                 label = "Email",
-                value = uiState.user?.email ?: "Not available"
+                value = email
             )
-
             Spacer(modifier = Modifier.height(12.dp))
 
             InfoRow(
-                icon = Icons.Default.AccountCircle,
-                label = "User ID",
-                value = uiState.user?.uid?.take(8) ?: "Not available"
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            InfoRow(
-                icon = if (uiState.user?.isEmailVerified == true)
-                    Icons.Default.CheckCircle
-                else
-                    Icons.Default.Warning,
+                icon = if (isVerified) Icons.Default.CheckCircle else Icons.Default.Warning,
                 label = "Email Verified",
-                value = if (uiState.user?.isEmailVerified == true) "Yes" else "No"
+                value = if (isVerified) "Yes" else "No"
             )
         }
     }
 }
 
-/**
- * Row displaying an information item
- */
 @Composable
 private fun InfoRow(
     icon: ImageVector,
@@ -299,9 +272,7 @@ private fun InfoRow(
             tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(24.dp)
         )
-
         Spacer(modifier = Modifier.width(12.dp))
-
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = label,
@@ -317,9 +288,6 @@ private fun InfoRow(
     }
 }
 
-/**
- * Action buttons for sign out and delete account
- */
 @Composable
 private fun ActionButtons(
     onSignOutClick: () -> Unit,
@@ -331,37 +299,28 @@ private fun ActionButtons(
             .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        // Sign Out Button
         Button(
             onClick = onSignOutClick,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary
-            )
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
         ) {
             Icon(
-                imageVector = Icons.Default.ExitToApp,
+                imageVector = Icons.AutoMirrored.Filled.ExitToApp,
                 contentDescription = null,
                 modifier = Modifier.size(20.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = "Sign Out",
-                style = MaterialTheme.typography.bodyLarge
-            )
+            Text(text = "Sign Out", style = MaterialTheme.typography.bodyLarge)
         }
 
-        // Delete Account Button
         OutlinedButton(
             onClick = onDeleteAccountClick,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
-            colors = ButtonDefaults.outlinedButtonColors(
-                contentColor = MaterialTheme.colorScheme.error
-            )
+            colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)
         ) {
             Icon(
                 imageVector = Icons.Default.Delete,
@@ -369,81 +328,11 @@ private fun ActionButtons(
                 modifier = Modifier.size(20.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = "Delete Account",
-                style = MaterialTheme.typography.bodyLarge
-            )
+            Text(text = "Delete Account", style = MaterialTheme.typography.bodyLarge)
         }
     }
 }
 
-/**
- * Content shown when user is not authenticated
- */
-@Composable
-private fun UnauthenticatedContent(
-    onSignInClick: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Icon(
-            imageVector = Icons.Default.Person,
-            contentDescription = null,
-            modifier = Modifier.size(120.dp),
-            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        Text(
-            text = "Welcome to Yambol",
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = "Sign in to access your profile and manage your teams",
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(48.dp))
-
-        Button(
-            onClick = onSignInClick,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary
-            )
-        ) {
-            Icon(
-                imageVector = Icons.Default.Login,
-                contentDescription = null,
-                modifier = Modifier.size(20.dp)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = "Sign In",
-                style = MaterialTheme.typography.bodyLarge
-            )
-        }
-    }
-}
-
-/**
- * Delete account confirmation dialog
- */
 @Composable
 private fun DeleteAccountDialog(
     onConfirm: () -> Unit,
@@ -458,12 +347,7 @@ private fun DeleteAccountDialog(
                 tint = MaterialTheme.colorScheme.error
             )
         },
-        title = {
-            Text(
-                text = "Delete Account?",
-                style = MaterialTheme.typography.titleLarge
-            )
-        },
+        title = { Text(text = "Delete Account?", style = MaterialTheme.typography.titleLarge) },
         text = {
             Text(
                 text = "This action cannot be undone. All your data will be permanently deleted.",
@@ -473,17 +357,11 @@ private fun DeleteAccountDialog(
         confirmButton = {
             Button(
                 onClick = onConfirm,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.error
-                )
-            ) {
-                Text("Delete")
-            }
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+            ) { Text("Delete") }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Cancel")
-            }
+            TextButton(onClick = onDismiss) { Text("Cancel") }
         }
     )
 }

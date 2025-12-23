@@ -17,7 +17,6 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -36,7 +35,10 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun CustomLoginContent(
-    uiState: ProfileUiState,
+    email: String,
+    password: String,
+    isLoginMode: Boolean,
+    isPasswordVisible: Boolean,
     onEmailChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
     onTogglePasswordVisibility: () -> Unit,
@@ -61,7 +63,7 @@ fun CustomLoginContent(
         Spacer(modifier = Modifier.height(32.dp))
 
         Text(
-            text = if (uiState.isLoginMode) "Welcome Back" else "Create Account",
+            text = if (isLoginMode) "Welcome Back" else "Create Account",
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface
@@ -69,8 +71,9 @@ fun CustomLoginContent(
 
         Spacer(modifier = Modifier.height(32.dp))
 
+        // Email Input
         OutlinedTextField(
-            value = uiState.emailInput,
+            value = email,
             onValueChange = onEmailChange,
             label = { Text("Email") },
             modifier = Modifier.fillMaxWidth(),
@@ -87,13 +90,14 @@ fun CustomLoginContent(
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Password Input
         OutlinedTextField(
-            value = uiState.passwordInput,
+            value = password,
             onValueChange = onPasswordChange,
             label = { Text("Password") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
-            visualTransformation = if (uiState.isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+            visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Password,
                 imeAction = ImeAction.Done
@@ -104,7 +108,7 @@ fun CustomLoginContent(
             trailingIcon = {
                 IconButton(onClick = onTogglePasswordVisibility) {
                     Icon(
-                        imageVector = if (uiState.isPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                        imageVector = if (isPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
                         contentDescription = "Toggle password visibility"
                     )
                 }
@@ -119,27 +123,20 @@ fun CustomLoginContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp),
-            enabled = !uiState.isLoading,
             shape = MaterialTheme.shapes.medium
         ) {
-            if (uiState.isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(24.dp),
-                    color = MaterialTheme.colorScheme.onPrimary
-                )
-            } else {
-                Text(
-                    text = if (uiState.isLoginMode) "Sign In" else "Sign Up",
-                    style = MaterialTheme.typography.titleMedium
-                )
-            }
+            Text(
+                text = if (isLoginMode) "Sign In" else "Sign Up",
+                style = MaterialTheme.typography.titleMedium
+            )
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Toggle Mode
         TextButton(onClick = onToggleModeClick) {
             Text(
-                text = if (uiState.isLoginMode)
+                text = if (isLoginMode)
                     "Don't have an account? Sign Up"
                 else
                     "Already have an account? Sign In",
