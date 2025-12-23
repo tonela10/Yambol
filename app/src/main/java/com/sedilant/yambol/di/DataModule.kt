@@ -18,6 +18,8 @@ import com.sedilant.yambol.data.draftTrain.TrainingDatabase
 import com.sedilant.yambol.data.draftTrain.TrainingDraftDao
 import com.sedilant.yambol.data.draftTrain.TrainingDraftRepository
 import com.sedilant.yambol.data.draftTrain.TrainingDraftRepositoryImpl
+import com.sedilant.yambol.data.firebaseAuth.AuthRepository
+import com.sedilant.yambol.data.firebaseAuth.AuthRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -85,6 +87,14 @@ abstract class DataModule {
         @Singleton
         fun provideAuthUI(): AuthUI {
             return AuthUI.getInstance()
+        }
+
+        @Provides
+        @Singleton
+        fun provideAuthRepository(
+            auth: FirebaseAuth
+        ): AuthRepository {
+            return AuthRepositoryImpl(auth)
         }
     }
 }

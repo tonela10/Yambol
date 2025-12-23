@@ -1,113 +1,262 @@
 package com.sedilant.yambol.ui.profile
 
-import android.app.Activity
-import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.firebase.ui.auth.AuthUI
-import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
 import com.google.firebase.auth.FirebaseUser
-import com.sedilant.yambol.data.AuthRepository
+import com.sedilant.yambol.data.firebaseAuth.AuthRepository
+import com.sedilant.yambol.data.firebaseAuth.AuthResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-sealed class ProfileUiState {
-    object Initial : ProfileUiState()
-    object Loading : ProfileUiState()
-    data class Authenticated(val user: FirebaseUser) : ProfileUiState()
-    object Unauthenticated : ProfileUiState()
-    data class Error(val message: String) : ProfileUiState()
-}
+/**
+ * UI State for the Profile Screen
+ */
+data class ProfileUiState(
+    val user: FirebaseUser? = null,
+    val isLoading: Boolean = false,
+    val errorMessage: String? = null,
+    val successMessage: String? = null,
+    val showDeleteConfirmation: Boolean = false,
 
+    // Estado del Formulario de Login/Registro Personalizado
+    val emailInput: String = "",
+    val passwordInput: String = "",
+    val isLoginMode: Boolean = true, // true = Login, false = Registro
+    val isPasswordVisible: Boolean = false
+)
+
+/**
+ * ViewModel for Profile Screen
+ * Manages authentication state, user profile operations and login form
+ */
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val authRepository: AuthRepository
 ) : ViewModel() {
 
-    private val _profileUiState = MutableStateFlow<ProfileUiState>(ProfileUiState.Initial)
-    val profileUiState: StateFlow<ProfileUiState> = _profileUiState.asStateFlow()
+    private val _uiState = MutableStateFlow(ProfileUiState())
+    val uiState: StateFlow<ProfileUiState> = _uiState.asStateFlow()
 
     init {
-        checkAuthStatus()
+        observeAuthState()
     }
 
-    fun checkAuthStatus() {
-        val user = authRepository.currentUser
-        _profileUiState.value = if (user != null) {
-            ProfileUiState.Authenticated(user)
-        } else {
-            ProfileUiState.Unauthenticated
-        }
-    }
-
-    fun getSignInIntent(): Intent {
-        val providers = arrayListOf(
-            AuthUI.IdpConfig.EmailBuilder().build(),
-            AuthUI.IdpConfig.GoogleBuilder().build(),
-            // Add other providers as needed
-        )
-        return authRepository.createSignInIntent(providers)
-    }
-
-    fun handleSignInResult(result: FirebaseAuthUIAuthenticationResult) {
-        if (result.resultCode == Activity.RESULT_OK) {
-            // Successfully signed in
-            val user = authRepository.currentUser
-            if (user != null) {
-                _profileUiState.value = ProfileUiState.Authenticated(user)
-            } else {
-                _profileUiState.value = ProfileUiState.Error("Sign in succeeded but user is null")
-            }
-        } else {
-            // Sign in failed
-            val response = result.idpResponse
-            if (response == null) {
-                // User pressed back button
-                _profileUiState.value = ProfileUiState.Unauthenticated
-            } else {
-                val errorMessage = response.error?.message ?: "Unknown error occurred"
-                _profileUiState.value = ProfileUiState.Error(errorMessage)
+    /**
+     * Observe authentication state changes
+     */
+    private fun observeAuthState() {
+        viewModelScope.launch {
+            authRepository.getAuthStateFlow().collect { user ->
+                _uiState.update { it.copy(user = user) }
             }
         }
     }
 
-    fun signOut(activity: Activity) {
-        viewModelScope.launch {
-            _profileUiState.value = ProfileUiState.Loading
-            authRepository.signOut(activity)
-                .onSuccess {
-                    _profileUiState.value = ProfileUiState.Unauthenticated
-                }
-                .onFailure { exception ->
-                    _profileUiState.value = ProfileUiState.Error(
-                        exception.message ?: "Failed to sign out"
-                    )
-                }
+    // =================================================================
+    // MÉTODOS DEL FORMULARIO DE LOGIN / REGISTRO
+    // =================================================================
+
+    fun onEmailChange(newValue: String) {
+        _uiState.update { it.copy(emailInput = newValue, errorMessage = null) }
+    }
+
+    fun onPasswordChange(newValue: String) {
+        _uiState.update { it.copy(passwordInput = newValue, errorMessage = null) }
+    }
+
+    fun toggleLoginMode() {
+        _uiState.update {
+            it.copy(
+                isLoginMode = !it.isLoginMode,
+                errorMessage = null,
+                successMessage = null
+            )
         }
     }
 
-    fun deleteAccount(activity: Activity) {
+    fun togglePasswordVisibility() {
+        _uiState.update { it.copy(isPasswordVisible = !it.isPasswordVisible) }
+    }
+
+    /**
+     * Ejecuta el inicio de sesión o el registro basado en el modo actual
+     */
+    fun authenticate() {
+        val email = _uiState.value.emailInput.trim()
+        val password = _uiState.value.passwordInput.trim()
+
+        if (email.isBlank() || password.isBlank()) {
+            _uiState.update { it.copy(errorMessage = "Please fill in all fields") }
+            return
+        }
+
         viewModelScope.launch {
-            _profileUiState.value = ProfileUiState.Loading
-            authRepository.deleteAccount(activity)
-                .onSuccess {
-                    _profileUiState.value = ProfileUiState.Unauthenticated
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+
+            // Elegimos función del repo según el modo (Login o Registro)
+            val result = if (_uiState.value.isLoginMode) {
+                authRepository.signInWithEmail(email, password)
+            } else {
+                authRepository.signUpWithEmail(email, password)
+            }
+
+            when (result) {
+                is AuthResult.Success -> {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            successMessage = if (it.isLoginMode) "Welcome back!" else "Account created successfully!",
+                            emailInput = "",     // Limpiamos campos por seguridad
+                            passwordInput = ""
+                        )
+                    }
+                    // No hace falta llamar a reloadUser manualmente,
+                    // observeAuthState detectará el cambio automáticamente.
                 }
-                .onFailure { exception ->
-                    _profileUiState.value = ProfileUiState.Error(
-                        exception.message ?: "Failed to delete account"
-                    )
+                is AuthResult.Error -> {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = result.exception.message ?: "Authentication failed"
+                        )
+                    }
                 }
+                AuthResult.Loading -> {
+                    // El loading ya se gestionó al inicio
+                }
+            }
         }
     }
 
-    fun getUserEmail(): String? = authRepository.getUserEmail()
+    // =================================================================
+    // MÉTODOS DE GESTIÓN DE CUENTA (SignOut, Delete, Info)
+    // =================================================================
 
-    fun getUserDisplayName(): String? = authRepository.getUserDisplayName()
+    /**
+     * Sign out the current user
+     */
+    fun signOut() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
-    fun getUserPhotoUrl(): String? = authRepository.getUserPhotoUrl()
+            when (val result = authRepository.signOut()) {
+                is AuthResult.Success -> {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            successMessage = "Successfully signed out",
+                            user = null,
+                            emailInput = "", // Reset inputs
+                            passwordInput = ""
+                        )
+                    }
+                }
+                is AuthResult.Error -> {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = "Failed to sign out: ${result.exception.message}"
+                        )
+                    }
+                }
+                is AuthResult.Loading -> { }
+            }
+        }
+    }
+
+    /**
+     * Show delete account confirmation dialog
+     */
+    fun showDeleteConfirmation() {
+        _uiState.update { it.copy(showDeleteConfirmation = true) }
+    }
+
+    /**
+     * Hide delete account confirmation dialog
+     */
+    fun hideDeleteConfirmation() {
+        _uiState.update { it.copy(showDeleteConfirmation = false) }
+    }
+
+    /**
+     * Delete the current user account
+     */
+    fun deleteAccount() {
+        viewModelScope.launch {
+            // Cerramos el diálogo y mostramos loading
+            _uiState.update {
+                it.copy(
+                    isLoading = true,
+                    errorMessage = null,
+                    showDeleteConfirmation = false
+                )
+            }
+
+            when (val result = authRepository.deleteAccount()) {
+                is AuthResult.Success -> {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            successMessage = "Account deleted successfully",
+                            user = null,
+                            emailInput = "",
+                            passwordInput = ""
+                        )
+                    }
+                }
+                is AuthResult.Error -> {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = "Failed to delete account: ${result.exception.message}"
+                        )
+                    }
+                }
+                is AuthResult.Loading -> { }
+            }
+        }
+    }
+
+    // =================================================================
+    // GETTERS Y UTILIDADES DE UI
+    // =================================================================
+
+    fun clearErrorMessage() {
+        _uiState.update { it.copy(errorMessage = null) }
+    }
+
+    fun clearSuccessMessage() {
+        _uiState.update { it.copy(successMessage = null) }
+    }
+
+    /**
+     * Get user display name or email, or a default string
+     */
+    fun getUserDisplayName(): String {
+        val user = _uiState.value.user
+        return when {
+            !user?.displayName.isNullOrBlank() -> user?.displayName ?: ""
+            !user?.email.isNullOrBlank() -> user?.email ?: ""
+            else -> "User"
+        }
+    }
+
+    /**
+     * Get user email safely
+     */
+    fun getUserEmail(): String {
+        return _uiState.value.user?.email ?: "No email"
+    }
+
+    /**
+     * Check if user is signed in
+     */
+    fun isUserSignedIn(): Boolean {
+        return _uiState.value.user != null
+    }
 }

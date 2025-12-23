@@ -23,28 +23,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <!-- FirebaseUI Activities with AppCompat theme -->
-        <activity
-            android:name="com.firebase.ui.auth.ui.idp.AuthMethodPickerActivity"
-            android:theme="@style/FirebaseUITheme"
-            tools:replace="android:theme" />
-
-        <activity
-            android:name="com.firebase.ui.auth.ui.email.EmailActivity"
-            android:theme="@style/FirebaseUITheme"
-            tools:replace="android:theme" />
-
-        <activity
-            android:name="com.firebase.ui.auth.ui.phone.PhoneActivity"
-            android:theme="@style/FirebaseUITheme"
-            tools:replace="android:theme" />
-
-        <activity
-            android:name="com.firebase.ui.auth.ui.idp.SingleSignInActivity"
-            android:theme="@style/FirebaseUITheme"
-            tools:replace="android:theme" />
-
     </application>
 
 </manifest>

@@ -62,7 +62,7 @@ dependencies {
     implementation(libs.reorderable)
 
     // Firebase
-    implementation(libs.firebase.bom)
+    implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.auth)
     implementation("com.firebaseui:firebase-ui-auth:9.0.0")
