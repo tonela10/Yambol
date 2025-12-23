@@ -26,7 +26,7 @@ data class ProfileUiState(
     // Estado del Formulario de Login/Registro Personalizado
     val emailInput: String = "",
     val passwordInput: String = "",
-    val isLoginMode: Boolean = true, // true = Login, false = Registro
+    val isLoginMode: Boolean = true,
     val isPasswordVisible: Boolean = false
 )
 
@@ -240,8 +240,8 @@ class ProfileViewModel @Inject constructor(
     fun getUserDisplayName(): String {
         val user = _uiState.value.user
         return when {
-            !user?.displayName.isNullOrBlank() -> user?.displayName ?: ""
-            !user?.email.isNullOrBlank() -> user?.email ?: ""
+            !user?.displayName.isNullOrBlank() -> user.displayName ?: ""
+            !user?.email.isNullOrBlank() -> user.email ?: ""
             else -> "User"
         }
     }

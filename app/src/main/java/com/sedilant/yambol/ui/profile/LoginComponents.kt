@@ -47,13 +47,12 @@ fun CustomLoginContent(
         modifier = Modifier
             .fillMaxSize()
             .padding(24.dp)
-            .verticalScroll(rememberScrollState()), // Importante para teclados
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // Logo o Icono
         Icon(
-            imageVector = Icons.Default.Lock, // O tu logo
+            imageVector = Icons.Default.Lock,
             contentDescription = null,
             modifier = Modifier.size(80.dp),
             tint = MaterialTheme.colorScheme.primary
@@ -70,7 +69,6 @@ fun CustomLoginContent(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Campo Email
         OutlinedTextField(
             value = uiState.emailInput,
             onValueChange = onEmailChange,
@@ -89,7 +87,6 @@ fun CustomLoginContent(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Campo Password
         OutlinedTextField(
             value = uiState.passwordInput,
             onValueChange = onPasswordChange,
@@ -117,7 +114,6 @@ fun CustomLoginContent(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Botón Principal
         Button(
             onClick = onAuthButtonClick,
             modifier = Modifier
@@ -141,7 +137,6 @@ fun CustomLoginContent(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Toggle entre Login/Registro
         TextButton(onClick = onToggleModeClick) {
             Text(
                 text = if (uiState.isLoginMode)
