@@ -1,90 +1,69 @@
 package com.sedilant.yambol
 
-import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.sedilant.yambol.ui.NavigationBottomBar
 import com.sedilant.yambol.ui.addStats.AddTeamStatsScreen
-import com.sedilant.yambol.ui.board.BoardScreen
 import com.sedilant.yambol.ui.createTeam.CreateTeamScreen
 import com.sedilant.yambol.ui.createTrain.CreateTrainScreenV2
 import com.sedilant.yambol.ui.home.HomeScreen
 import com.sedilant.yambol.ui.playerCard.PlayerCardScreen
 import com.sedilant.yambol.ui.profile.ProfileScreen
-import com.sedilant.yambol.ui.statistics.StatisticsScreen
 import com.sedilant.yambol.ui.training.TrainingScreen
 import com.sedilant.yambol.ui.trainingDetails.TrainingDetailsScreen
 import kotlinx.serialization.Serializable
 
 // TODO Create an issue to move this code to another file. Add the issue url when created
 @Serializable
-sealed class YambolScreen(@StringRes val route: Int) {
+sealed interface YambolScreen {
     @Serializable
-    data object Home : YambolScreen(route = R.string.home_screen_title)
+    data object Home : YambolScreen
 
     @Serializable
-    data object Training : YambolScreen(route = R.string.training_screen_title)
+    data object Training : YambolScreen
+
+    // TODO implement Statistics & Board screen when ready
+    @Serializable
+    data object Statistics : YambolScreen
 
     @Serializable
-    data object Statistics : YambolScreen(route = R.string.statistic_screen_title)
+    data object Board : YambolScreen
 
     @Serializable
-    data object Board : YambolScreen(route = R.string.board_screen_title)
+    data object Profile : YambolScreen
 
     @Serializable
-    data object Profile : YambolScreen(route = R.string.profile_screen_title)
+    data object CreateTeam : YambolScreen
 
     @Serializable
-    data object CreateTeam : YambolScreen(route = R.string.create_team_screen)
+    data class PlayerCardDetails(val id: Int?) : YambolScreen
 
     @Serializable
-    data class PlayerCardDetails(val id: Int?) :
-        YambolScreen(route = R.string.player_card_screen)
+    data class AddTeamStats(val teamId: Int, val statsIds: List<Int>) : YambolScreen
 
     @Serializable
-    data class AddTeamStats(val teamId: Int, val statsIds: List<Int>) : YambolScreen(
-        route = R.string.add_teams_stats_screen
-    )
+    data class TrainingDetails(val trainId: Int) : YambolScreen
 
     @Serializable
-    data class TrainingDetails(val trainId: Int) : YambolScreen(R.string.training_details_screen)
-
-    @Serializable
-    data class CreateTrain(val currentTeam: Int) : YambolScreen(R.string.create_train_screen)
+    data class CreateTrain(val currentTeam: Int) : YambolScreen
 }
 
 @Composable
 fun YambolApp() {
     val navController = rememberNavController()
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-
-    // Check the current destination against the actual screen types
-    val currentDestination = navBackStackEntry?.destination?.route
-    val shouldShowBottomBar = when {
-        currentDestination?.contains("CreateTeam") == true -> false
-        currentDestination?.contains("PlayerCardDetails") == true -> false
-        currentDestination?.contains("AddTeamStats") == true -> false
-        currentDestination?.contains("TrainingDetails") == true -> false
-        currentDestination?.contains("CreateTrain") == true -> false
-        else -> true
-    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
-            if (shouldShowBottomBar) {
-                NavigationBottomBar(navController = navController)
-            }
+            NavigationBottomBar(navController = navController)
         }
     ) { paddingValues ->
         NavHost(
@@ -139,14 +118,6 @@ fun YambolApp() {
                         )
                     }
                 )
-            }
-
-            composable<YambolScreen.Statistics> {
-                StatisticsScreen()
-            }
-
-            composable<YambolScreen.Board> {
-                BoardScreen()
             }
 
             composable<YambolScreen.Profile> {
