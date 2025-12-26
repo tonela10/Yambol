@@ -12,7 +12,12 @@
           "package_name": "com.sedilant.yambol"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "448568418891-4vq7apk7c16o5s69qg6gvns664oc8cif.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBNZ9pnR14pF5EijoF_QuN6nDPBGxEc9n0"
@@ -20,7 +25,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "448568418891-4vq7apk7c16o5s69qg6gvns664oc8cif.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

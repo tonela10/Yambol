@@ -62,8 +62,11 @@ dependencies {
     implementation(libs.reorderable)
 
     // Firebase
-    implementation(platform("com.google.firebase:firebase-bom:34.5.0"))
-    implementation("com.google.firebase:firebase-analytics")
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.auth)
+    implementation("com.firebaseui:firebase-ui-auth:9.0.0")
+    implementation(libs.firebase.firestore.ktx)
 
     // Room
     implementation(libs.androidx.room.ktx)
