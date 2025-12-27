@@ -11,7 +11,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.sedilant.yambol.ui.NavigationBottomBar
-import com.sedilant.yambol.ui.addStats.AddTeamStatsScreen
 import com.sedilant.yambol.ui.createTeam.CreateTeamScreen
 import com.sedilant.yambol.ui.createTrain.CreateTrainScreenV2
 import com.sedilant.yambol.ui.home.HomeScreen
@@ -46,6 +45,7 @@ sealed interface YambolScreen {
     @Serializable
     data class PlayerCardDetails(val id: Int?) : YambolScreen
 
+    // TODO implement AddTeamStats screen when ready
     @Serializable
     data class AddTeamStats(val teamId: Int, val statsIds: List<Int>) : YambolScreen
 
@@ -126,17 +126,6 @@ fun YambolApp() {
                 PlayerCardScreen(
                     playerId = id,
                     onNavigateBack = { navController.popBackStack() }
-                )
-            }
-
-            composable<YambolScreen.AddTeamStats> { navBackStackEntry ->
-                val args = navBackStackEntry.toRoute<YambolScreen.AddTeamStats>()
-
-                AddTeamStatsScreen(
-                    teamId = args.teamId,
-                    statIds = args.statsIds,
-                    onNavigateBack = { navController.popBackStack() },
-                    onCompleted = { navController.popBackStack() },
                 )
             }
 

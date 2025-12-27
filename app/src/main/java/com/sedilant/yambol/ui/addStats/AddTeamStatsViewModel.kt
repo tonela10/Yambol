@@ -1,5 +1,6 @@
 package com.sedilant.yambol.ui.addStats
 
+/*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sedilant.yambol.domain.get.GetPlayersByTeamIdUseCase
@@ -202,3 +203,4 @@ sealed interface AddTeamStatsUiState {
 interface AddTeamStatsViewModelFactory {
     fun create(teamId: Int, statIds: List<Int>): AddTeamStatsViewModel
 }
+*/
