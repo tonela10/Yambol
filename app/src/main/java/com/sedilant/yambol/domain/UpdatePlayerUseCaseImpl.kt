@@ -1,21 +1,25 @@
 package com.sedilant.yambol.domain
 
-import com.sedilant.yambol.data.team.TeamRepository
+import com.sedilant.yambol.data.team.player.PlayerEntity
+import com.sedilant.yambol.data.team.player.PlayerRepository
 import javax.inject.Inject
 
 class UpdatePlayerUseCaseImpl @Inject constructor(
-    private val teamRepository: TeamRepository
+    private val playerRepository: PlayerRepository
 ) : UpdatePlayerUseCase {
     override suspend fun invoke(
-        playerId: Int,
+        playerId: Long,
         newName: String,
         newNumber: Int,
+        teamId: Long,
     ) {
-        teamRepository.updatePlayer(
-            playerId = playerId,
-            newName = newName.lowercase(),
-            newNumber = newNumber,
-            newPosition = 1
+        playerRepository.updatePlayer(
+            player = PlayerEntity(
+                id = playerId,
+                name = newName,
+                number = newNumber,
+                teamId = teamId
+            )
         )
     }
 }

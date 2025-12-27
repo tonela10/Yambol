@@ -1,20 +1,19 @@
 package com.sedilant.yambol.domain.insert
 
-import com.sedilant.yambol.data.team.PlayerEntity
-import com.sedilant.yambol.data.team.TeamRepository
+import com.sedilant.yambol.data.team.player.PlayerEntity
+import com.sedilant.yambol.data.team.player.PlayerRepository
 import com.sedilant.yambol.ui.home.models.PlayerUiModel
 import javax.inject.Inject
 
 class InsertPlayerUseCaseImpl @Inject constructor(
-    private val teamRepository: TeamRepository
+    private val playerRepository: PlayerRepository
 ) : InsertPlayerUseCase {
-    override suspend fun invoke(playerUiModel: PlayerUiModel, teamId: Int) {
-        teamRepository.insertPlayer(
+    override suspend fun invoke(playerUiModel: PlayerUiModel) {
+        playerRepository.insertPlayer(
             PlayerEntity(
                 name = playerUiModel.name.lowercase(),
                 number = playerUiModel.number.toInt(),
-                teamId = teamId,
-                position = 5,
+                teamId = playerUiModel.teamId,
             )
         )
     }
