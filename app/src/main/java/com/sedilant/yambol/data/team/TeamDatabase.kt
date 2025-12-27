@@ -6,7 +6,6 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.sedilant.yambol.data.StatsDao
 import com.sedilant.yambol.data.converters.Converters
 
 @Database(
@@ -16,7 +15,7 @@ import com.sedilant.yambol.data.converters.Converters
         TeamObjectivesEntity::class,
         TrainEntity::class,
         TrainCrossTrainTaskEntity::class,
-        TrainTaskEntity::class],
+        TaskEntity::class],
     version = 1,
     exportSchema = true,
 //    autoMigrations = [
@@ -27,7 +26,6 @@ import com.sedilant.yambol.data.converters.Converters
 abstract class TeamDatabase : RoomDatabase() {
     abstract fun playerDao(): PlayerDao
     abstract fun teamObjectivesDao(): TeamObjectivesDao
-    abstract fun statsDao(): StatsDao
     abstract fun trainingDao(): TrainingDao
 
     companion object {

@@ -2,7 +2,7 @@ package com.sedilant.yambol.domain.insert
 
 import com.sedilant.yambol.data.team.TeamRepository
 import com.sedilant.yambol.data.team.TrainCrossTrainTaskEntity
-import com.sedilant.yambol.data.team.TrainTaskEntity
+import com.sedilant.yambol.data.team.TaskEntity
 import javax.inject.Inject
 
 class CreateTrainTaskUseCaseImpl @Inject constructor(
@@ -17,12 +17,12 @@ class CreateTrainTaskUseCaseImpl @Inject constructor(
         variables: List<String>
     ) {
         val trainTaskId = teamRepository.insertTrainTask(
-            TrainTaskEntity(
+            TaskEntity(
                 name = name,
-                numberOfPlayers = numberOfPlayer,
                 concept = concept,
                 description = description,
-                variables = variables
+                variables = variables,
+                corrections = null
             )
         )
         teamRepository.insertTrainCrossTrainTask(

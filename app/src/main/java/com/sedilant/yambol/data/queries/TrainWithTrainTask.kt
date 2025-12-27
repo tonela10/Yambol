@@ -5,7 +5,7 @@ import androidx.room.Junction
 import androidx.room.Relation
 import com.sedilant.yambol.data.team.TrainCrossTrainTaskEntity
 import com.sedilant.yambol.data.team.TrainEntity
-import com.sedilant.yambol.data.team.TrainTaskEntity
+import com.sedilant.yambol.data.team.TaskEntity
 
 data class TrainWithTrainTask(
     @Embedded val train: TrainEntity,
@@ -18,11 +18,11 @@ data class TrainWithTrainTask(
             entityColumn = "trainingTaskId"
         )
     )
-    val tasks: List<TrainTaskEntity>
+    val tasks: List<TaskEntity>
 )
 
 data class TrainTaskWithTrain(
-    @Embedded val trainTask: TrainTaskEntity,
+    @Embedded val trainTask: TaskEntity,
     @Relation(
         parentColumn = "id",
         entityColumn = "trainId"

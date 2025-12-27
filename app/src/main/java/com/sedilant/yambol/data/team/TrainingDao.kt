@@ -13,17 +13,17 @@ interface TrainingDao {
     fun getAllTrainsByTeamId(teamId: Int): List<TrainEntity>
 
     @Transaction
-    @Query("SELECT * FROM train WHERE trainId = :trainId")
+    @Query("SELECT * FROM train WHERE id = :trainId")
     fun getTrainWithTrainTaskByTrainId(trainId: Int): TrainWithTrainTask
 
-    @Query("SELECT trainId FROM train WHERE teamId = :teamId ORDER BY trainId DESC LIMIT 1")
+    @Query("SELECT id FROM train WHERE teamId = :teamId ORDER BY id DESC LIMIT 1")
     fun getLastTrainWithTrainTaskByTeamId(teamId: Int): Long
 
     @Insert
     fun insertTrain(trainEntity: TrainEntity): Long
 
     @Insert
-    fun insertTrainTask(trainTaskEntity: TrainTaskEntity): Long
+    fun insertTrainTask(taskEntity: TaskEntity): Long
 
     @Insert
     fun insertTrainCrossTrainTask(trainCrossTrainTaskEntity: TrainCrossTrainTaskEntity)

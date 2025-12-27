@@ -1,9 +1,6 @@
 package com.sedilant.yambol.data.team
 
-import com.sedilant.yambol.data.team.PlayerDao
 import com.sedilant.yambol.data.queries.TrainWithTrainTask
-import com.sedilant.yambol.domain.mapToDomain
-import com.sedilant.yambol.ui.home.models.PlayerUiModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
@@ -19,10 +16,6 @@ class TeamRepositoryImpl @Inject constructor(
         return playerDao.getAllTeams()
     }
 
-    override suspend fun getTeamPlayers(id: Int): Flow<List<PlayerEntity>> {
-        return playerDao.getTeamPlayers(id)
-    }
-
     override suspend fun getTeamId(teamName: String): Int? {
         return playerDao.getTeamId(teamName)
     }
@@ -31,33 +24,6 @@ class TeamRepositoryImpl @Inject constructor(
         playerDao.insertTeam(teamEntity)
     }
 
-    override suspend fun insertPlayer(playerEntity: PlayerEntity) {
-        playerDao.insertPlayer(playerEntity)
-    }
-
-    override suspend fun updatePlayer(playerId: Int, newName: String, newNumber: Int, newPosition: Int) {
-        withContext(Dispatchers.IO) {
-            playerDao.updatePlayer(playerId, newName, newNumber, newPosition)
-        }
-    }
-
-    override suspend fun getPlayerTeamId(playerId: Int): Int {
-        return withContext(Dispatchers.IO) {
-            playerDao.getPlayerTeamId(playerId)
-        }
-    }
-
-    override suspend fun isJerseyNumberTaken(teamId: Int, jerseyNumber: Int, excludePlayerId: Int?): Boolean {
-        return withContext(Dispatchers.IO) {
-            playerDao.isJerseyNumberTaken(teamId, jerseyNumber, excludePlayerId)
-        }
-    }
-
-    override suspend fun deletePlayer(playerId: Int) {
-        withContext(Dispatchers.IO) {
-            playerDao.deletePlayerById(playerId)
-        }
-    }
     // TEAM OBJECTIVES DAO METHODS
     override suspend fun insertTeamObjective(teamObjectivesEntity: TeamObjectivesEntity) {
         teamObjectivesDao.insertTeamObjective(teamObjectivesEntity)
@@ -82,12 +48,6 @@ class TeamRepositoryImpl @Inject constructor(
     override suspend fun deleteTeamObjective(teamObjectivesEntity: TeamObjectivesEntity) {
         return withContext(Dispatchers.IO) {
             teamObjectivesDao.deleteTeamObjective(teamObjectivesEntity)
-        }
-    }
-
-    override suspend fun getPlayer(id: Int): PlayerUiModel {
-        return withContext(Dispatchers.IO) {
-            playerDao.getPlayer(id).mapToDomain()
         }
     }
 
@@ -116,7 +76,7 @@ class TeamRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun insertTrainTask(trainTaskEntity: TrainTaskEntity): Int {
+    override suspend fun insertTrainTask(trainTaskEntity: TaskEntity): Int {
         return withContext(Dispatchers.IO) {
             trainingDao.insertTrainTask(trainTaskEntity).toInt() // TODO undo this ñapa
         }

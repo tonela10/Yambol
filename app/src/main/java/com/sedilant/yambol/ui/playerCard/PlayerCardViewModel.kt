@@ -6,7 +6,6 @@ import com.sedilant.yambol.domain.CheckJerseyNumberUseCase
 import com.sedilant.yambol.domain.UpdatePlayerUseCase
 import com.sedilant.yambol.domain.delete.DeletePlayerUseCase
 import com.sedilant.yambol.domain.get.GetPlayerByIdUseCase
-import com.sedilant.yambol.domain.get.GetPlayerStatsUseCase
 import com.sedilant.yambol.domain.get.GetPlayerTeamIdUseCase
 import com.sedilant.yambol.ui.home.models.PlayerUiModel
 import com.sedilant.yambol.ui.playerCard.composables.EditPlayerData
@@ -24,7 +23,6 @@ import kotlinx.coroutines.launch
 class PlayerCardViewModel @AssistedInject constructor(
     @Assisted private val playerId: Int?,
     private val getPlayerByIdUseCase: GetPlayerByIdUseCase,
-    private val getPlayerStatsUseCase: GetPlayerStatsUseCase,
     private val updatePlayerUseCase: UpdatePlayerUseCase,
     private val getPlayerTeamIdUseCase: GetPlayerTeamIdUseCase,
     private val checkJerseyNumberUseCase: CheckJerseyNumberUseCase,

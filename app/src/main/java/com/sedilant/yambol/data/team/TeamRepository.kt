@@ -8,10 +8,8 @@ interface TeamRepository {
 
     // team information related methods
     suspend fun getAllTeams(): Flow<List<TeamEntity>>
-    suspend fun getTeamPlayers(id: Int): Flow<List<PlayerEntity>>
     suspend fun getTeamId(teamName: String): Int?
     suspend fun insertTeam(teamEntity: TeamEntity)
-    suspend fun insertPlayer(playerEntity: PlayerEntity)
     suspend fun updateTeam(teamId: Int, newName: String)
 
     // team objectives related methods
@@ -21,22 +19,11 @@ interface TeamRepository {
     suspend fun getTeamObjectiveById(objectiveId: Int): TeamObjectivesEntity?
     suspend fun deleteTeamObjective(teamObjectivesEntity: TeamObjectivesEntity)
 
-    // player information related methods
-    suspend fun getPlayer(id: Int): PlayerUiModel // TODO create a PlayerDomainModel
-    suspend fun updatePlayer(playerId: Int, newName: String, newNumber: Int, newPosition: Int)
-    suspend fun getPlayerTeamId(playerId: Int): Int
-    suspend fun isJerseyNumberTaken(
-        teamId: Int,
-        jerseyNumber: Int,
-        excludePlayerId: Int? = null
-    ): Boolean
-    suspend fun deletePlayer(playerId: Int)
-
     // team trainings related info
     suspend fun getAllTrainingsByTeamId(teamId: Int): List<TrainEntity>
     suspend fun getTrainWithTrainTaskByTrainId(trainId: Int): TrainWithTrainTask
     suspend fun insertTrain(trainEntity: TrainEntity): Int
-    suspend fun insertTrainTask(trainTaskEntity: TrainTaskEntity): Int
+    suspend fun insertTrainTask(trainTaskEntity: TaskEntity): Int
     suspend fun insertTrainCrossTrainTask(trainCrossTrainTaskEntity: TrainCrossTrainTaskEntity)
     suspend fun getLastTrainWithTrainTaskByTeamId(teamId: Int): Long?
 }

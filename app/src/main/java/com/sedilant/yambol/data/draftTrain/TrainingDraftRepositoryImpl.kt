@@ -8,18 +8,18 @@ import javax.inject.Inject
 
 // TODO Change to English
 class TrainingDraftRepositoryImpl @Inject constructor(
-    private val dao: TrainingDraftDao
+    private val trainingDraftDao: TrainingDraftDao
 ) : TrainingDraftRepository {
 
     // Crear nuevo borrador
     override suspend fun createDraft(training: Training): String {
         val entity = training.toEntity()
-        dao.insertTrainingDraft(entity)
+        trainingDraftDao.insertTrainingDraft(entity)
 
         val taskEntities = training.tasks.mapIndexed { index, task ->
             task.toEntity(entity.id, index)
         }
-        dao.insertTasks(taskEntities)
+        trainingDraftDao.insertTasks(taskEntities)
 
         return entity.id
     }
@@ -30,7 +30,7 @@ class TrainingDraftRepositoryImpl @Inject constructor(
         return try {
             // Intentar obtener el primer borrador
             val drafts = mutableListOf<TrainingDraftEntity>()
-            dao.getAllDrafts().first().also { drafts.addAll(it) }
+            trainingDraftDao.getAllDrafts().first().also { drafts.addAll(it) }
 
             if (drafts.isNotEmpty()) {
                 drafts.first().id
@@ -73,7 +73,7 @@ class TrainingDraftRepositoryImpl @Inject constructor(
         hour: Float?,
         concepts: List<String>?
     ) {
-        val current = dao.getTrainingDraftById(id) ?: return
+        val current = trainingDraftDao.getTrainingDraftById(id) ?: return
 
         val updated = current.copy(
             date = date?.time ?: current.date,
@@ -83,51 +83,51 @@ class TrainingDraftRepositoryImpl @Inject constructor(
             updatedAt = System.currentTimeMillis()
         )
 
-        dao.updateTrainingDraft(updated)
+        trainingDraftDao.updateTrainingDraft(updated)
     }
 
     // Añadir una tarea
     override suspend fun addTask(trainingId: String, task: Task) {
-        val existingTasks = dao.getTasksForTraining(trainingId)
+        val existingTasks = trainingDraftDao.getTasksForTraining(trainingId)
         val newOrderIndex = existingTasks.size
 
-        dao.insertTask(task.toEntity(trainingId, newOrderIndex))
-        dao.updateTimestamp(trainingId)
+        trainingDraftDao.insertTask(task.toEntity(trainingId, newOrderIndex))
+        trainingDraftDao.updateTimestamp(trainingId)
     }
 
     // Actualizar una tarea
     override suspend fun updateTask(trainingId: String, task: Task) {
-        val existingTask = dao.getTasksForTraining(trainingId)
+        val existingTask = trainingDraftDao.getTasksForTraining(trainingId)
             .find { it.id == task.id } ?: return
 
         val updated = task.toEntity(trainingId, existingTask.orderIndex)
-        dao.updateTask(updated)
-        dao.updateTimestamp(trainingId)
+        trainingDraftDao.updateTask(updated)
+        trainingDraftDao.updateTimestamp(trainingId)
     }
 
     // Eliminar una tarea
     override suspend fun removeTask(trainingId: String, taskId: String) {
-        dao.deleteTask(taskId)
-        dao.updateTimestamp(trainingId)
+        trainingDraftDao.deleteTask(taskId)
+        trainingDraftDao.updateTimestamp(trainingId)
     }
 
     // Obtener borrador completo
     override suspend fun getDraft(id: String): Training? {
-        return dao.getTrainingWithTasks(id)?.toDomain()
+        return trainingDraftDao.getTrainingWithTasks(id)?.toDomain()
     }
 
     // Observar borrador
     override fun observeDraft(id: String): Flow<Training?> {
-        return dao.getTasksForTrainingFlow(id).map { tasks ->
-            val trainingEntity = dao.getTrainingDraftById(id) ?: return@map null
+        return trainingDraftDao.getTasksForTrainingFlow(id).map { tasks ->
+            val trainingEntity = trainingDraftDao.getTrainingDraftById(id) ?: return@map null
             trainingEntity.toDomain(tasks)
         }
     }
 
     // Finalizar borrador (marcarlo como completado)
     override suspend fun finalizeDraft(id: String) {
-        val current = dao.getTrainingDraftById(id) ?: return
-        dao.updateTrainingDraft(
+        val current = trainingDraftDao.getTrainingDraftById(id) ?: return
+        trainingDraftDao.updateTrainingDraft(
             current.copy(
                 isCompleted = true,
                 updatedAt = System.currentTimeMillis()
@@ -137,21 +137,21 @@ class TrainingDraftRepositoryImpl @Inject constructor(
 
     // Eliminar borrador
     override suspend fun deleteDraft(id: String) {
-        dao.deleteTrainingDraft(id)
+        trainingDraftDao.deleteTrainingDraft(id)
     }
 
     // Obtener todos los borradores
     override fun getAllDrafts(): Flow<List<Training>> {
-        return dao.getAllDraftsWithTasks().map { list ->
+        return trainingDraftDao.getAllDraftsWithTasks().map { list ->
             list.map { it.toDomain() }
         }
     }
 
     // Obtener todos los entrenamientos finalizados
     override fun getAllCompletedTrainings(): Flow<List<Training>> {
-        return dao.getAllCompletedTrainings().map { trainings ->
+        return trainingDraftDao.getAllCompletedTrainings().map { trainings ->
             trainings.map { training ->
-                val tasks = dao.getTasksForTraining(training.id)
+                val tasks = trainingDraftDao.getTasksForTraining(training.id)
                 training.toDomain(tasks)
             }
         }
@@ -160,6 +160,6 @@ class TrainingDraftRepositoryImpl @Inject constructor(
     // Limpiar borradores antiguos (ej: más de 7 días)
     override suspend fun cleanOldDrafts(daysOld: Int) {
         val cutoffTime = System.currentTimeMillis() - (daysOld * 24 * 60 * 60 * 1000L)
-        dao.deleteOldDrafts(cutoffTime)
+        trainingDraftDao.deleteOldDrafts(cutoffTime)
     }
 }

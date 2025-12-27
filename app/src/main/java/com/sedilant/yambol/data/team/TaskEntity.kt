@@ -6,12 +6,12 @@ import androidx.room.PrimaryKey
 @Entity(
     tableName = "train_task",
 )
-data class TrainTaskEntity(
+data class TaskEntity(
     @PrimaryKey(autoGenerate = true)
     val trainingTaskId: Long = 0,
     val name: String,
-    val numberOfPlayers: Int,
-    val concept: String,
+    val concept: String, // TODO check if list is needed
     val description: String,
+    val corrections: String?,
     val variables: List<String>?,
 )

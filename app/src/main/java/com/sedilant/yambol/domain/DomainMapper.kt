@@ -1,10 +1,8 @@
 package com.sedilant.yambol.domain
 
 import com.sedilant.yambol.data.team.PlayerEntity
+import com.sedilant.yambol.data.team.TaskEntity
 import com.sedilant.yambol.data.team.TeamEntity
-import com.sedilant.yambol.data.team.TrainTaskEntity
-import com.sedilant.yambol.data.queries.AbilityRecordWithName
-import com.sedilant.yambol.domain.models.AbilityDomainModel
 import com.sedilant.yambol.domain.models.TeamDomainModel
 import com.sedilant.yambol.domain.models.TrainTaskDomainModel
 import com.sedilant.yambol.ui.home.models.PlayerUiModel
@@ -24,23 +22,13 @@ fun PlayerEntity.mapToDomain(): PlayerUiModel {
     )
 }
 
-fun AbilityRecordWithName.mapToDomain(): AbilityDomainModel {
-    return AbilityDomainModel(
-        name = ability.name,
-        value = record.value.toFloat(),
-        recordId = record.id,
-        id = ability.id,
-    )
-}
-
-fun TrainTaskEntity.mapToDomain(): TrainTaskDomainModel {
+fun TaskEntity.mapToDomain(): TrainTaskDomainModel {
     return TrainTaskDomainModel(
         trainingTaskId = trainingTaskId.toInt(),
         name = name,
-        numberOfPlayer = numberOfPlayers,
         concept = concept,
         description = description,
-        variables = variables
+        variables = variables,
     )
 }
 

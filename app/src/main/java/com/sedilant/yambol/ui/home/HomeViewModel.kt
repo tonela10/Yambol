@@ -9,7 +9,6 @@ import com.sedilant.yambol.domain.UpdateTeamObjectiveUseCase
 import com.sedilant.yambol.domain.UpdateTeamUseCase
 import com.sedilant.yambol.domain.get.GetLastTrainOfTeamUseCase
 import com.sedilant.yambol.domain.get.GetPlayersByTeamIdUseCase
-import com.sedilant.yambol.domain.get.GetStatByNameUseCase
 import com.sedilant.yambol.domain.get.GetTeamObjectivesUseCase
 import com.sedilant.yambol.domain.get.GetTeamsUseCase
 import com.sedilant.yambol.domain.insert.InsertTeamObjectiveUseCase
@@ -42,7 +41,6 @@ class HomeViewModel @Inject constructor(
     private val toggleTeamObjectiveUseCase: ToggleTeamObjectiveUseCase,
     private val deleteTeamObjectiveUseCase: DeleteTeamObjectiveUseCase,
     private val dataStoreManager: DataStoreManager,
-    private val getStatByNameUseCase: GetStatByNameUseCase,
     private val getLastTrainOfTeamUseCase: GetLastTrainOfTeamUseCase,
     private val updateTeamUseCase: UpdateTeamUseCase,
 ) : ViewModel() {
