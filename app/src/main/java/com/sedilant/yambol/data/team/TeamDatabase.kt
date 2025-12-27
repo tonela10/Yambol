@@ -1,4 +1,4 @@
-package com.sedilant.yambol.data
+package com.sedilant.yambol.data.team
 
 import android.content.Context
 import androidx.room.Database
@@ -6,23 +6,14 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.sedilant.yambol.data.StatsDao
 import com.sedilant.yambol.data.converters.Converters
-import com.sedilant.yambol.data.entities.AbilityNameEntity
-import com.sedilant.yambol.data.entities.AbilityRecordEntity
-import com.sedilant.yambol.data.entities.PlayerEntity
-import com.sedilant.yambol.data.entities.TeamEntity
-import com.sedilant.yambol.data.entities.TeamObjectivesEntity
-import com.sedilant.yambol.data.entities.TrainCrossTrainTaskEntity
-import com.sedilant.yambol.data.entities.TrainEntity
-import com.sedilant.yambol.data.entities.TrainTaskEntity
 
 @Database(
     entities = [
         PlayerEntity::class,
         TeamEntity::class,
         TeamObjectivesEntity::class,
-        AbilityRecordEntity::class,
-        AbilityNameEntity::class,
         TrainEntity::class,
         TrainCrossTrainTaskEntity::class,
         TrainTaskEntity::class],

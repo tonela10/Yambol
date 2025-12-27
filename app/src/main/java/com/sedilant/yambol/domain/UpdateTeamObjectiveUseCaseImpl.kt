@@ -1,6 +1,6 @@
 package com.sedilant.yambol.domain
 
-import com.sedilant.yambol.data.TeamRepository
+import com.sedilant.yambol.data.team.TeamRepository
 import javax.inject.Inject
 
 class UpdateTeamObjectiveUseCaseImpl @Inject constructor(

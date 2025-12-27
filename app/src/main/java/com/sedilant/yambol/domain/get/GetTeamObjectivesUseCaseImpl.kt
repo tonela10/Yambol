@@ -1,6 +1,6 @@
 package com.sedilant.yambol.domain.get
 
-import com.sedilant.yambol.data.TeamRepository
+import com.sedilant.yambol.data.team.TeamRepository
 import com.sedilant.yambol.domain.models.TeamObjectivesDomainModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map

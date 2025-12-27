@@ -1,11 +1,8 @@
-package com.sedilant.yambol.data
+package com.sedilant.yambol.data.team
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
-import com.sedilant.yambol.data.entities.PlayerEntity
-import com.sedilant.yambol.data.entities.TeamEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao

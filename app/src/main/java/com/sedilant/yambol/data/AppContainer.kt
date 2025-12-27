@@ -1,6 +1,9 @@
 package com.sedilant.yambol.data
 
 import android.content.Context
+import com.sedilant.yambol.data.team.TeamDatabase
+import com.sedilant.yambol.data.team.TeamRepository
+import com.sedilant.yambol.data.team.TeamRepositoryImpl
 
 interface AppContainer {
     val teamRepository: TeamRepository

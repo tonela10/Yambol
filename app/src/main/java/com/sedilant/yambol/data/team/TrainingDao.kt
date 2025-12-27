@@ -1,12 +1,9 @@
-package com.sedilant.yambol.data
+package com.sedilant.yambol.data.team
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
-import com.sedilant.yambol.data.entities.TrainCrossTrainTaskEntity
-import com.sedilant.yambol.data.entities.TrainEntity
-import com.sedilant.yambol.data.entities.TrainTaskEntity
 import com.sedilant.yambol.data.queries.TrainWithTrainTask
 
 @Dao

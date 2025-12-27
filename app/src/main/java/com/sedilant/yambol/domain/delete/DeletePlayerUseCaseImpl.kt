@@ -1,6 +1,6 @@
 package com.sedilant.yambol.domain.delete
 
-import com.sedilant.yambol.data.TeamRepository
+import com.sedilant.yambol.data.team.TeamRepository
 import javax.inject.Inject
 
 class DeletePlayerUseCaseImpl @Inject constructor(

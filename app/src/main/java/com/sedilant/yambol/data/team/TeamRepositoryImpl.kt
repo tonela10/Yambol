@@ -1,11 +1,6 @@
-package com.sedilant.yambol.data
+package com.sedilant.yambol.data.team
 
-import com.sedilant.yambol.data.entities.PlayerEntity
-import com.sedilant.yambol.data.entities.TeamEntity
-import com.sedilant.yambol.data.entities.TeamObjectivesEntity
-import com.sedilant.yambol.data.entities.TrainCrossTrainTaskEntity
-import com.sedilant.yambol.data.entities.TrainEntity
-import com.sedilant.yambol.data.entities.TrainTaskEntity
+import com.sedilant.yambol.data.team.PlayerDao
 import com.sedilant.yambol.data.queries.TrainWithTrainTask
 import com.sedilant.yambol.domain.mapToDomain
 import com.sedilant.yambol.ui.home.models.PlayerUiModel

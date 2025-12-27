@@ -1,8 +1,8 @@
 package com.sedilant.yambol.domain
 
-import com.sedilant.yambol.data.entities.PlayerEntity
-import com.sedilant.yambol.data.entities.TeamEntity
-import com.sedilant.yambol.data.entities.TrainTaskEntity
+import com.sedilant.yambol.data.team.PlayerEntity
+import com.sedilant.yambol.data.team.TeamEntity
+import com.sedilant.yambol.data.team.TrainTaskEntity
 import com.sedilant.yambol.data.queries.AbilityRecordWithName
 import com.sedilant.yambol.domain.models.AbilityDomainModel
 import com.sedilant.yambol.domain.models.TeamDomainModel

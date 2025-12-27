@@ -4,7 +4,7 @@ import androidx.room.Embedded
 import androidx.room.Relation
 import com.sedilant.yambol.data.entities.AbilityNameEntity
 import com.sedilant.yambol.data.entities.AbilityRecordEntity
-import com.sedilant.yambol.data.entities.PlayerEntity
+import com.sedilant.yambol.data.team.PlayerEntity
 
 
 data class PlayerWithAbilityRecords(

@@ -3,9 +3,9 @@ package com.sedilant.yambol.data.queries
 import androidx.room.Embedded
 import androidx.room.Junction
 import androidx.room.Relation
-import com.sedilant.yambol.data.entities.TrainCrossTrainTaskEntity
-import com.sedilant.yambol.data.entities.TrainEntity
-import com.sedilant.yambol.data.entities.TrainTaskEntity
+import com.sedilant.yambol.data.team.TrainCrossTrainTaskEntity
+import com.sedilant.yambol.data.team.TrainEntity
+import com.sedilant.yambol.data.team.TrainTaskEntity
 
 data class TrainWithTrainTask(
     @Embedded val train: TrainEntity,

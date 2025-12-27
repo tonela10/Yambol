@@ -1,6 +1,6 @@
 package com.sedilant.yambol.domain.get
 
-import com.sedilant.yambol.data.TeamRepository
+import com.sedilant.yambol.data.team.TeamRepository
 import javax.inject.Inject
 
 class GetPlayerTeamIdUseCaseImpl @Inject constructor(

@@ -1,4 +1,4 @@
-package com.sedilant.yambol.data.entities
+package com.sedilant.yambol.data.team
 
 import androidx.room.Entity
 

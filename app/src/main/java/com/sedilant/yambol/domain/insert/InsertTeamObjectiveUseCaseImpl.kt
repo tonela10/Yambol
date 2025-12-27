@@ -1,7 +1,7 @@
 package com.sedilant.yambol.domain.insert
 
-import com.sedilant.yambol.data.TeamRepository
-import com.sedilant.yambol.data.entities.TeamObjectivesEntity
+import com.sedilant.yambol.data.team.TeamRepository
+import com.sedilant.yambol.data.team.TeamObjectivesEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject

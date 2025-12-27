@@ -1,7 +1,7 @@
 package com.sedilant.yambol.domain.insert
 
-import com.sedilant.yambol.data.TeamRepository
-import com.sedilant.yambol.data.entities.TrainEntity
+import com.sedilant.yambol.data.team.TeamRepository
+import com.sedilant.yambol.data.team.TrainEntity
 import java.util.Date
 import javax.inject.Inject
 

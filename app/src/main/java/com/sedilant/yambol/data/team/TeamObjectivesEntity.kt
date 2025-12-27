@@ -1,4 +1,4 @@
-package com.sedilant.yambol.data.entities
+package com.sedilant.yambol.data.team
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -6,8 +6,7 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(
-    tableName = "player",
+@Entity(tableName = "team_objectives",
     foreignKeys = [
         ForeignKey(
             entity = TeamEntity::class,
@@ -16,14 +15,12 @@ import androidx.room.PrimaryKey
             onDelete = ForeignKey.CASCADE // O RESTRICT it depends
         )
     ],
-    indices = [Index("team_id")]
-)
-data class PlayerEntity(
+    indices = [Index("team_id")])
+data class TeamObjectivesEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    val name: String,
-    val number: Int,
-    val position: Int,
+    val description: String,
+    val isFinish: Boolean,
     @ColumnInfo(name = "team_id")
     val teamId: Int,
 )

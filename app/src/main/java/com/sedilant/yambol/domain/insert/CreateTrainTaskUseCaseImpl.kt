@@ -1,8 +1,8 @@
 package com.sedilant.yambol.domain.insert
 
-import com.sedilant.yambol.data.TeamRepository
-import com.sedilant.yambol.data.entities.TrainCrossTrainTaskEntity
-import com.sedilant.yambol.data.entities.TrainTaskEntity
+import com.sedilant.yambol.data.team.TeamRepository
+import com.sedilant.yambol.data.team.TrainCrossTrainTaskEntity
+import com.sedilant.yambol.data.team.TrainTaskEntity
 import javax.inject.Inject
 
 class CreateTrainTaskUseCaseImpl @Inject constructor(

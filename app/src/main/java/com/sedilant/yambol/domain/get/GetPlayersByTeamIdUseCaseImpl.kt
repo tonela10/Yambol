@@ -1,6 +1,6 @@
 package com.sedilant.yambol.domain.get
 
-import com.sedilant.yambol.data.TeamRepository
+import com.sedilant.yambol.data.team.TeamRepository
 import com.sedilant.yambol.domain.mapToDomain
 import com.sedilant.yambol.ui.home.models.PlayerUiModel
 import kotlinx.coroutines.flow.Flow
