@@ -20,10 +20,9 @@ import androidx.room.PrimaryKey
 )
 data class PlayerEntity(
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    val id: Long = 0,
     val name: String,
     val number: Int,
-    val position: Int,
     @ColumnInfo(name = "team_id")
     val teamId: Int,
 )

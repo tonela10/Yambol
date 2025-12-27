@@ -5,5 +5,5 @@ import com.sedilant.yambol.domain.Position
 data class PlayerUiModel(
     val name: String,
     val number: String,
-    val id: Int = 0
+    val id: Long = 0
 )
