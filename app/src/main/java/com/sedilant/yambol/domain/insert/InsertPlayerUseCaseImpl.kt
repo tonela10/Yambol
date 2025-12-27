@@ -15,13 +15,7 @@ class InsertPlayerUseCaseImpl @Inject constructor(
                 name = playerUiModel.name.lowercase(),
                 number = playerUiModel.number.toInt(),
                 teamId = teamId,
-                position = when (playerUiModel.position) {
-                    Position.POINT_GUARD -> 1
-                    Position.SHOOTING_GUARD -> 2
-                    Position.SMALL_FORWARD -> 3
-                    Position.POWER_FORWARD -> 4
-                    Position.CENTER -> 5
-                },
+                position = 5,
             )
         )
     }

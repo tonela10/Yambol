@@ -50,7 +50,6 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     homeViewModel: HomeViewModel = hiltViewModel(),
     onCreateTeam: () -> Unit,
-    onPlayerClicked: (Int) -> Unit,
     onRegisterTrain: (Int, List<Int>) -> Unit,
     onLastTrainClick: (Int) -> Unit
 ) {
@@ -67,7 +66,6 @@ fun HomeScreen(
         editTeamState = editTeamState,
         onTeamChange = { homeViewModel.onTeamChange(it) },
         onCreateTeam = onCreateTeam,
-        onPlayerClicked = { id -> onPlayerClicked(id) },
         onSaveNewObjective = homeViewModel::onSaveNewObjective,
         onToggleObjectiveStatus = homeViewModel::onToggleObjectiveStatus,
         onUpdateObjective = homeViewModel::onUpdateObjective,
@@ -87,7 +85,6 @@ private fun HomeScreenStateless(
     editTeamState: EditTeamState,
     onTeamChange: (Int) -> Unit,
     onCreateTeam: () -> Unit,
-    onPlayerClicked: (Int) -> Unit,
     onSaveNewObjective: (String) -> Unit,
     onToggleObjectiveStatus: (Int) -> Unit,
     onUpdateObjective: (Int, String) -> Unit,
@@ -144,7 +141,6 @@ private fun HomeScreenStateless(
                 if (homeUiState.listOfPlayer.isNotEmpty()) {
                     SectionHeader(title = "Players")
                     PlayersRow(
-                        onPlayerClicked = onPlayerClicked,
                         listOfPlayer = homeUiState.listOfPlayer,
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
@@ -259,7 +255,6 @@ fun TeamTabs(
 @Composable
 private fun PlayersRow(
     listOfPlayer: List<PlayerUiModel>,
-    onPlayerClicked: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyRow(
@@ -270,7 +265,6 @@ private fun PlayersRow(
         items(listOfPlayer) { player ->
             PlayerCard(
                 player = player,
-                onClick = { onPlayerClicked(player.id) }
             )
         }
     }
@@ -279,11 +273,10 @@ private fun PlayersRow(
 @Composable
 private fun PlayerCard(
     player: PlayerUiModel,
-    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
-        onClick = onClick,
+        onClick = {},
         modifier = modifier
             .width(160.dp)
             .height(80.dp),
@@ -304,14 +297,6 @@ private fun PlayerCard(
                     text = player.name,
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.SemiBold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = player.position.name,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -440,10 +425,9 @@ private fun PlayersRowPreview() {
     YambolTheme {
         PlayersRow(
             listOf(
-                PlayerUiModel("Antonio", "10", Position.POINT_GUARD, id = 0),
-                PlayerUiModel("Luis", "44", Position.SHOOTING_GUARD, id = 0)
+                PlayerUiModel("Antonio", "10", id = 0),
+                PlayerUiModel("Luis", "44", id = 0)
             ),
-            onPlayerClicked = {}
         )
     }
 }
@@ -470,8 +454,8 @@ private fun HomeScreenPreview() {
             homeUiState = HomeUiState.Success(
                 listOfTeams = listOf(TeamUiModel("Utebo", 1), TeamUiModel("Olivar", 2)),
                 listOfPlayer = listOf(
-                    PlayerUiModel("Antonio", "10", Position.POINT_GUARD, id = 0),
-                    PlayerUiModel("Luis", "44", Position.SHOOTING_GUARD, id = 1)
+                    PlayerUiModel("Antonio", "10",  id = 0),
+                    PlayerUiModel("Luis", "44", id = 1)
                 ),
                 currentTeam = TeamUiModel("Utebo", 1),
                 listOfObjectives = listOf(),
@@ -482,7 +466,6 @@ private fun HomeScreenPreview() {
             onToggleObjectiveStatus = {},
             onUpdateObjective = { _, _ -> },
             onDeleteTeamObjective = { _, _, _ -> },
-            onPlayerClicked = {},
             onRegisterTrain = { _, _ -> },
             onLastTrainClick = { },
             editTeamState = EditTeamState.Hidden,

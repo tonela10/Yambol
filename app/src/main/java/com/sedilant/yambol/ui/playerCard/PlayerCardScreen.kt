@@ -110,7 +110,6 @@ private fun PlayerCardScreenStateless(
                 PlayerInfoCard(
                     name = uiState.player.name,
                     number = uiState.player.number,
-                    position = uiState.player.position.toString()
                 )
 
                 PlayerStatsCard()
@@ -181,7 +180,6 @@ private fun PlayerInfoCard(
     modifier: Modifier = Modifier,
     name: String,
     number: String,
-    position: String,
 ) {
     ElevatedCard(
         modifier = modifier.fillMaxWidth(),
@@ -233,16 +231,6 @@ private fun PlayerInfoCard(
                     )
                 }
                 Column {
-                    Text(
-                        text = "Position",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Text(
-                        text = position,
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Bold
-                    )
                 }
             }
         }
@@ -320,7 +308,6 @@ private fun PlayerCardScreenPreview() {
                 PlayerUiModel(
                     name = "Antonio",
                     number = "1",
-                    position = Position.CENTER,
                     id = 1,
                 ),
                 abilityList = listOf()

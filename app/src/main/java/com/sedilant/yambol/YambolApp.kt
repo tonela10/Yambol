@@ -78,11 +78,6 @@ fun YambolApp() {
                     onCreateTeam = {
                         navController.navigate(YambolScreen.CreateTeam)
                     },
-                    onPlayerClicked = { player ->
-                        navController.navigate(
-                            YambolScreen.PlayerCardDetails(player)
-                        )
-                    },
                     onRegisterTrain = { teamId, statIds ->
                         navController.navigate(
                             YambolScreen.AddTeamStats(
