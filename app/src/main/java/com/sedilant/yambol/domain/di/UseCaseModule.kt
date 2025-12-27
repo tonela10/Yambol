@@ -1,4 +1,4 @@
-package com.sedilant.yambol.di
+package com.sedilant.yambol.domain.di
 
 import com.sedilant.yambol.UpdateTeamUseCaseImpl
 import com.sedilant.yambol.domain.CheckJerseyNumberUseCase
@@ -20,12 +20,8 @@ import com.sedilant.yambol.domain.get.GetLastTrainOfTeamUseCase
 import com.sedilant.yambol.domain.get.GetLastTrainOfTeamUseCaseImpl
 import com.sedilant.yambol.domain.get.GetPlayerByIdUseCase
 import com.sedilant.yambol.domain.get.GetPlayerByIdUseCaseImpl
-import com.sedilant.yambol.domain.get.GetPlayerTeamIdUseCase
-import com.sedilant.yambol.domain.get.GetPlayerTeamIdUseCaseImpl
 import com.sedilant.yambol.domain.get.GetPlayersByTeamIdUseCase
 import com.sedilant.yambol.domain.get.GetPlayersByTeamIdUseCaseImpl
-import com.sedilant.yambol.domain.get.GetTeamIdUseCase
-import com.sedilant.yambol.domain.get.GetTeamIdUseCaseImpl
 import com.sedilant.yambol.domain.get.GetTeamObjectivesUseCase
 import com.sedilant.yambol.domain.get.GetTeamObjectivesUseCaseImpl
 import com.sedilant.yambol.domain.get.GetTeamsUseCase
@@ -56,9 +52,6 @@ abstract class UseCaseModule {
 
     @Binds
     abstract fun bindGetPlayersUseCase(impl: GetPlayersByTeamIdUseCaseImpl): GetPlayersByTeamIdUseCase
-
-    @Binds
-    abstract fun bindGetTeamIdUseCase(impl: GetTeamIdUseCaseImpl): GetTeamIdUseCase
 
     @Binds
     abstract fun bindInsertPlayer(impl: InsertPlayerUseCaseImpl): InsertPlayerUseCase
@@ -104,9 +97,6 @@ abstract class UseCaseModule {
 
     @Binds
     abstract fun bindUpdatePlayerUseCase(impl: UpdatePlayerUseCaseImpl): UpdatePlayerUseCase
-
-    @Binds
-    abstract fun bindGetPlayerTeamIdUseCase(impl: GetPlayerTeamIdUseCaseImpl): GetPlayerTeamIdUseCase
 
     @Binds
     abstract fun bindCheckJerseyNumberUseCase(impl: CheckJerseyNumberUseCaseImpl): CheckJerseyNumberUseCase
