@@ -1,4 +1,4 @@
-package com.sedilant.yambol.data.team
+package com.sedilant.yambol.data.team.player
 
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -18,7 +18,7 @@ class PlayerRepositoryImpl @Inject constructor(
         return playerDao.getPlayerById(id)
     }
 
-    override suspend fun getPlayersByTeam(teamId: Int): Flow<List<PlayerEntity>> {
+    override suspend fun getPlayersByTeam(teamId: Long): Flow<List<PlayerEntity>> {
         return playerDao.getPlayersByTeam(teamId)
     }
 
@@ -34,7 +34,15 @@ class PlayerRepositoryImpl @Inject constructor(
         playerDao.deletePlayer(player)
     }
 
-    override suspend fun deleteAllPlayersFromTeam(teamId: Int) {
+    override suspend fun deleteAllPlayersFromTeam(teamId: Long) {
         playerDao.deleteAllPlayersFromTeam(teamId)
+    }
+
+    override suspend fun isJerseyNumberTaken(
+        teamId: Long,
+        jerseyNumber: Int,
+        excludePlayerId: Long?
+    ): Boolean {
+        return playerDao.isJerseyNumberTaken(teamId, jerseyNumber, excludePlayerId)
     }
 }

@@ -1,4 +1,4 @@
-package com.sedilant.yambol.data.team
+package com.sedilant.yambol.data.team.player
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -18,49 +18,33 @@ interface PlayerDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPlayers(players: List<PlayerEntity>)
 
-    // READ
     @Query("SELECT * FROM player WHERE id = :id")
     suspend fun getPlayerById(id: Long): PlayerEntity?
 
     @Query("SELECT * FROM player WHERE team_id = :teamId ORDER BY number ASC")
-    fun getPlayersByTeam(teamId: Int): Flow<List<PlayerEntity>>
+    fun getPlayersByTeam(teamId: Long): Flow<List<PlayerEntity>>
 
     @Query("SELECT * FROM player ORDER BY name ASC")
     fun getAllPlayers(): Flow<List<PlayerEntity>>
 
-    // UPDATE
     @Update
     suspend fun updatePlayer(player: PlayerEntity)
 
-    // DELETE
     @Delete
     suspend fun deletePlayer(player: PlayerEntity)
 
     @Query("DELETE FROM player WHERE team_id = :teamId")
-    suspend fun deleteAllPlayersFromTeam(teamId: Int)
+    suspend fun deleteAllPlayersFromTeam(teamId: Long)
 
     // new block of player dao CRUD up TODO move create new teamDao to get the Team information
 
-    @Query("SELECT * FROM team")
-    fun getAllTeams(): Flow<List<TeamEntity>>
-
+    @Deprecated("Use getPlayerByTeam instead")
     @Query("SELECT * FROM player WHERE team_id = :teamId")
     fun getTeamPlayers(teamId: Int): Flow<List<PlayerEntity>>
 
-    @Query("SELECT id FROM team WHERE name = :teamName")
-    fun getTeamId(teamName: String): Int?
-
-    @Insert
-    fun insertTeam(teamEntity: TeamEntity)
-
+    @Deprecated("Use getPlayerById instead")
     @Query("SELECT * FROM player WHERE id = :playerId")
     fun getPlayer(playerId: Int): PlayerEntity
-
-    @Query("UPDATE team SET name = :newName WHERE id = :teamId")
-    suspend fun updateTeam(teamId: Int, newName: String)
-
-    @Query("SELECT team_id FROM player WHERE id = :playerId")
-    suspend fun getPlayerTeamId(playerId: Int): Int
 
     @Query(
         """
@@ -70,8 +54,13 @@ interface PlayerDao {
     AND (:excludePlayerId IS NULL OR id != :excludePlayerId)
 """
     )
-    suspend fun isJerseyNumberTaken(teamId: Int, jerseyNumber: Int, excludePlayerId: Int?): Boolean
+    suspend fun isJerseyNumberTaken(
+        teamId: Long,
+        jerseyNumber: Int,
+        excludePlayerId: Long?
+    ): Boolean
 
+    @Deprecated("Use deletePlayer instead")
     @Query("DELETE FROM player WHERE id = :playerId")
     suspend fun deletePlayerById(playerId: Int)
 }
