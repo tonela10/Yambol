@@ -13,7 +13,7 @@ class GetTrainWithTrainTaskByTrainIdUseCaseImpl @Inject constructor(
     override suspend fun invoke(trainId: Int): TrainWithTaskDomainModel {
         val it = teamRepository.getTrainWithTrainTaskByTrainId(trainId)
         return TrainWithTaskDomainModel(
-            trainId = it.train.trainId,
+            trainId = it.train.id,
             date = Date(it.train.date),
             time = it.train.time,
             concepts = it.train.concepts,

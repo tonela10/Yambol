@@ -6,7 +6,6 @@ import com.sedilant.yambol.domain.CheckJerseyNumberUseCase
 import com.sedilant.yambol.domain.UpdatePlayerUseCase
 import com.sedilant.yambol.domain.delete.DeletePlayerUseCase
 import com.sedilant.yambol.domain.get.GetPlayerByIdUseCase
-import com.sedilant.yambol.domain.get.GetPlayerTeamIdUseCase
 import com.sedilant.yambol.ui.home.models.PlayerUiModel
 import com.sedilant.yambol.ui.playerCard.composables.EditPlayerData
 import dagger.assisted.Assisted
@@ -24,7 +23,6 @@ class PlayerCardViewModel @AssistedInject constructor(
     @Assisted private val playerId: Int?,
     private val getPlayerByIdUseCase: GetPlayerByIdUseCase,
     private val updatePlayerUseCase: UpdatePlayerUseCase,
-    private val getPlayerTeamIdUseCase: GetPlayerTeamIdUseCase,
     private val checkJerseyNumberUseCase: CheckJerseyNumberUseCase,
     private val deletePlayerUseCase: DeletePlayerUseCase,
 ) : ViewModel() {
@@ -69,9 +67,6 @@ class PlayerCardViewModel @AssistedInject constructor(
                     editBottomSheetLoading = true,
                     editBottomSheetError = null
                 )
-
-                // Get player team ID for validation
-                val teamId = getPlayerTeamIdUseCase(currentState.player.id)
 
                 // Check if jersey number is taken (excluding current player)
                 val numberInt = editPlayerData.number.toInt()

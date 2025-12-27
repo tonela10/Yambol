@@ -11,9 +11,10 @@ import com.sedilant.yambol.data.draftTrain.TrainingDraftRepository
 import com.sedilant.yambol.data.draftTrain.TrainingDraftRepositoryImpl
 import com.sedilant.yambol.data.firebaseAuth.AuthRepository
 import com.sedilant.yambol.data.firebaseAuth.AuthRepositoryImpl
-import com.sedilant.yambol.data.team.PlayerDao
-import com.sedilant.yambol.data.team.PlayerRepository
-import com.sedilant.yambol.data.team.PlayerRepositoryImpl
+import com.sedilant.yambol.data.team.TeamDao
+import com.sedilant.yambol.data.team.player.PlayerDao
+import com.sedilant.yambol.data.team.player.PlayerRepository
+import com.sedilant.yambol.data.team.player.PlayerRepositoryImpl
 import com.sedilant.yambol.data.team.TeamDatabase
 import com.sedilant.yambol.data.team.TeamObjectivesDao
 import com.sedilant.yambol.data.team.TeamRepository
@@ -50,6 +51,11 @@ abstract class DataModule {
         @Provides
         fun providePlayerDao(context: Context): PlayerDao {
             return TeamDatabase.getDatabase(context).playerDao()
+        }
+
+        @Provides
+        fun provideTeamDao(context: Context): TeamDao {
+            return TeamDatabase.getDatabase(context).teamDao()
         }
 
         @Provides

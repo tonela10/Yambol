@@ -7,21 +7,23 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class TeamRepositoryImpl @Inject constructor(
-    private val playerDao: PlayerDao,
+    private val teamDao: TeamDao,
     private val teamObjectivesDao: TeamObjectivesDao,
     private val trainingDao: TrainingDao,
 ) : TeamRepository {
-    // PLAYER DAO METHODS
+    // TEAM DAO METHODS
     override suspend fun getAllTeams(): Flow<List<TeamEntity>> {
-        return playerDao.getAllTeams()
+        return teamDao.getAllTeams()
     }
 
-    override suspend fun getTeamId(teamName: String): Int? {
-        return playerDao.getTeamId(teamName)
+    override suspend fun insertTeam(teamEntity: TeamEntity): Long {
+        return teamDao.insertTeam(teamEntity)
     }
 
-    override suspend fun insertTeam(teamEntity: TeamEntity) {
-        playerDao.insertTeam(teamEntity)
+    override suspend fun updateTeam(teamId: Long, newName: String) {
+        withContext(Dispatchers.IO) {
+            teamDao.updateTeam(TeamEntity(teamId, newName))
+        }
     }
 
     // TEAM OBJECTIVES DAO METHODS
@@ -34,9 +36,7 @@ class TeamRepositoryImpl @Inject constructor(
     }
 
     override suspend fun updateTeamObjective(teamObjectivesEntity: TeamObjectivesEntity) {
-        withContext(Dispatchers.IO) {
-            teamObjectivesDao.updateTeamObjective(teamObjectivesEntity)
-        }
+        teamObjectivesDao.updateTeamObjective(teamObjectivesEntity)
     }
 
     override suspend fun getTeamObjectiveById(objectiveId: Int): TeamObjectivesEntity? {
@@ -48,12 +48,6 @@ class TeamRepositoryImpl @Inject constructor(
     override suspend fun deleteTeamObjective(teamObjectivesEntity: TeamObjectivesEntity) {
         return withContext(Dispatchers.IO) {
             teamObjectivesDao.deleteTeamObjective(teamObjectivesEntity)
-        }
-    }
-
-    override suspend fun updateTeam(teamId: Int, newName: String) {
-        withContext(Dispatchers.IO) {
-            playerDao.updateTeam(teamId, newName)
         }
     }
 

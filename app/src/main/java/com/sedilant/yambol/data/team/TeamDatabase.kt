@@ -7,6 +7,8 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.sedilant.yambol.data.converters.Converters
+import com.sedilant.yambol.data.team.player.PlayerDao
+import com.sedilant.yambol.data.team.player.PlayerEntity
 
 @Database(
     entities = [
@@ -27,6 +29,8 @@ abstract class TeamDatabase : RoomDatabase() {
     abstract fun playerDao(): PlayerDao
     abstract fun teamObjectivesDao(): TeamObjectivesDao
     abstract fun trainingDao(): TrainingDao
+    abstract fun teamDao(): TeamDao
+
 
     companion object {
         @Volatile

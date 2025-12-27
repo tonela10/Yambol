@@ -1,16 +1,14 @@
 package com.sedilant.yambol.data.team
 
 import com.sedilant.yambol.data.queries.TrainWithTrainTask
-import com.sedilant.yambol.ui.home.models.PlayerUiModel
 import kotlinx.coroutines.flow.Flow
 
 interface TeamRepository {
 
     // team information related methods
     suspend fun getAllTeams(): Flow<List<TeamEntity>>
-    suspend fun getTeamId(teamName: String): Int?
-    suspend fun insertTeam(teamEntity: TeamEntity)
-    suspend fun updateTeam(teamId: Int, newName: String)
+    suspend fun insertTeam(teamEntity: TeamEntity): Long
+    suspend fun updateTeam(teamId: Long, newName: String)
 
     // team objectives related methods
     suspend fun getTeamObjectives(teamId: Int): Flow<List<TeamObjectivesEntity>>

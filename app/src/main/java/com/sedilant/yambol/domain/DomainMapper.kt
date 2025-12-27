@@ -1,8 +1,8 @@
 package com.sedilant.yambol.domain
 
-import com.sedilant.yambol.data.team.PlayerEntity
 import com.sedilant.yambol.data.team.TaskEntity
 import com.sedilant.yambol.data.team.TeamEntity
+import com.sedilant.yambol.data.team.player.PlayerEntity
 import com.sedilant.yambol.domain.models.TeamDomainModel
 import com.sedilant.yambol.domain.models.TrainTaskDomainModel
 import com.sedilant.yambol.ui.home.models.PlayerUiModel
@@ -14,11 +14,12 @@ fun TeamEntity.mapToDomain(): TeamDomainModel {
     )
 }
 
-fun PlayerEntity.mapToDomain(): PlayerUiModel {
+fun PlayerEntity.mapToUI(): PlayerUiModel {
     return PlayerUiModel(
         name = name,
         number = number.toString(),
-        id = id
+        id = id,
+        teamId = teamId,
     )
 }
 

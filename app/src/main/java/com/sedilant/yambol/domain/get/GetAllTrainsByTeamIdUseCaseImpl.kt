@@ -11,7 +11,7 @@ class GetAllTrainsByTeamIdUseCaseImpl @Inject constructor(
     override suspend fun invoke(teamId: Int): List<TrainDomainModel> {
         return teamRepository.getAllTrainingsByTeamId(teamId).map {
             TrainDomainModel(
-                id = it.trainId,
+                id = it.id,
                 date = Date(it.date),
                 time = it.time,
                 concepts = it.concepts,

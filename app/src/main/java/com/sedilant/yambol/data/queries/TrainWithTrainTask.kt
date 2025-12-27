@@ -10,7 +10,7 @@ import com.sedilant.yambol.data.team.TaskEntity
 data class TrainWithTrainTask(
     @Embedded val train: TrainEntity,
     @Relation(
-        parentColumn = "trainId",
+        parentColumn = "id",
         entityColumn = "trainingTaskId",
         associateBy = Junction(
             TrainCrossTrainTaskEntity::class,
