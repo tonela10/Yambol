@@ -93,7 +93,6 @@ class PlayerCardViewModel @AssistedInject constructor(
                     playerId = currentState.player.id,
                     newName = editPlayerData.name,
                     newNumber = numberInt,
-                    newPosition = editPlayerData.position
                 )
 
                 // Hide bottom sheet and reload data

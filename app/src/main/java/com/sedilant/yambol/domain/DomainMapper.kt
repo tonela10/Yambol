@@ -20,14 +20,6 @@ fun PlayerEntity.mapToDomain(): PlayerUiModel {
     return PlayerUiModel(
         name = name,
         number = number.toString(),
-        position = when (position) {
-            1 -> Position.POINT_GUARD
-            2 -> Position.SHOOTING_GUARD
-            3 -> Position.SMALL_FORWARD
-            4 -> Position.POWER_FORWARD
-            5 -> Position.CENTER
-            else -> Position.CENTER
-        },
         id = id
     )
 }

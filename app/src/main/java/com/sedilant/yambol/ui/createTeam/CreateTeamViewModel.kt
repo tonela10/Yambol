@@ -2,7 +2,6 @@ package com.sedilant.yambol.ui.createTeam
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sedilant.yambol.domain.Position
 import com.sedilant.yambol.domain.get.GetTeamIdUseCase
 import com.sedilant.yambol.domain.insert.InsertPlayerUseCase
 import com.sedilant.yambol.domain.insert.InsertTeamUseCase
@@ -119,7 +118,6 @@ class CreateTeamViewModel @Inject constructor(
                     PlayerUiModel(
                         name = name,
                         number = number,
-                        position = Position.POINT_GUARD,
                     )
                 )
 

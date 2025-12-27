@@ -40,7 +40,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.sedilant.yambol.R
-import com.sedilant.yambol.domain.Position
 import com.sedilant.yambol.ui.home.models.PlayerUiModel
 import com.sedilant.yambol.ui.home.models.TeamUiModel
 import com.sedilant.yambol.ui.theme.YambolTheme
@@ -50,8 +49,6 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     homeViewModel: HomeViewModel = hiltViewModel(),
     onCreateTeam: () -> Unit,
-    onPlayerClicked: (Int) -> Unit,
-    onRegisterTrain: (Int, List<Int>) -> Unit,
     onLastTrainClick: (Int) -> Unit
 ) {
     val homeUiState = homeViewModel.uiState.collectAsState(
@@ -67,12 +64,10 @@ fun HomeScreen(
         editTeamState = editTeamState,
         onTeamChange = { homeViewModel.onTeamChange(it) },
         onCreateTeam = onCreateTeam,
-        onPlayerClicked = { id -> onPlayerClicked(id) },
         onSaveNewObjective = homeViewModel::onSaveNewObjective,
         onToggleObjectiveStatus = homeViewModel::onToggleObjectiveStatus,
         onUpdateObjective = homeViewModel::onUpdateObjective,
         onDeleteTeamObjective = homeViewModel::onDeleteObjective,
-        onRegisterTrain = { teamId, statsId -> onRegisterTrain(teamId, statsId) },
         onLastTrainClick = onLastTrainClick,
         onEditTeam = homeViewModel::showEditTeamDialog,
         onUpdateTeamName = homeViewModel::updateTeamName,
@@ -87,12 +82,10 @@ private fun HomeScreenStateless(
     editTeamState: EditTeamState,
     onTeamChange: (Int) -> Unit,
     onCreateTeam: () -> Unit,
-    onPlayerClicked: (Int) -> Unit,
     onSaveNewObjective: (String) -> Unit,
     onToggleObjectiveStatus: (Int) -> Unit,
     onUpdateObjective: (Int, String) -> Unit,
     onDeleteTeamObjective: (Int, String, Boolean) -> Unit,
-    onRegisterTrain: (Int, List<Int>) -> Unit,
     onLastTrainClick: (Int) -> Unit,
     onEditTeam: (String) -> Unit,
     onUpdateTeamName: (String) -> Unit,
@@ -144,7 +137,6 @@ private fun HomeScreenStateless(
                 if (homeUiState.listOfPlayer.isNotEmpty()) {
                     SectionHeader(title = "Players")
                     PlayersRow(
-                        onPlayerClicked = onPlayerClicked,
                         listOfPlayer = homeUiState.listOfPlayer,
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
@@ -159,17 +151,13 @@ private fun HomeScreenStateless(
                     modifier = Modifier.padding(bottom = 24.dp)
                 )
 
+                // TODO to show only the last training only if there is one
                 ActionButtonsSection(
                     onLastTrainClick = {
                         if (homeUiState.lastTrainId != null) {
                             onLastTrainClick(homeUiState.lastTrainId)
                         }
                     },
-                    onRegisterTrainClick = {
-                        homeUiState.currentTeam?.let {
-                            onRegisterTrain(it.id, homeUiState.statIds)
-                        }
-                    }
                 )
             }
         }
@@ -259,7 +247,6 @@ fun TeamTabs(
 @Composable
 private fun PlayersRow(
     listOfPlayer: List<PlayerUiModel>,
-    onPlayerClicked: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyRow(
@@ -270,7 +257,6 @@ private fun PlayersRow(
         items(listOfPlayer) { player ->
             PlayerCard(
                 player = player,
-                onClick = { onPlayerClicked(player.id) }
             )
         }
     }
@@ -279,11 +265,10 @@ private fun PlayersRow(
 @Composable
 private fun PlayerCard(
     player: PlayerUiModel,
-    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
-        onClick = onClick,
+        onClick = {},
         modifier = modifier
             .width(160.dp)
             .height(80.dp),
@@ -307,14 +292,6 @@ private fun PlayerCard(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = player.position.name,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
             }
 
             Spacer(modifier = Modifier.width(12.dp))
@@ -333,7 +310,6 @@ private fun PlayerCard(
 @Composable
 private fun ActionButtonsSection(
     onLastTrainClick: () -> Unit,
-    onRegisterTrainClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -360,14 +336,6 @@ private fun ActionButtonsSection(
                 title = "Last Training",
                 description = "View your recent session",
                 onClick = onLastTrainClick,
-                modifier = Modifier.weight(1f)
-            )
-
-            BigButtonYambol(
-                drawable = R.drawable.fitness_center,
-                title = "New Training",
-                description = "Register a new session",
-                onClick = onRegisterTrainClick,
                 modifier = Modifier.weight(1f)
             )
         }
@@ -440,10 +408,9 @@ private fun PlayersRowPreview() {
     YambolTheme {
         PlayersRow(
             listOf(
-                PlayerUiModel("Antonio", "10", Position.POINT_GUARD, id = 0),
-                PlayerUiModel("Luis", "44", Position.SHOOTING_GUARD, id = 0)
+                PlayerUiModel("Antonio", "10", id = 0),
+                PlayerUiModel("Luis", "44", id = 0)
             ),
-            onPlayerClicked = {}
         )
     }
 }
@@ -470,8 +437,8 @@ private fun HomeScreenPreview() {
             homeUiState = HomeUiState.Success(
                 listOfTeams = listOf(TeamUiModel("Utebo", 1), TeamUiModel("Olivar", 2)),
                 listOfPlayer = listOf(
-                    PlayerUiModel("Antonio", "10", Position.POINT_GUARD, id = 0),
-                    PlayerUiModel("Luis", "44", Position.SHOOTING_GUARD, id = 1)
+                    PlayerUiModel("Antonio", "10", id = 0),
+                    PlayerUiModel("Luis", "44", id = 1)
                 ),
                 currentTeam = TeamUiModel("Utebo", 1),
                 listOfObjectives = listOf(),
@@ -482,8 +449,6 @@ private fun HomeScreenPreview() {
             onToggleObjectiveStatus = {},
             onUpdateObjective = { _, _ -> },
             onDeleteTeamObjective = { _, _, _ -> },
-            onPlayerClicked = {},
-            onRegisterTrain = { _, _ -> },
             onLastTrainClick = { },
             editTeamState = EditTeamState.Hidden,
             onEditTeam = {},

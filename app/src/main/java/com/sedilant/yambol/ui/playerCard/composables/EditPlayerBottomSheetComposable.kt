@@ -49,7 +49,6 @@ import com.sedilant.yambol.ui.theme.YambolTheme
 data class EditPlayerData(
     val name: String,
     val number: String,
-    val position: Position
 )
 
 @Composable
@@ -63,7 +62,6 @@ fun EditPlayerBottomSheet(
 ) {
     var playerName by remember { mutableStateOf(player.name) }
     var playerNumber by remember { mutableStateOf(player.number) }
-    var selectedPosition by remember { mutableStateOf(player.position) }
     var isNameError by remember { mutableStateOf(false) }
     var isNumberError by remember { mutableStateOf(false) }
     var numberErrorMessage by remember { mutableStateOf("") }
@@ -115,7 +113,6 @@ fun EditPlayerBottomSheet(
                 EditPlayerData(
                     name = trimmedName,
                     number = playerNumber,
-                    position = selectedPosition
                 )
             )
         }
@@ -185,11 +182,6 @@ fun EditPlayerBottomSheet(
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Medium
                     )
-                    Text(
-                        text = positions.find { it.first == player.position }?.second ?: "",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
                 }
             }
         }
@@ -254,87 +246,6 @@ fun EditPlayerBottomSheet(
                 enabled = !isLoading,
                 singleLine = true
             )
-
-            Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Text(
-                    text = "Position",
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surface
-                    ),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Column(
-                        modifier = Modifier.padding(vertical = 8.dp)
-                    ) {
-                        positions.forEachIndexed { index, (position, displayName) ->
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(56.dp)
-                                    .selectable(
-                                        selected = selectedPosition == position,
-                                        onClick = { selectedPosition = position }
-                                    )
-                                    .then(
-                                        if (selectedPosition == position) {
-                                            Modifier.border(
-                                                width = 1.dp,
-                                                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
-                                                shape = RoundedCornerShape(8.dp)
-                                            )
-                                        } else Modifier
-                                    )
-                                    .padding(horizontal = 16.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                RadioButton(
-                                    selected = selectedPosition == position,
-                                    onClick = null,
-                                    enabled = !isLoading,
-                                    colors = RadioButtonDefaults.colors(
-                                        selectedColor = MaterialTheme.colorScheme.primary,
-                                        unselectedColor = MaterialTheme.colorScheme.outline
-                                    )
-                                )
-
-                                Text(
-                                    text = displayName,
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = if (selectedPosition == position) {
-                                        MaterialTheme.colorScheme.primary
-                                    } else {
-                                        MaterialTheme.colorScheme.onSurface
-                                    },
-                                    fontWeight = if (selectedPosition == position) {
-                                        FontWeight.Medium
-                                    } else {
-                                        FontWeight.Normal
-                                    },
-                                    modifier = Modifier.padding(start = 12.dp)
-                                )
-                            }
-
-                            // Add divider between items (except for the last item)
-                            if (index < positions.size - 1) {
-                                HorizontalDivider(
-                                    modifier = Modifier.padding(horizontal = 16.dp),
-                                    thickness = 0.5.dp,
-                                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
-                                )
-                            }
-                        }
-                    }
-                }
-            }
         }
 
         if (errorMessage != null && !isNameError && !isNumberError) {
@@ -388,7 +299,6 @@ private fun EditPlayerBottomSheetPreview() {
             player = PlayerUiModel(
                 name = "Carlos Canut",
                 number = "23",
-                position = Position.POINT_GUARD,
                 id = 1
             ),
             onSave = {},
@@ -406,7 +316,6 @@ private fun EditPlayerBottomSheetWithErrorPreview() {
             player = PlayerUiModel(
                 name = "Carlos Canut",
                 number = "23",
-                position = Position.POINT_GUARD,
                 id = 1
             ),
             onSave = {},

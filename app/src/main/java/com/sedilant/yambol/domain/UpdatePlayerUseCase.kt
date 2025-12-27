@@ -5,6 +5,5 @@ interface UpdatePlayerUseCase {
         playerId: Int,
         newName: String,
         newNumber: Int,
-        newPosition: Position
     )
 }

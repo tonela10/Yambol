@@ -40,7 +40,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.sedilant.yambol.domain.Position
 import com.sedilant.yambol.ui.home.models.PlayerUiModel
 import com.sedilant.yambol.ui.playerCard.StatUiModel
 import com.sedilant.yambol.ui.theme.YambolTheme
@@ -378,12 +377,10 @@ private fun AddTeamStatsScreenPreview() {
                     PlayerUiModel(
                         name = "John Doe",
                         number = "1",
-                        position = Position.CENTER,
                     ),
                     PlayerUiModel(
                         name = "Theo Johnson",
                         number = "1",
-                        position = Position.CENTER,
                     )
 
                 ),
