@@ -12,7 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -48,7 +48,7 @@ import java.util.Date
 @Composable
 fun CreateTrainScreen(
     modifier: Modifier = Modifier,
-    defaultTeamId: Int,
+    defaultTeamId: Long,
     onNavigateBack: () -> Unit,
     onTrainCreated: () -> Unit,
     createTrainViewModel: CreateTrainViewModel = hiltViewModel(
@@ -98,7 +98,7 @@ fun CreateTrainScreenStateless(
     onDateSelected: (Date) -> Unit = {},
     onHoursChanged: (Int) -> Unit = {},
     onMinutesChanged: (Int) -> Unit = {},
-    onTeamSelected: (Int) -> Unit = {},
+    onTeamSelected: (Long) -> Unit = {},
     onConceptAdded: (String) -> Unit = {},
     onConceptRemoved: (String) -> Unit = {},
     onTaskAdded: (TrainTaskData) -> Unit = {},
@@ -116,7 +116,7 @@ fun CreateTrainScreenStateless(
         ) {
             IconButton(onClick = onNavigateBack) {
                 Icon(
-                    imageVector = Icons.Default.ArrowBack,
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Navigate back"
                 )
             }

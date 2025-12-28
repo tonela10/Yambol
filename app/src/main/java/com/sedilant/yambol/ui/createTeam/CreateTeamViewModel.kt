@@ -2,8 +2,8 @@ package com.sedilant.yambol.ui.createTeam
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sedilant.yambol.domain.get.GetTeamIdUseCase
-import com.sedilant.yambol.domain.insert.InsertPlayerUseCase
+import com.sedilant.yambol.domain.get.GetTeamsUseCase
+import com.sedilant.yambol.domain.insert.InsertPlayersUseCase
 import com.sedilant.yambol.domain.insert.InsertTeamUseCase
 import com.sedilant.yambol.ui.home.models.PlayerUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,14 +19,24 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/*   TODO remove the commment
+    Pedir nombre del equipo y guardarlo -> tengo el id del equipo.
+    Creo jugadores para el equipo con el id del equipo
+    Guardo Lista de jugadores con el ide del equipo
+
+    Sin cancelo la operación elimino el equipo y en consecuencia se borran todos los jugadores
+ */
+// TODO create an onCancel method to remove the team created in case the user cancel the process
 @HiltViewModel
 @OptIn(ExperimentalCoroutinesApi::class)
 class CreateTeamViewModel @Inject constructor(
-    private val getTeamIdUseCase: GetTeamIdUseCase,
-    private val insertPlayerUseCase: InsertPlayerUseCase,
+    private val insertPlayersUseCase: InsertPlayersUseCase,
     private val insertTeamUseCase: InsertTeamUseCase,
+    private val getTeamsUseCase: GetTeamsUseCase,
 ) : ViewModel() {
 
+    private lateinit var listOfTeams: List<String>
+    var teamId: Long = 0
     private var listOfPlayers: MutableList<PlayerUiModel> = mutableListOf()
 
     private val teamNameFlow = MutableStateFlow(ValueAndValidation())
@@ -77,6 +87,7 @@ class CreateTeamViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             trigger.emit(Unit)
+            listOfTeams = getTeamsUseCase().first().map { it.name }
         }
     }
 
@@ -89,11 +100,17 @@ class CreateTeamViewModel @Inject constructor(
                 return@launch
             }
 
-            val teamExists = getTeamIdUseCase(teamName)
-            if (teamExists != null) {
-                teamNameFlow.update { ValueAndValidation(it.input, false) }
+            val teamExists = listOfTeams.contains(teamName)
+            if (teamExists) {
+                teamNameFlow.update {
+                    ValueAndValidation(
+                        it.input,
+                        false
+                    )
+                } // TODO display error message : The team name already exists
             } else {
                 teamNameFlow.update { ValueAndValidation(teamName, true) }
+                teamId = insertTeamUseCase(teamName)
                 formFlow.update { Form.ADD_PLAYER }
             }
         }
@@ -118,6 +135,7 @@ class CreateTeamViewModel @Inject constructor(
                     PlayerUiModel(
                         name = name,
                         number = number,
+                        teamId = teamId,
                     )
                 )
 
@@ -133,16 +151,7 @@ class CreateTeamViewModel @Inject constructor(
     fun onFinish() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val teamName = teamNameFlow.value.input.trim()
-
-                insertTeamUseCase(teamName)
-                val teamId = getTeamIdUseCase(teamName)
-
-                teamId?.let { id ->
-                    listOfPlayers.forEach { player ->
-                        insertPlayerUseCase(player, id)
-                    }
-                }
+                insertPlayersUseCase(listOfPlayers)
             } catch (e: Exception) {
                 // Handle errors
             }

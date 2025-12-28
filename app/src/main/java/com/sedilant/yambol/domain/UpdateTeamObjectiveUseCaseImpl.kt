@@ -1,13 +1,13 @@
 package com.sedilant.yambol.domain
 
-import com.sedilant.yambol.data.TeamRepository
+import com.sedilant.yambol.data.team.TeamRepository
 import javax.inject.Inject
 
 class UpdateTeamObjectiveUseCaseImpl @Inject constructor(
     private val repository: TeamRepository
 ) : UpdateTeamObjectiveUseCase {
     override suspend fun invoke(objectiveId: Int, description: String?, isFinish: Boolean?) {
-        val objective = repository.getTeamObjectiveById(objectiveId) ?: return
+        val objective = repository.getTeamObjectiveById(objectiveId) ?: return // TODO return an error saying that the objective does not exists
 
         val updatedObjective = objective.copy(
             description = description ?: objective.description,

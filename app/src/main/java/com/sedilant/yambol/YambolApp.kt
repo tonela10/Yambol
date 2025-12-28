@@ -11,11 +11,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.sedilant.yambol.ui.NavigationBottomBar
-import com.sedilant.yambol.ui.addStats.AddTeamStatsScreen
 import com.sedilant.yambol.ui.createTeam.CreateTeamScreen
 import com.sedilant.yambol.ui.createTrain.CreateTrainScreenV2
 import com.sedilant.yambol.ui.home.HomeScreen
-import com.sedilant.yambol.ui.playerCard.PlayerCardScreen
 import com.sedilant.yambol.ui.profile.ProfileScreen
 import com.sedilant.yambol.ui.training.TrainingScreen
 import com.sedilant.yambol.ui.trainingDetails.TrainingDetailsScreen
@@ -46,14 +44,15 @@ sealed interface YambolScreen {
     @Serializable
     data class PlayerCardDetails(val id: Int?) : YambolScreen
 
+    // TODO implement AddTeamStats screen when ready
     @Serializable
     data class AddTeamStats(val teamId: Int, val statsIds: List<Int>) : YambolScreen
 
     @Serializable
-    data class TrainingDetails(val trainId: Int) : YambolScreen
+    data class TrainingDetails(val trainId: Long) : YambolScreen
 
     @Serializable
-    data class CreateTrain(val currentTeam: Int) : YambolScreen
+    data class CreateTrain(val currentTeam: Long) : YambolScreen
 }
 
 @Composable
@@ -119,25 +118,6 @@ fun YambolApp() {
                         }
                     }
                 }
-            }
-
-            composable<YambolScreen.PlayerCardDetails> { navBackStackEntry ->
-                val id = navBackStackEntry.toRoute<YambolScreen.PlayerCardDetails>().id
-                PlayerCardScreen(
-                    playerId = id,
-                    onNavigateBack = { navController.popBackStack() }
-                )
-            }
-
-            composable<YambolScreen.AddTeamStats> { navBackStackEntry ->
-                val args = navBackStackEntry.toRoute<YambolScreen.AddTeamStats>()
-
-                AddTeamStatsScreen(
-                    teamId = args.teamId,
-                    statIds = args.statsIds,
-                    onNavigateBack = { navController.popBackStack() },
-                    onCompleted = { navController.popBackStack() },
-                )
             }
 
             composable<YambolScreen.TrainingDetails> { navBackStackEntry ->

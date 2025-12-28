@@ -1,7 +1,7 @@
 package com.sedilant.yambol.domain
 
-import com.sedilant.yambol.data.TeamRepository
-import com.sedilant.yambol.data.entities.TeamObjectivesEntity
+import com.sedilant.yambol.data.team.TeamRepository
+import com.sedilant.yambol.data.team.TeamObjectivesEntity
 import javax.inject.Inject
 
 class DeleteTeamObjectiveUseCaseImpl @Inject constructor(
@@ -11,7 +11,7 @@ class DeleteTeamObjectiveUseCaseImpl @Inject constructor(
         objectiveId: Int,
         description: String,
         isFinish: Boolean,
-        teamId: Int
+        teamId: Long
     ) {
         teamRepository.deleteTeamObjective(
             TeamObjectivesEntity(

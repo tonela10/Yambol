@@ -1,10 +1,8 @@
 package com.sedilant.yambol.domain
 
-import com.sedilant.yambol.data.entities.PlayerEntity
-import com.sedilant.yambol.data.entities.TeamEntity
-import com.sedilant.yambol.data.entities.TrainTaskEntity
-import com.sedilant.yambol.data.queries.AbilityRecordWithName
-import com.sedilant.yambol.domain.models.AbilityDomainModel
+import com.sedilant.yambol.data.team.TaskEntity
+import com.sedilant.yambol.data.team.TeamEntity
+import com.sedilant.yambol.data.team.player.PlayerEntity
 import com.sedilant.yambol.domain.models.TeamDomainModel
 import com.sedilant.yambol.domain.models.TrainTaskDomainModel
 import com.sedilant.yambol.ui.home.models.PlayerUiModel
@@ -16,31 +14,32 @@ fun TeamEntity.mapToDomain(): TeamDomainModel {
     )
 }
 
-fun PlayerEntity.mapToDomain(): PlayerUiModel {
+fun PlayerEntity.mapToUI(): PlayerUiModel {
     return PlayerUiModel(
         name = name,
         number = number.toString(),
-        id = id
+        id = id,
+        teamId = teamId,
     )
 }
 
-fun AbilityRecordWithName.mapToDomain(): AbilityDomainModel {
-    return AbilityDomainModel(
-        name = ability.name,
-        value = record.value.toFloat(),
-        recordId = record.id,
-        id = ability.id,
-    )
-}
-
-fun TrainTaskEntity.mapToDomain(): TrainTaskDomainModel {
-    return TrainTaskDomainModel(
-        trainingTaskId = trainingTaskId.toInt(),
+fun PlayerUiModel.mapToEntity(): PlayerEntity {
+    return PlayerEntity(
         name = name,
-        numberOfPlayer = numberOfPlayers,
+        number = number.toInt(),
+        id = id,
+        teamId = teamId,
+    )
+}
+
+
+fun TaskEntity.mapToDomain(): TrainTaskDomainModel {
+    return TrainTaskDomainModel(
+        trainingTaskId = id,
+        name = name,
         concept = concept,
         description = description,
-        variables = variables
+        variables = variables,
     )
 }
 

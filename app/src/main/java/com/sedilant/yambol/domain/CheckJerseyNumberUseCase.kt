@@ -2,8 +2,8 @@ package com.sedilant.yambol.domain
 
 interface CheckJerseyNumberUseCase {
     suspend operator fun invoke(
-        teamId: Int,
+        teamId: Long,
         jerseyNumber: Int,
-        excludePlayerId: Int? = null
+        excludePlayerId: Long? = null
     ): Boolean
 }

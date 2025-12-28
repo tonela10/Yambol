@@ -1,10 +1,11 @@
-package com.sedilant.yambol.data.entities
+package com.sedilant.yambol.data.team.player
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.sedilant.yambol.data.team.TeamEntity
 
 @Entity(
     tableName = "player",
@@ -20,10 +21,9 @@ import androidx.room.PrimaryKey
 )
 data class PlayerEntity(
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    val id: Long = 0,
     val name: String,
     val number: Int,
-    val position: Int,
     @ColumnInfo(name = "team_id")
-    val teamId: Int,
+    val teamId: Long,
 )

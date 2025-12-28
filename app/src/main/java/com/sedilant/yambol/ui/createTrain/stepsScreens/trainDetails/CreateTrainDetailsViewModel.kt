@@ -21,7 +21,7 @@ import java.util.Locale
 
 @HiltViewModel(assistedFactory = CreateTrainDetailsViewModelFactory::class)
 class CreateTrainDetailsViewModel @AssistedInject constructor(
-    @Assisted private val teamId: Int,
+    @Assisted private val teamId: Long,
     private val draftRepository: TrainingDraftRepository,
     private val createTrainUseCase: CreateTrainUseCase,
     private val createTrainTaskUseCase: CreateTrainTaskUseCase
@@ -188,5 +188,5 @@ data class TrainInfo(
 
 @AssistedFactory
 interface CreateTrainDetailsViewModelFactory {
-    fun create(teamId: Int): CreateTrainDetailsViewModel
+    fun create(teamId: Long): CreateTrainDetailsViewModel
 }

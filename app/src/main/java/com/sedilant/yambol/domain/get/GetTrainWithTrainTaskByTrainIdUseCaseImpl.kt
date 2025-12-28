@@ -1,6 +1,6 @@
 package com.sedilant.yambol.domain.get
 
-import com.sedilant.yambol.data.TeamRepository
+import com.sedilant.yambol.data.team.TeamRepository
 import com.sedilant.yambol.domain.mapToDomain
 import com.sedilant.yambol.domain.models.TrainWithTaskDomainModel
 import java.util.Date
@@ -10,10 +10,10 @@ class GetTrainWithTrainTaskByTrainIdUseCaseImpl @Inject constructor(
     private val teamRepository: TeamRepository
 ) :
     GetTrainWithTrainTaskByTrainIdUseCase {
-    override suspend fun invoke(trainId: Int): TrainWithTaskDomainModel {
+    override suspend fun invoke(trainId: Long): TrainWithTaskDomainModel {
         val it = teamRepository.getTrainWithTrainTaskByTrainId(trainId)
         return TrainWithTaskDomainModel(
-            trainId = it.train.trainId,
+            trainId = it.train.id,
             date = Date(it.train.date),
             time = it.train.time,
             concepts = it.train.concepts,

@@ -1,23 +1,19 @@
 package com.sedilant.yambol.domain.insert
 
-import com.sedilant.yambol.data.TeamRepository
-import com.sedilant.yambol.data.entities.TeamObjectivesEntity
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import com.sedilant.yambol.data.team.TeamObjectivesEntity
+import com.sedilant.yambol.data.team.TeamRepository
 import javax.inject.Inject
 
 class InsertTeamObjectiveUseCaseImpl @Inject constructor(
     private val teamRepository: TeamRepository
 ) : InsertTeamObjectiveUseCase {
-    override suspend fun invoke(description: String, teamId: Int) {
-       withContext(Dispatchers.IO){
-           teamRepository.insertTeamObjective(
-               TeamObjectivesEntity(
-                   description = description,
-                   isFinish = false,
-                   teamId = teamId,
-               )
-           )
-       }
+    override suspend fun invoke(description: String, teamId: Long) {
+        teamRepository.insertTeamObjective(
+            TeamObjectivesEntity(
+                description = description,
+                isFinish = false,
+                teamId = teamId,
+            )
+        )
     }
 }

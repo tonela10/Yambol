@@ -1,12 +1,12 @@
 package com.sedilant.yambol.domain
 
-import com.sedilant.yambol.data.TeamRepository
+import com.sedilant.yambol.data.team.player.PlayerRepository
 import javax.inject.Inject
 
 class CheckJerseyNumberUseCaseImpl @Inject constructor(
-    private val teamRepository: TeamRepository
+    private val playerRepository: PlayerRepository,
 ) : CheckJerseyNumberUseCase {
-    override suspend fun invoke(teamId: Int, jerseyNumber: Int, excludePlayerId: Int?): Boolean {
-        return teamRepository.isJerseyNumberTaken(teamId, jerseyNumber, excludePlayerId)
+    override suspend fun invoke(teamId: Long, jerseyNumber: Int, excludePlayerId: Long?): Boolean {
+        return playerRepository.isJerseyNumberTaken(teamId, jerseyNumber, excludePlayerId)
     }
 }

@@ -1,25 +1,25 @@
-package com.sedilant.yambol.di
+package com.sedilant.yambol.data.di
 
 import android.app.Application
 import android.content.Context
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
 import com.sedilant.yambol.data.DataStoreManager
-import com.sedilant.yambol.data.PlayerDao
-import com.sedilant.yambol.data.StatsDao
-import com.sedilant.yambol.data.StatsRecordRepository
-import com.sedilant.yambol.data.StatsRecordRepositoryImpl
-import com.sedilant.yambol.data.TeamDatabase
-import com.sedilant.yambol.data.TeamObjectivesDao
-import com.sedilant.yambol.data.TeamRepository
-import com.sedilant.yambol.data.TeamRepositoryImpl
-import com.sedilant.yambol.data.TrainingDao
 import com.sedilant.yambol.data.draftTrain.TrainingDatabase
 import com.sedilant.yambol.data.draftTrain.TrainingDraftDao
 import com.sedilant.yambol.data.draftTrain.TrainingDraftRepository
 import com.sedilant.yambol.data.draftTrain.TrainingDraftRepositoryImpl
 import com.sedilant.yambol.data.firebaseAuth.AuthRepository
 import com.sedilant.yambol.data.firebaseAuth.AuthRepositoryImpl
+import com.sedilant.yambol.data.team.TeamDao
+import com.sedilant.yambol.data.team.player.PlayerDao
+import com.sedilant.yambol.data.team.player.PlayerRepository
+import com.sedilant.yambol.data.team.player.PlayerRepositoryImpl
+import com.sedilant.yambol.data.team.TeamDatabase
+import com.sedilant.yambol.data.team.TeamObjectivesDao
+import com.sedilant.yambol.data.team.TeamRepository
+import com.sedilant.yambol.data.team.TeamRepositoryImpl
+import com.sedilant.yambol.data.team.TrainingDao
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -35,10 +35,10 @@ abstract class DataModule {
     abstract fun binTeamRepository(impl: TeamRepositoryImpl): TeamRepository
 
     @Binds
-    abstract fun bindStatsRecordRepository(impl: StatsRecordRepositoryImpl): StatsRecordRepository
+    abstract fun bindTrainingDraftRepository(impl: TrainingDraftRepositoryImpl): TrainingDraftRepository
 
     @Binds
-    abstract fun bindTrainingDraftRepository(impl: TrainingDraftRepositoryImpl): TrainingDraftRepository
+    abstract fun bindPlayerRepository(impl: PlayerRepositoryImpl): PlayerRepository
 
     companion object {
 
@@ -54,13 +54,13 @@ abstract class DataModule {
         }
 
         @Provides
-        fun provideTeamObjectivesDao(context: Context): TeamObjectivesDao {
-            return TeamDatabase.getDatabase(context).teamObjectivesDao()
+        fun provideTeamDao(context: Context): TeamDao {
+            return TeamDatabase.getDatabase(context).teamDao()
         }
 
         @Provides
-        fun provideStatsDao(context: Context): StatsDao {
-            return TeamDatabase.getDatabase(context).statsDao()
+        fun provideTeamObjectivesDao(context: Context): TeamObjectivesDao {
+            return TeamDatabase.getDatabase(context).teamObjectivesDao()
         }
 
         @Provides
@@ -77,6 +77,7 @@ abstract class DataModule {
         fun provideDataStoreManager(context: Context): DataStoreManager {
             return DataStoreManager(context)
         }
+
         @Provides
         @Singleton
         fun provideFirebaseAuth(): FirebaseAuth {

@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel(assistedFactory = TrainingDetailsViewModelFactory::class)
 class TrainingDetailsViewModel @AssistedInject constructor(
-    @Assisted private val trainId: Int,
+    @Assisted private val trainId: Long,
     private val getTrainWithTrainTaskByTrainIdUseCase: GetTrainWithTrainTaskByTrainIdUseCase
 ) : ViewModel() {
 
@@ -52,5 +52,5 @@ sealed interface TrainingDetailsUiState {
 
 @AssistedFactory
 interface TrainingDetailsViewModelFactory {
-    fun create(trainId: Int): TrainingDetailsViewModel
+    fun create(trainId: Long): TrainingDetailsViewModel
 }

@@ -1,4 +1,4 @@
-package com.sedilant.yambol.data.entities
+package com.sedilant.yambol.data.team
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -7,14 +7,13 @@ import androidx.room.PrimaryKey
  * TrainEntity(
  *      date = 10/10/2024
  *      time = 1  -> One hour
- *      numberOfPlayers: 12  -> 12 player for this training
  */
 @Entity(tableName = "train")
 data class TrainEntity(
     @PrimaryKey(autoGenerate = true)
-    val trainId: Long = 0, // TODO change with just --> id
+    val id: Long = 0,
     val date: Long,
     val time: Float,
     val concepts: List<String>,
-    val teamId: Int
+    val teamId: Long
 )

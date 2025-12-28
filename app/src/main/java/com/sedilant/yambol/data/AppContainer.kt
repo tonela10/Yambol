@@ -1,6 +1,9 @@
 package com.sedilant.yambol.data
 
 import android.content.Context
+import com.sedilant.yambol.data.team.TeamDatabase
+import com.sedilant.yambol.data.team.TeamRepository
+import com.sedilant.yambol.data.team.TeamRepositoryImpl
 
 interface AppContainer {
     val teamRepository: TeamRepository
@@ -9,9 +12,9 @@ interface AppContainer {
 class DefaultAppContainer(context: Context) : AppContainer {
     override val teamRepository: TeamRepository by lazy {
         TeamRepositoryImpl(
-            playerDao = TeamDatabase.getDatabase(context).playerDao(),
             teamObjectivesDao = TeamDatabase.getDatabase(context).teamObjectivesDao(),
-            trainingDao = TeamDatabase.getDatabase(context).trainingDao()
+            trainingDao = TeamDatabase.getDatabase(context).trainingDao(),
+            teamDao = TeamDatabase.getDatabase(context).teamDao()
         )
     }
 }

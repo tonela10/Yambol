@@ -35,7 +35,7 @@ import java.util.Locale
 fun TrainingList(
     modifier: Modifier = Modifier,
     trainings: List<TrainDomainModel>,
-    onTrainingClick: (Int) -> Unit = {},
+    onTrainingClick: (Long) -> Unit = {},
 ) {
     LazyColumn(
         modifier = modifier.fillMaxSize(),
@@ -45,7 +45,7 @@ fun TrainingList(
         items(trainings) { training ->
             TrainingItem(
                 training = training,
-                onClick = { onTrainingClick(training.id.toInt()) }
+                onClick = { onTrainingClick(training.id) }
             )
         }
     }

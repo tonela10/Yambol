@@ -1,10 +1,9 @@
 package com.sedilant.yambol.ui.addStats
 
+/*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sedilant.yambol.domain.get.GetPlayersByTeamIdUseCase
-import com.sedilant.yambol.domain.get.GetStatByIdUseCase
-import com.sedilant.yambol.domain.insert.SavePlayerStatUseCase
 import com.sedilant.yambol.ui.home.models.PlayerUiModel
 import com.sedilant.yambol.ui.playerCard.StatUiModel
 import dagger.assisted.Assisted
@@ -22,8 +21,6 @@ class AddTeamStatsViewModel @AssistedInject constructor(
     @Assisted private val teamId: Int,
     @Assisted private val statIds: List<Int>,
     private val getPlayersByTeamIdUseCase: GetPlayersByTeamIdUseCase,
-    private val getStatByIdUseCase: GetStatByIdUseCase,
-    private val savePlayerStatUseCase: SavePlayerStatUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<AddTeamStatsUiState>(AddTeamStatsUiState.Loading)
@@ -206,3 +203,4 @@ sealed interface AddTeamStatsUiState {
 interface AddTeamStatsViewModelFactory {
     fun create(teamId: Int, statIds: List<Int>): AddTeamStatsViewModel
 }
+*/

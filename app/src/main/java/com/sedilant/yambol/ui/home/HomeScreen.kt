@@ -49,7 +49,7 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     homeViewModel: HomeViewModel = hiltViewModel(),
     onCreateTeam: () -> Unit,
-    onLastTrainClick: (Int) -> Unit
+    onLastTrainClick: (Long) -> Unit
 ) {
     val homeUiState = homeViewModel.uiState.collectAsState(
         initial = HomeUiState.Loading
@@ -80,13 +80,13 @@ private fun HomeScreenStateless(
     modifier: Modifier = Modifier,
     homeUiState: HomeUiState,
     editTeamState: EditTeamState,
-    onTeamChange: (Int) -> Unit,
+    onTeamChange: (Long) -> Unit,
     onCreateTeam: () -> Unit,
     onSaveNewObjective: (String) -> Unit,
     onToggleObjectiveStatus: (Int) -> Unit,
     onUpdateObjective: (Int, String) -> Unit,
     onDeleteTeamObjective: (Int, String, Boolean) -> Unit,
-    onLastTrainClick: (Int) -> Unit,
+    onLastTrainClick: (Long) -> Unit,
     onEditTeam: (String) -> Unit,
     onUpdateTeamName: (String) -> Unit,
     onDismissEditTeam: () -> Unit,
@@ -197,9 +197,9 @@ fun SectionHeader(
 @Composable
 fun TeamTabs(
     modifier: Modifier = Modifier,
-    currentTeamId: Int,
+    currentTeamId: Long,
     listOfTeams: List<TeamUiModel>,
-    onTeamChange: (Int) -> Unit,
+    onTeamChange: (Long) -> Unit,
     onCreateTeam: () -> Unit,
     isAddTeamShow: Boolean = true,
 ) {
@@ -268,7 +268,7 @@ private fun PlayerCard(
     modifier: Modifier = Modifier
 ) {
     Card(
-        onClick = {},
+        onClick = {}, // TODO change the component to not be clickable
         modifier = modifier
             .width(160.dp)
             .height(80.dp),
@@ -408,8 +408,8 @@ private fun PlayersRowPreview() {
     YambolTheme {
         PlayersRow(
             listOf(
-                PlayerUiModel("Antonio", "10", id = 0),
-                PlayerUiModel("Luis", "44", id = 0)
+                PlayerUiModel("Antonio", "10", id = 0, teamId = 0),
+                PlayerUiModel("Luis", "44", id = 0, teamId = 0)
             ),
         )
     }
@@ -437,12 +437,11 @@ private fun HomeScreenPreview() {
             homeUiState = HomeUiState.Success(
                 listOfTeams = listOf(TeamUiModel("Utebo", 1), TeamUiModel("Olivar", 2)),
                 listOfPlayer = listOf(
-                    PlayerUiModel("Antonio", "10", id = 0),
-                    PlayerUiModel("Luis", "44", id = 1)
+                    PlayerUiModel("Antonio", "10", id = 0, teamId = 1),
+                    PlayerUiModel("Luis", "44", id = 1, teamId = 1)
                 ),
                 currentTeam = TeamUiModel("Utebo", 1),
                 listOfObjectives = listOf(),
-                statIds = listOf(),
             ),
             onTeamChange = {},
             onSaveNewObjective = {},

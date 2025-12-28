@@ -1,4 +1,4 @@
-package com.sedilant.yambol.data.entities
+package com.sedilant.yambol.data.team
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -22,5 +22,5 @@ data class TeamObjectivesEntity(
     val description: String,
     val isFinish: Boolean,
     @ColumnInfo(name = "team_id")
-    val teamId: Int,
+    val teamId: Long,
 )

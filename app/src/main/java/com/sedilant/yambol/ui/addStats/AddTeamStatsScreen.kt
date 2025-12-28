@@ -1,4 +1,5 @@
 package com.sedilant.yambol.ui.addStats
+/*
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -403,3 +404,4 @@ private fun AddTeamStatsScreenPreview() {
         )
     }
 }
+*/
