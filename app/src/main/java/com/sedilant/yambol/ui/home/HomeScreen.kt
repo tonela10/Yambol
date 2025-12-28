@@ -268,7 +268,7 @@ private fun PlayerCard(
     modifier: Modifier = Modifier
 ) {
     Card(
-        onClick = {},
+        onClick = {}, // TODO change the component to not be clickable
         modifier = modifier
             .width(160.dp)
             .height(80.dp),
