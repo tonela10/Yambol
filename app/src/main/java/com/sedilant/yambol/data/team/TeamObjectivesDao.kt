@@ -14,7 +14,7 @@ interface TeamObjectivesDao {
     suspend fun insertTeamObjective(teamObjectivesEntity: TeamObjectivesEntity)
 
     @Query("SELECT * FROM team_objectives WHERE team_id = :teamId")
-    suspend fun getTeamObjectives(teamId: Long): Flow<List<TeamObjectivesEntity>>
+    fun getTeamObjectives(teamId: Long): Flow<List<TeamObjectivesEntity>>
 
     @Update
     suspend fun updateTeamObjective(teamObjectivesEntity: TeamObjectivesEntity)
