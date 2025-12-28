@@ -34,8 +34,8 @@ import com.sedilant.yambol.domain.models.TeamDomainModel
 @Composable
 fun TeamSelectionDropdown(
     teams: List<TeamDomainModel>,
-    selectedTeamId: Int,
-    onTeamSelected: (Int) -> Unit
+    selectedTeamId: Long,
+    onTeamSelected: (Long) -> Unit
 ) {
     if (teams.isNotEmpty()) {
         var expanded by remember { mutableStateOf(false) }

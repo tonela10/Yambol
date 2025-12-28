@@ -20,7 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.sedilant.yambol.R
 import com.sedilant.yambol.domain.models.TrainDomainModel
 import com.sedilant.yambol.ui.home.SectionHeader
@@ -36,9 +36,9 @@ import java.util.Date
 @Composable
 fun TrainingScreen(
     modifier: Modifier = Modifier,
-    onTrainClicked: (Int) -> Unit,
-    onNavigateToCreateTraining: (Int) -> Unit,
-    trainingViewModel: TrainingViewModel = hiltViewModel<TrainingViewModel>()
+    onTrainClicked: (Long) -> Unit,
+    onNavigateToCreateTraining: (Long) -> Unit,
+    trainingViewModel: TrainingViewModel = hiltViewModel()
 ) {
 
     val uiState = trainingViewModel.uiState.collectAsState().value
@@ -56,9 +56,9 @@ fun TrainingScreen(
 private fun TrainingScreenStateless(
     modifier: Modifier = Modifier,
     uiState: TrainingUiState,
-    onTeamChange: (Int) -> Unit,
-    onTrainClicked: (Int) -> Unit,
-    onNavigateToCreateTraining: (Int) -> Unit,
+    onTeamChange: (Long) -> Unit,
+    onTrainClicked: (Long) -> Unit,
+    onNavigateToCreateTraining: (Long) -> Unit,
 ) {
     var selectedDateFilter by remember { mutableStateOf(DateFilter.ALL) }
 

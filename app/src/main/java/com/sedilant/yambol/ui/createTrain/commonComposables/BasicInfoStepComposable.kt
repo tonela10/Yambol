@@ -58,7 +58,7 @@ fun BasicInfoStep(
     onDateSelected: (Date) -> Unit,
     onHoursChanged: (Int) -> Unit,
     onMinutesChanged: (Int) -> Unit,
-    onTeamSelected: (Int) -> Unit
+    onTeamSelected: (Long) -> Unit
 ) {
     var showDatePicker by remember { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState(

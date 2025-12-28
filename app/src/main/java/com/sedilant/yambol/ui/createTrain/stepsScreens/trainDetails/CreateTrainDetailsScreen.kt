@@ -38,7 +38,7 @@ fun CreateTrainDetailsScreenV2(
     onBack: () -> Unit,
     onClose: () -> Unit,
     onTrainingSaved: () -> Unit, // Navigate after save
-    teamId: Int,
+    teamId: Long,
     viewModel: CreateTrainDetailsViewModel = hiltViewModel(
         creationCallback = { factory: CreateTrainDetailsViewModelFactory ->
             factory.create(teamId)

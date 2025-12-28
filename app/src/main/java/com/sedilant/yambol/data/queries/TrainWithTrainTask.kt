@@ -11,21 +11,12 @@ data class TrainWithTrainTask(
     @Embedded val train: TrainEntity,
     @Relation(
         parentColumn = "id",
-        entityColumn = "trainingTaskId",
+        entityColumn = "id",
         associateBy = Junction(
             TrainCrossTrainTaskEntity::class,
             parentColumn = "trainId",
-            entityColumn = "trainingTaskId"
+            entityColumn = "taskId"
         )
     )
     val tasks: List<TaskEntity>
-)
-
-data class TrainTaskWithTrain(
-    @Embedded val trainTask: TaskEntity,
-    @Relation(
-        parentColumn = "id",
-        entityColumn = "trainId"
-    )
-    val trains: List<TrainEntity>
 )

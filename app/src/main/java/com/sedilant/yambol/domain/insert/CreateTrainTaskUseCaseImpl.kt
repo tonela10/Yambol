@@ -9,14 +9,14 @@ class CreateTrainTaskUseCaseImpl @Inject constructor(
     private val teamRepository: TeamRepository
 ) : CreateTrainTaskUseCase {
     override suspend fun invoke(
-        trainId: Int,
+        trainId: Long,
         name: String,
         numberOfPlayer: Int,
         concept: String,
         description: String,
         variables: List<String>
     ) {
-        val trainTaskId = teamRepository.insertTrainTask(
+        val taskId = teamRepository.insertTrainTask(
             TaskEntity(
                 name = name,
                 concept = concept,
@@ -28,7 +28,7 @@ class CreateTrainTaskUseCaseImpl @Inject constructor(
         teamRepository.insertTrainCrossTrainTask(
             TrainCrossTrainTaskEntity(
                 trainId = trainId,
-                trainingTaskId = trainTaskId
+                taskId = taskId
             )
         )
     }

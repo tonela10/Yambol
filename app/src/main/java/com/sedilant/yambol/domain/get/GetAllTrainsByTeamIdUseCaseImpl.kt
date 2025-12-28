@@ -8,7 +8,7 @@ import javax.inject.Inject
 class GetAllTrainsByTeamIdUseCaseImpl @Inject constructor(
     private val teamRepository: TeamRepository
 ) : GetAllTrainsByTeamIdUseCase {
-    override suspend fun invoke(teamId: Int): List<TrainDomainModel> {
+    override suspend fun invoke(teamId: Long): List<TrainDomainModel> {
         return teamRepository.getAllTrainingsByTeamId(teamId).map {
             TrainDomainModel(
                 id = it.id,

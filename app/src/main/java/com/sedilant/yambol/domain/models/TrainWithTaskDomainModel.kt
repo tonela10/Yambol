@@ -7,6 +7,6 @@ data class TrainWithTaskDomainModel(
     val date: Date,
     val time: Float,
     val concepts: List<String>,
-    val teamId: Int,
+    val teamId: Long,
     val trains: List<TrainTaskDomainModel>
 )

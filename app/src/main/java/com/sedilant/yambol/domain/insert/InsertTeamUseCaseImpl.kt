@@ -7,8 +7,8 @@ import javax.inject.Inject
 class InsertTeamUseCaseImpl @Inject constructor(
     private val teamRepository: TeamRepository
 ) : InsertTeamUseCase {
-    override suspend fun invoke(name: String) {
-        teamRepository.insertTeam(
+    override suspend fun invoke(name: String): Long {
+        return teamRepository.insertTeam(
             TeamEntity(
                 name = name.lowercase()
             )

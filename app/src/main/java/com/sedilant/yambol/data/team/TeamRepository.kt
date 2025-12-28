@@ -11,17 +11,17 @@ interface TeamRepository {
     suspend fun updateTeam(teamId: Long, newName: String)
 
     // team objectives related methods
-    suspend fun getTeamObjectives(teamId: Int): Flow<List<TeamObjectivesEntity>>
+    suspend fun getTeamObjectives(teamId: Long): Flow<List<TeamObjectivesEntity>>
     suspend fun insertTeamObjective(teamObjectivesEntity: TeamObjectivesEntity)
     suspend fun updateTeamObjective(teamObjectivesEntity: TeamObjectivesEntity)
     suspend fun getTeamObjectiveById(objectiveId: Int): TeamObjectivesEntity?
     suspend fun deleteTeamObjective(teamObjectivesEntity: TeamObjectivesEntity)
 
     // team trainings related info
-    suspend fun getAllTrainingsByTeamId(teamId: Int): List<TrainEntity>
-    suspend fun getTrainWithTrainTaskByTrainId(trainId: Int): TrainWithTrainTask
-    suspend fun insertTrain(trainEntity: TrainEntity): Int
-    suspend fun insertTrainTask(trainTaskEntity: TaskEntity): Int
+    suspend fun getAllTrainingsByTeamId(teamId: Long): List<TrainEntity>
+    suspend fun getTrainWithTrainTaskByTrainId(trainId: Long): TrainWithTrainTask
+    suspend fun insertTrain(trainEntity: TrainEntity): Long
+    suspend fun insertTrainTask(trainTaskEntity: TaskEntity): Long
     suspend fun insertTrainCrossTrainTask(trainCrossTrainTaskEntity: TrainCrossTrainTaskEntity)
-    suspend fun getLastTrainWithTrainTaskByTeamId(teamId: Int): Long?
+    suspend fun getLastTrainWithTrainTaskByTeamId(teamId: Long): Long?
 }

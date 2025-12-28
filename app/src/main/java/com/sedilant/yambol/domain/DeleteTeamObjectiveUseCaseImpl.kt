@@ -11,7 +11,7 @@ class DeleteTeamObjectiveUseCaseImpl @Inject constructor(
         objectiveId: Int,
         description: String,
         isFinish: Boolean,
-        teamId: Int
+        teamId: Long
     ) {
         teamRepository.deleteTeamObjective(
             TeamObjectivesEntity(

@@ -31,7 +31,7 @@ class TeamRepositoryImpl @Inject constructor(
         teamObjectivesDao.insertTeamObjective(teamObjectivesEntity)
     }
 
-    override suspend fun getTeamObjectives(teamId: Int): Flow<List<TeamObjectivesEntity>> {
+    override suspend fun getTeamObjectives(teamId: Long): Flow<List<TeamObjectivesEntity>> {
         return teamObjectivesDao.getTeamObjectives(teamId)
     }
 
@@ -52,37 +52,38 @@ class TeamRepositoryImpl @Inject constructor(
     }
 
     // TRAIN DAO METHODS
-    override suspend fun getAllTrainingsByTeamId(teamId: Int): List<TrainEntity> {
+    override suspend fun getAllTrainingsByTeamId(teamId: Long): List<TrainEntity> {
         return withContext(Dispatchers.IO) {
             trainingDao.getAllTrainsByTeamId(teamId)
         }
     }
 
-    override suspend fun getTrainWithTrainTaskByTrainId(trainId: Int): TrainWithTrainTask {
+    override suspend fun getTrainWithTrainTaskByTrainId(trainId: Long): TrainWithTrainTask {
         return withContext(Dispatchers.IO) {
             trainingDao.getTrainWithTrainTaskByTrainId(trainId)
         }
     }
 
-    override suspend fun insertTrain(trainEntity: TrainEntity): Int {
+    override suspend fun insertTrain(trainEntity: TrainEntity): Long {
         return withContext(Dispatchers.IO) {
-            trainingDao.insertTrain(trainEntity).toInt() // TODO undo this ñapa
+            trainingDao.insertTrain(trainEntity)
         }
     }
 
-    override suspend fun insertTrainTask(trainTaskEntity: TaskEntity): Int {
+    override suspend fun insertTrainTask(trainTaskEntity: TaskEntity): Long {
         return withContext(Dispatchers.IO) {
-            trainingDao.insertTrainTask(trainTaskEntity).toInt() // TODO undo this ñapa
+            trainingDao.insertTrainTask(trainTaskEntity)
         }
     }
 
+    // TODO Name it like, add task to train
     override suspend fun insertTrainCrossTrainTask(trainCrossTrainTaskEntity: TrainCrossTrainTaskEntity) {
         withContext(Dispatchers.IO) {
             trainingDao.insertTrainCrossTrainTask(trainCrossTrainTaskEntity)
         }
     }
 
-    override suspend fun getLastTrainWithTrainTaskByTeamId(teamId: Int): Long {
+    override suspend fun getLastTrainWithTrainTaskByTeamId(teamId: Long): Long {
         return withContext(Dispatchers.IO) {
             trainingDao.getLastTrainWithTrainTaskByTeamId(teamId)
         }

@@ -80,7 +80,7 @@ class TrainingViewModel @Inject constructor(
         initialValue = TrainingUiState.Loading
     )
 
-    fun onTeamChange(newTeamId: Int) {
+    fun onTeamChange(newTeamId: Long) {
         viewModelScope.launch {
             dataStoreManager.saveCurrentTeam(newTeamId)
         }
@@ -93,7 +93,7 @@ sealed interface TrainingUiState {
     data class Success(
         val trainList: List<TrainDomainModel>,
         val teamList: List<TeamUiModel>,
-        val currentTeamId: Int
+        val currentTeamId: Long
     ) : TrainingUiState
 
     data class Error(val message: String) : TrainingUiState

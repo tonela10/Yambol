@@ -9,7 +9,7 @@ import javax.inject.Inject
 class InsertTeamObjectiveUseCaseImpl @Inject constructor(
     private val teamRepository: TeamRepository
 ) : InsertTeamObjectiveUseCase {
-    override suspend fun invoke(description: String, teamId: Int) {
+    override suspend fun invoke(description: String, teamId: Long) {
        withContext(Dispatchers.IO){
            teamRepository.insertTeamObjective(
                TeamObjectivesEntity(

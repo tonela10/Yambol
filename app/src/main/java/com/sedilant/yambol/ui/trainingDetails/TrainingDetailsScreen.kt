@@ -44,7 +44,7 @@ import java.util.Locale
 
 @Composable
 fun TrainingDetailsScreen(
-    trainId: Int,
+    trainId: Long,
     onNavigateBack: () -> Unit,
     trainingDetailsViewModel: TrainingDetailsViewModel = hiltViewModel(
         creationCallback = { factory: TrainingDetailsViewModelFactory ->
@@ -263,24 +263,6 @@ fun TaskCard(task: TrainTaskDomainModel) {
                 }
             }
 
-            // Number of Players
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.group_24dp),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(16.dp)
-                )
-                Text(
-                    text = "${task.numberOfPlayer} ${if (task.numberOfPlayer == 1) "player" else "players"}",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-
             if (task.description.isNotEmpty()) {
                 Text(
                     text = task.description,
@@ -386,7 +368,6 @@ private fun TrainingDetailsScreenPreview() {
                     TrainTaskDomainModel(
                         trainingTaskId = 1,
                         name = "Ball Control Drill",
-                        numberOfPlayer = 8,
                         concept = "Dribbling",
                         description = "Practice dribbling through cones with both feet, focusing on close ball control and quick direction changes.",
                         variables = listOf("Speed", "Distance", "Cone spacing")
@@ -394,7 +375,6 @@ private fun TrainingDetailsScreenPreview() {
                     TrainTaskDomainModel(
                         trainingTaskId = 2,
                         name = "Shooting Practice",
-                        numberOfPlayer = 12,
                         concept = "Shooting",
                         description = "Target practice from various angles and distances to improve accuracy and power.",
                         variables = listOf("Distance", "Angle", "Target zones")

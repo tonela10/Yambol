@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.update
 
 @HiltViewModel(assistedFactory = CreateTrainV2ViewModelFactory::class)
 class CreateTrainV2ViewModel @AssistedInject constructor(
-    @Assisted private val teamId: Int
+    @Assisted private val teamId: Long
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CreateTrainUiStateV2(teamId = teamId))
     val uiState: StateFlow<CreateTrainUiStateV2> = _uiState.asStateFlow()
@@ -42,7 +42,7 @@ class CreateTrainV2ViewModel @AssistedInject constructor(
 
 data class CreateTrainUiStateV2(
     val currentStep: Step = Step.BASIC_INFO,
-    val teamId: Int,
+    val teamId: Long,
 )
 
 enum class Step {
@@ -54,5 +54,5 @@ enum class Step {
 
 @AssistedFactory
 interface CreateTrainV2ViewModelFactory {
-    fun create(teamId: Int): CreateTrainV2ViewModel
+    fun create(teamId: Long): CreateTrainV2ViewModel
 }

@@ -23,9 +23,19 @@ fun PlayerEntity.mapToUI(): PlayerUiModel {
     )
 }
 
+fun PlayerUiModel.mapToEntity(): PlayerEntity {
+    return PlayerEntity(
+        name = name,
+        number = number.toInt(),
+        id = id,
+        teamId = teamId,
+    )
+}
+
+
 fun TaskEntity.mapToDomain(): TrainTaskDomainModel {
     return TrainTaskDomainModel(
-        trainingTaskId = trainingTaskId.toInt(),
+        trainingTaskId = id,
         name = name,
         concept = concept,
         description = description,

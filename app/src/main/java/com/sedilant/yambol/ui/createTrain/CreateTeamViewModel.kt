@@ -22,7 +22,7 @@ import java.util.Date
 
 @HiltViewModel(assistedFactory = CreateTrainViewModelFactory::class)
 class CreateTrainViewModel @AssistedInject constructor(
-    @Assisted private val defaultTeamId: Int,
+    @Assisted private val defaultTeamId: Long,
     private val savedStateHandle: SavedStateHandle,
     private val createTrainUseCase: CreateTrainUseCase,
     private val createTrainTaskUseCase: CreateTrainTaskUseCase,
@@ -54,7 +54,7 @@ class CreateTrainViewModel @AssistedInject constructor(
                 _uiState.update { currentState ->
                     currentState.copy(
                         teams = teams,
-                        selectedTeamId = savedStateHandle.get<Int>(KEY_SELECTED_TEAM_ID)
+                        selectedTeamId = savedStateHandle.get<Long>(KEY_SELECTED_TEAM_ID)
                             ?: defaultTeamId,
                         isLoading = false
                     )
@@ -78,7 +78,7 @@ class CreateTrainViewModel @AssistedInject constructor(
         val selectedDate = savedStateHandle.get<Long>(KEY_SELECTED_DATE)?.let { Date(it) }
         val selectedHours = savedStateHandle.get<Int>(KEY_SELECTED_HOURS) ?: 1
         val selectedMinutes = savedStateHandle.get<Int>(KEY_SELECTED_MINUTES) ?: 30
-        val selectedTeamId = savedStateHandle.get<Int>(KEY_SELECTED_TEAM_ID) ?: defaultTeamId
+        val selectedTeamId = savedStateHandle.get<Long>(KEY_SELECTED_TEAM_ID) ?: defaultTeamId
         val concepts = savedStateHandle.get<Array<String>>(KEY_CONCEPTS)?.toList() ?: emptyList()
         val tasks = savedStateHandle.get<Array<TrainTaskData>>(KEY_TASKS)?.toList() ?: emptyList()
 
@@ -129,7 +129,7 @@ class CreateTrainViewModel @AssistedInject constructor(
         savedStateHandle[KEY_SELECTED_MINUTES] = minutes
     }
 
-    fun updateTeam(teamId: Int) {
+    fun updateTeam(teamId: Long) {
         _uiState.update { it.copy(selectedTeamId = teamId) }
         savedStateHandle[KEY_SELECTED_TEAM_ID] = teamId
     }
@@ -168,7 +168,7 @@ class CreateTrainViewModel @AssistedInject constructor(
 
     fun canProceedFromBasicInfo(): Boolean {
         with(_uiState.value) {
-            return selectedDate != null && selectedTeamId != -1
+            return selectedDate != null && selectedTeamId.toInt() != -1
         }
     }
 
@@ -255,7 +255,7 @@ data class CreateTrainUiState(
     val selectedDate: Date? = null,
     val selectedHours: Int = 1,
     val selectedMinutes: Int = 30,
-    val selectedTeamId: Int = -1,
+    val selectedTeamId: Long = -1,
 
     val concepts: List<String> = emptyList(),
 
@@ -280,5 +280,5 @@ data class TrainTaskData(
 
 @AssistedFactory
 interface CreateTrainViewModelFactory {
-    fun create(defaultTeamId: Int): CreateTrainViewModel
+    fun create(defaultTeamId: Long): CreateTrainViewModel
 }

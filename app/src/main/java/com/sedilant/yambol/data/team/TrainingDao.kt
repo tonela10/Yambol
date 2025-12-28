@@ -10,14 +10,14 @@ import com.sedilant.yambol.data.queries.TrainWithTrainTask
 interface TrainingDao {
 
     @Query("SELECT * FROM train WHERE teamId = :teamId")
-    fun getAllTrainsByTeamId(teamId: Int): List<TrainEntity>
+    fun getAllTrainsByTeamId(teamId: Long): List<TrainEntity>
 
     @Transaction
     @Query("SELECT * FROM train WHERE id = :trainId")
-    fun getTrainWithTrainTaskByTrainId(trainId: Int): TrainWithTrainTask
+    fun getTrainWithTrainTaskByTrainId(trainId: Long): TrainWithTrainTask
 
     @Query("SELECT id FROM train WHERE teamId = :teamId ORDER BY id DESC LIMIT 1")
-    fun getLastTrainWithTrainTaskByTeamId(teamId: Int): Long
+    fun getLastTrainWithTrainTaskByTeamId(teamId: Long): Long
 
     @Insert
     fun insertTrain(trainEntity: TrainEntity): Long

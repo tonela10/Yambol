@@ -5,7 +5,6 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import androidx.sqlite.db.SupportSQLiteDatabase
 import com.sedilant.yambol.data.converters.Converters
 import com.sedilant.yambol.data.team.player.PlayerDao
 import com.sedilant.yambol.data.team.player.PlayerEntity
@@ -19,7 +18,7 @@ import com.sedilant.yambol.data.team.player.PlayerEntity
         TrainCrossTrainTaskEntity::class,
         TaskEntity::class],
     version = 1,
-    exportSchema = true,
+    exportSchema = false, // TODO enabled it before production
 //    autoMigrations = [
 //        AutoMigration(from = 1, to = 2)
 //    ]
@@ -38,22 +37,6 @@ abstract class TeamDatabase : RoomDatabase() {
         fun getDatabase(context: Context): TeamDatabase {
             return Instance ?: synchronized(this) {
                 Room.databaseBuilder(context, TeamDatabase::class.java, "team_database")
-                    .addCallback(object : Callback() {
-                        override fun onCreate(db: SupportSQLiteDatabase) {
-                            super.onCreate(db)
-                            db.execSQL(
-                                """
-                            INSERT INTO ability_name (name) VALUES 
-                            ('bounce'), 
-                            ('pass'), 
-                            ('shoot'), 
-                            ('defend'), 
-                            ('physical_state'), 
-                            ('mental_state');
-                        """.trimIndent()
-                            )
-                        }
-                    })
                     .build()
                     .also { Instance = it }
             }

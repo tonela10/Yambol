@@ -9,7 +9,7 @@ import javax.inject.Inject
 class GetTeamObjectivesUseCaseImpl @Inject constructor(
     private val teamRepository: TeamRepository,
 ) : GetTeamObjectivesUseCase {
-    override suspend fun invoke(teamId: Int): Flow<List<TeamObjectivesDomainModel>> {
+    override suspend fun invoke(teamId: Long): Flow<List<TeamObjectivesDomainModel>> {
         return teamRepository.getTeamObjectives(teamId).map { list ->
             list.map {
                 TeamObjectivesDomainModel(
