@@ -16,7 +16,7 @@ interface TeamDao {
     fun getTeamId(teamName: String): Int?
 
     @Update
-    fun updateTeam(teamEntity: TeamEntity)
+    suspend fun updateTeam(teamEntity: TeamEntity)
 
     @Insert
     fun insertTeam(teamEntity: TeamEntity): Long

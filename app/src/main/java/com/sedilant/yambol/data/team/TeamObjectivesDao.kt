@@ -11,10 +11,10 @@ import kotlinx.coroutines.flow.Flow
 interface TeamObjectivesDao {
 
     @Insert
-    fun insertTeamObjective(teamObjectivesEntity: TeamObjectivesEntity)
+    suspend fun insertTeamObjective(teamObjectivesEntity: TeamObjectivesEntity)
 
     @Query("SELECT * FROM team_objectives WHERE team_id = :teamId")
-    fun getTeamObjectives(teamId: Long): Flow<List<TeamObjectivesEntity>>
+    suspend fun getTeamObjectives(teamId: Long): Flow<List<TeamObjectivesEntity>>
 
     @Update
     suspend fun updateTeamObjective(teamObjectivesEntity: TeamObjectivesEntity)

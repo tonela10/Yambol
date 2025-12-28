@@ -1,9 +1,7 @@
 package com.sedilant.yambol.data.team
 
 import com.sedilant.yambol.data.queries.TrainWithTrainTask
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class TeamRepositoryImpl @Inject constructor(
@@ -21,9 +19,7 @@ class TeamRepositoryImpl @Inject constructor(
     }
 
     override suspend fun updateTeam(teamId: Long, newName: String) {
-        withContext(Dispatchers.IO) {
-            teamDao.updateTeam(TeamEntity(teamId, newName))
-        }
+        teamDao.updateTeam(TeamEntity(teamId, newName))
     }
 
     // TEAM OBJECTIVES DAO METHODS
@@ -40,52 +36,39 @@ class TeamRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getTeamObjectiveById(objectiveId: Int): TeamObjectivesEntity? {
-        return withContext(Dispatchers.IO) {
-            teamObjectivesDao.getTeamObjectiveById(objectiveId)
-        }
+        return teamObjectivesDao.getTeamObjectiveById(objectiveId)
     }
 
     override suspend fun deleteTeamObjective(teamObjectivesEntity: TeamObjectivesEntity) {
-        return withContext(Dispatchers.IO) {
-            teamObjectivesDao.deleteTeamObjective(teamObjectivesEntity)
-        }
+        teamObjectivesDao.deleteTeamObjective(teamObjectivesEntity)
     }
 
     // TRAIN DAO METHODS
     override suspend fun getAllTrainingsByTeamId(teamId: Long): List<TrainEntity> {
-        return withContext(Dispatchers.IO) {
-            trainingDao.getAllTrainsByTeamId(teamId)
-        }
+        return trainingDao.getAllTrainsByTeamId(teamId)
+
     }
 
     override suspend fun getTrainWithTrainTaskByTrainId(trainId: Long): TrainWithTrainTask {
-        return withContext(Dispatchers.IO) {
-            trainingDao.getTrainWithTrainTaskByTrainId(trainId)
-        }
+        return trainingDao.getTrainWithTrainTaskByTrainId(trainId)
+
     }
 
     override suspend fun insertTrain(trainEntity: TrainEntity): Long {
-        return withContext(Dispatchers.IO) {
-            trainingDao.insertTrain(trainEntity)
-        }
+        return trainingDao.insertTrain(trainEntity)
+
     }
 
     override suspend fun insertTrainTask(trainTaskEntity: TaskEntity): Long {
-        return withContext(Dispatchers.IO) {
-            trainingDao.insertTrainTask(trainTaskEntity)
-        }
+        return trainingDao.insertTrainTask(trainTaskEntity)
     }
 
     // TODO Name it like, add task to train
     override suspend fun insertTrainCrossTrainTask(trainCrossTrainTaskEntity: TrainCrossTrainTaskEntity) {
-        withContext(Dispatchers.IO) {
-            trainingDao.insertTrainCrossTrainTask(trainCrossTrainTaskEntity)
-        }
+        trainingDao.insertTrainCrossTrainTask(trainCrossTrainTaskEntity)
     }
 
     override suspend fun getLastTrainWithTrainTaskByTeamId(teamId: Long): Long {
-        return withContext(Dispatchers.IO) {
-            trainingDao.getLastTrainWithTrainTaskByTeamId(teamId)
-        }
+        return trainingDao.getLastTrainWithTrainTaskByTeamId(teamId)
     }
 }
