@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey
 )
 data class TaskEntity(
     @PrimaryKey(autoGenerate = true)
-    val trainingTaskId: Long = 0,
+    val id: Long = 0,
     val name: String,
     val concept: String, // TODO check if list is needed
     val description: String,

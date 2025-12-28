@@ -22,5 +22,5 @@ data class TeamObjectivesEntity(
     val description: String,
     val isFinish: Boolean,
     @ColumnInfo(name = "team_id")
-    val teamId: Int,
+    val teamId: Long,
 )
