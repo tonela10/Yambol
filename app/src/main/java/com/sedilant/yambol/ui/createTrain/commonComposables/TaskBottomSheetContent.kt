@@ -42,16 +42,16 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.sedilant.yambol.ui.createTrain.TrainTaskData
+import com.sedilant.yambol.ui.createTrain.TaskData
 import com.sedilant.yambol.ui.theme.YambolTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TaskBottomSheetContent(
-    initialTask: TrainTaskData? = null,
+    initialTask: TaskData? = null,
     concepts: List<String>,
     onDismiss: () -> Unit,
-    onSave: (TrainTaskData) -> Unit
+    onSave: (TaskData) -> Unit
 ) {
     var name by remember { mutableStateOf(initialTask?.name ?: "") }
     var numberOfPlayer by remember {
@@ -214,7 +214,7 @@ fun TaskBottomSheetContent(
                         val variables =
                             variablesText.split(",").map { it.trim() }.filter { it.isNotEmpty() }
                         onSave(
-                            TrainTaskData(
+                            TaskData(
                                 name = name,
                                 numberOfPlayer = numberOfPlayer.toIntOrNull() ?: 8,
                                 concept = selectedConcept,
@@ -254,7 +254,7 @@ fun TaskBottomSheetContent(
                     val variables =
                         variablesText.split(",").map { it.trim() }.filter { it.isNotEmpty() }
                     onSave(
-                        TrainTaskData(
+                        TaskData(
                             name = name,
                             numberOfPlayer = numberOfPlayer.toIntOrNull() ?: 8,
                             concept = selectedConcept,
