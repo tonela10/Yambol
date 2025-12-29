@@ -9,7 +9,8 @@ data class Training(
     val duration: Float,
     val hour: Float,
     val concepts: List<String>,
-    val tasks: List<Task>
+    val tasks: List<Task>,
+    val teamId: Long
 )
 
 data class Task(
@@ -25,10 +26,11 @@ fun TrainingDraftEntity.toDomain(tasks: List<TrainingTaskEntity>): Training {
     return Training(
         id = this.id,
         date = Date(this.date),
-        duration = this.duration,
-        hour = this.hour,
+        duration = this.endTime,
+        hour = this.startTime,
         concepts = this.concepts.split(",").filter { it.isNotBlank() },
-        tasks = tasks.map { it.toDomain() }
+        tasks = tasks.map { it.toDomain() },
+        teamId = teamId
     )
 }
 
@@ -36,9 +38,10 @@ fun Training.toEntity(): TrainingDraftEntity {
     return TrainingDraftEntity(
         id = this.id,
         date = this.date.time,
-        duration = this.duration,
-        hour = this.hour,
-        concepts = this.concepts.joinToString(",")
+        endTime = this.duration,
+        startTime = this.hour,
+        concepts = this.concepts.joinToString(","),
+        teamId = teamId
     )
 }
 

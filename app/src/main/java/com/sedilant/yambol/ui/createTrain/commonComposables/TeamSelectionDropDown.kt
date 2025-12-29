@@ -18,6 +18,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -27,9 +28,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sedilant.yambol.domain.models.TeamDomainModel
+import com.sedilant.yambol.ui.theme.YambolTheme
 
 @Composable
 fun TeamSelectionDropdown(
@@ -97,6 +100,31 @@ fun TeamSelectionDropdown(
                     }
                 }
             }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun TeamSelectionDropdownPreview() {
+    val mockTeams = listOf(
+        TeamDomainModel(id = 1L, name = "Cachos F.C."),
+        TeamDomainModel(id = 2L, name = "Yambol Warriors"),
+        TeamDomainModel(id = 3L, name = "Junior Team")
+    )
+
+    var selectedId by remember { mutableStateOf(1L) }
+
+    YambolTheme() {
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            TeamSelectionDropdown(
+                teams = mockTeams,
+                selectedTeamId = selectedId,
+                onTeamSelected = { newId -> selectedId = newId }
+            )
         }
     }
 }

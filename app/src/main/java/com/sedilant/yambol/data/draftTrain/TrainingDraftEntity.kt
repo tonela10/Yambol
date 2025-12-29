@@ -1,5 +1,6 @@
 package com.sedilant.yambol.data.draftTrain
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.util.UUID
@@ -9,11 +10,13 @@ import java.util.UUID
 data class TrainingDraftEntity(
     @PrimaryKey
     val id: String = UUID.randomUUID().toString(),
-    val date: Long, // Timestamp en milisegundos
-    val duration: Float,
-    val hour: Float,
+    val date: Long,
+    val endTime: Float,
+    val startTime: Float,
     val concepts: String, // Lista serializada como "concepto1,concepto2,concepto3"
-    val isCompleted: Boolean = false, // false = borrador, true = finalizado
+    val isCompleted: Boolean = false, // false = draft, true = finalize
     val createdAt: Long = System.currentTimeMillis(),
-    val updatedAt: Long = System.currentTimeMillis()
+    val updatedAt: Long = System.currentTimeMillis(),
+    @ColumnInfo(name = "team_id")
+    val teamId: Long
 )

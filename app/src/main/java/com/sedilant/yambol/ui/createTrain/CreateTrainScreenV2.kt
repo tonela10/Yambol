@@ -62,6 +62,7 @@ private fun CreateTrainScreenV2Stateless(
             Step.BASIC_INFO -> CreateTrainBasicInfoScreen(
                 onClose = onCancel,
                 onNext = onNextStep,
+                teamId = uiState.teamId
             )
 
             Step.CONCEPTS -> CreateTrainConceptsScreen(
