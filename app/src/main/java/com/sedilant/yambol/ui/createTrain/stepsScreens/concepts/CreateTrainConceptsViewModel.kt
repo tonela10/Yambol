@@ -27,7 +27,7 @@ class CreateTrainConceptsViewModel @Inject constructor(
     private val _draftId = MutableStateFlow<String?>(null)
 
 
-    val uiState: StateFlow<UiStateNew> = _draftId
+    val uiState: StateFlow<UiState> = _draftId
         .filterNotNull()
         .flatMapLatest { id ->
             combine(
@@ -42,16 +42,16 @@ class CreateTrainConceptsViewModel @Inject constructor(
                             isSelected = draft.concepts.contains(concept.id),
                         )
                     }
-                    UiStateNew.Success(concepts = listOfConcepts)
+                    UiState.Success(concepts = listOfConcepts)
                 } else {
-                    UiStateNew.Error("No se pudo encontrar el borrador")
+                    UiState.Error("No se pudo encontrar el borrador")
                 }
             }
         }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
-            initialValue = UiStateNew.Loading
+            initialValue = UiState.Loading
         )
 
     init {
@@ -97,10 +97,10 @@ class CreateTrainConceptsViewModel @Inject constructor(
         }
     }
 
-    sealed interface UiStateNew {
-        data class Success(val concepts: List<Concept>) : UiStateNew
-        data class Error(val message: String) : UiStateNew
-        data object Loading : UiStateNew
+    sealed interface UiState {
+        data class Success(val concepts: List<Concept>) : UiState
+        data class Error(val message: String) : UiState
+        data object Loading : UiState
     }
 }
 

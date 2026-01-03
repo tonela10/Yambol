@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sedilant.yambol.ui.createTrain.commonComposables.CreateTrainScaffold
-import com.sedilant.yambol.ui.createTrain.stepsScreens.concepts.CreateTrainConceptsViewModel.UiStateNew
+import com.sedilant.yambol.ui.createTrain.stepsScreens.concepts.CreateTrainConceptsViewModel.UiState
 
 @Composable
 fun CreateTrainConceptsScreen(
@@ -44,7 +44,7 @@ fun CreateTrainConceptsScreen(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun CreateTrainConceptsScreenStateless(
-    uiState: UiStateNew,
+    uiState: UiState,
     onBack: () -> Unit,
     onNext: () -> Unit,
     onConceptSelected: (Long) -> Unit,
@@ -70,13 +70,13 @@ private fun CreateTrainConceptsScreenStateless(
                 .padding(16.dp)
         ) {
             when (uiState) {
-                is UiStateNew.Loading -> {
+                is UiState.Loading -> {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         LoadingIndicator()
                     }
                 }
 
-                is UiStateNew.Error -> {
+                is UiState.Error -> {
                     Column(
                         modifier = Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.Center,
@@ -87,7 +87,7 @@ private fun CreateTrainConceptsScreenStateless(
                     }
                 }
 
-                is UiStateNew.Success -> {
+                is UiState.Success -> {
                     val filteredConcepts = remember(uiState.concepts, searchQuery) {
                         if (searchQuery.isBlank()) {
                             uiState.concepts.toList()
@@ -243,7 +243,7 @@ fun ConceptsScreenPreview() {
     )
 
     CreateTrainConceptsScreenStateless(
-        uiState = UiStateNew.Success(
+        uiState = UiState.Success(
             concepts = sampleConcepts
         ),
         onBack = {},
