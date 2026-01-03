@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
+import com.sedilant.yambol.data.converters.Converters
 
 @Database(
     entities = [
@@ -13,6 +15,7 @@ import androidx.room.RoomDatabase
     version = 1,
     exportSchema = false
 )
+@TypeConverters(Converters::class)
 abstract class TrainingDatabase : RoomDatabase() {
     abstract fun trainingDraftDao(): TrainingDraftDao
 
@@ -27,7 +30,7 @@ abstract class TrainingDatabase : RoomDatabase() {
                     TrainingDatabase::class.java,
                     "training_database"
                 )
-                    .fallbackToDestructiveMigration()
+                    .fallbackToDestructiveMigration(false)
                     .build()
                 INSTANCE = instance
                 instance

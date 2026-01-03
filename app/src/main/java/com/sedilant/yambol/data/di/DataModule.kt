@@ -12,14 +12,17 @@ import com.sedilant.yambol.data.draftTrain.TrainingDraftRepositoryImpl
 import com.sedilant.yambol.data.firebaseAuth.AuthRepository
 import com.sedilant.yambol.data.firebaseAuth.AuthRepositoryImpl
 import com.sedilant.yambol.data.team.TeamDao
-import com.sedilant.yambol.data.team.player.PlayerDao
-import com.sedilant.yambol.data.team.player.PlayerRepository
-import com.sedilant.yambol.data.team.player.PlayerRepositoryImpl
 import com.sedilant.yambol.data.team.TeamDatabase
 import com.sedilant.yambol.data.team.TeamObjectivesDao
 import com.sedilant.yambol.data.team.TeamRepository
 import com.sedilant.yambol.data.team.TeamRepositoryImpl
 import com.sedilant.yambol.data.team.TrainingDao
+import com.sedilant.yambol.data.team.concept.ConceptDao
+import com.sedilant.yambol.data.team.concept.ConceptRepository
+import com.sedilant.yambol.data.team.concept.ConceptRepositoryImpl
+import com.sedilant.yambol.data.team.player.PlayerDao
+import com.sedilant.yambol.data.team.player.PlayerRepository
+import com.sedilant.yambol.data.team.player.PlayerRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -40,12 +43,20 @@ abstract class DataModule {
     @Binds
     abstract fun bindPlayerRepository(impl: PlayerRepositoryImpl): PlayerRepository
 
+    @Binds
+    abstract fun bindConceptRepository(impl: ConceptRepositoryImpl): ConceptRepository
+
     companion object {
 
         @Provides
         @Singleton
         fun provideContext(application: Application): Context {
             return application.applicationContext
+        }
+
+        @Provides
+        fun provideConceptDao(context: Context): ConceptDao {
+            return TeamDatabase.getDatabase(context).conceptDao()
         }
 
         @Provides

@@ -25,6 +25,9 @@ interface TrainingDraftDao {
     @Query("SELECT * FROM training_drafts WHERE id = :id")
     suspend fun getTrainingDraftById(id: String): TrainingDraftEntity?
 
+    @Query("SELECT * FROM training_drafts WHERE id = :id")
+    fun observeDraftById(id:String): Flow<TrainingWithTasks?>
+
     @Query("SELECT * FROM training_drafts WHERE isCompleted = 0 ORDER BY updatedAt DESC")
     fun getAllDrafts(): Flow<List<TrainingDraftEntity>>
 

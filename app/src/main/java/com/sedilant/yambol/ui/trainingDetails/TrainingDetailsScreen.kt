@@ -255,7 +255,7 @@ fun TaskCard(task: TrainTaskDomainModel) {
                     shape = MaterialTheme.shapes.small
                 ) {
                     Text(
-                        text = task.concept,
+                        text = "test", // task.concepts,
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onPrimaryContainer,
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
@@ -368,14 +368,14 @@ private fun TrainingDetailsScreenPreview() {
                     TrainTaskDomainModel(
                         trainingTaskId = 1,
                         name = "Ball Control Drill",
-                        concept = "Dribbling",
+                        concepts = listOf(),  //"Dribbling",
                         description = "Practice dribbling through cones with both feet, focusing on close ball control and quick direction changes.",
                         variables = listOf("Speed", "Distance", "Cone spacing")
                     ),
                     TrainTaskDomainModel(
                         trainingTaskId = 2,
                         name = "Shooting Practice",
-                        concept = "Shooting",
+                        concepts = listOf(),  //"Dribbling",
                         description = "Target practice from various angles and distances to improve accuracy and power.",
                         variables = listOf("Distance", "Angle", "Target zones")
                     )

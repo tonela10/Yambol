@@ -12,14 +12,14 @@ class CreateTrainTaskUseCaseImpl @Inject constructor(
         trainId: Long,
         name: String,
         numberOfPlayer: Int,
-        concept: String,
+        concept: List<Long>,
         description: String,
         variables: List<String>
     ) {
         val taskId = teamRepository.insertTrainTask(
             TaskEntity(
                 name = name,
-                concept = concept,
+                conceptsId = concept,
                 description = description,
                 variables = variables,
                 corrections = null

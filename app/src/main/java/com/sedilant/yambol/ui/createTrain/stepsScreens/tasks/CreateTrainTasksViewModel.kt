@@ -2,8 +2,9 @@ package com.sedilant.yambol.ui.createTrain.stepsScreens.tasks
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sedilant.yambol.data.draftTrain.TrainingDraftRepository
 import com.sedilant.yambol.data.draftTrain.Task
+import com.sedilant.yambol.data.draftTrain.TrainingDraftRepository
+import com.sedilant.yambol.data.team.concept.ConceptRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,7 +15,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CreateTrainTasksViewModel @Inject constructor(
-    private val repository: TrainingDraftRepository
+    private val repository: TrainingDraftRepository,
+    private val conceptsRepository: ConceptRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(UiState())
@@ -43,7 +45,8 @@ class CreateTrainTasksViewModel @Inject constructor(
                         TaskUI(
                             id = task.id,
                             name = task.name,
-                            concepts = task.concepts,
+                            concepts = conceptsRepository.getListOfConcepts(task.concepts)
+                                .map { it.name },
                             description = task.description,
                             variation = task.variation,
                             duration = ""
@@ -77,7 +80,7 @@ class CreateTrainTasksViewModel @Inject constructor(
         name: String,
         description: String = "",
         variation: List<String> = emptyList(),
-        concepts: List<String> = emptyList()
+        concepts: List<Long> = emptyList()
     ) {
         val id = draftId ?: return
         if (name.isBlank()) return
@@ -96,7 +99,7 @@ class CreateTrainTasksViewModel @Inject constructor(
                 val newTaskUI = TaskUI(
                     id = newTask.id,
                     name = newTask.name,
-                    concepts = newTask.concepts,
+                    concepts = listOf("uno"), // TODO newTask.concepts,
                     description = newTask.description,
                     variation = newTask.variation,
                     duration = ""
@@ -146,7 +149,7 @@ class CreateTrainTasksViewModel @Inject constructor(
                     Task(
                         id = taskUI.id,
                         name = taskUI.name,
-                        concepts = taskUI.concepts,
+                        concepts = listOf(1),  // TODO taskUI.concepts,
                         description = taskUI.description,
                         variation = taskUI.variation
                     )

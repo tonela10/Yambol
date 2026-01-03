@@ -5,7 +5,7 @@ interface CreateTrainTaskUseCase {
         trainId: Long,
         name: String,
         numberOfPlayer: Int,
-        concept: String,
+        concept: List<Long>,
         description: String,
         variables: List<String>
     )

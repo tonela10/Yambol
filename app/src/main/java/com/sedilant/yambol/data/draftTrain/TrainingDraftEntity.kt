@@ -13,7 +13,7 @@ data class TrainingDraftEntity(
     val date: Long,
     val endTime: Float,
     val startTime: Float,
-    val concepts: String, // Lista serializada como "concepto1,concepto2,concepto3"
+    val concepts: List<Long>,
     val isCompleted: Boolean = false, // false = draft, true = finalize
     val createdAt: Long = System.currentTimeMillis(),
     val updatedAt: Long = System.currentTimeMillis(),

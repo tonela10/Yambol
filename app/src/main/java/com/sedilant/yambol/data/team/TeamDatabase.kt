@@ -6,6 +6,8 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.sedilant.yambol.data.converters.Converters
+import com.sedilant.yambol.data.team.concept.ConceptDao
+import com.sedilant.yambol.data.team.concept.ConceptEntity
 import com.sedilant.yambol.data.team.player.PlayerDao
 import com.sedilant.yambol.data.team.player.PlayerEntity
 
@@ -16,20 +18,19 @@ import com.sedilant.yambol.data.team.player.PlayerEntity
         TeamObjectivesEntity::class,
         TrainEntity::class,
         TrainCrossTrainTaskEntity::class,
-        TaskEntity::class],
+        TaskEntity::class,
+        ConceptEntity::class,
+    ],
     version = 1,
     exportSchema = false, // TODO enabled it before production
-//    autoMigrations = [
-//        AutoMigration(from = 1, to = 2)
-//    ]
 )
 @TypeConverters(Converters::class)
 abstract class TeamDatabase : RoomDatabase() {
+    abstract fun conceptDao(): ConceptDao
     abstract fun playerDao(): PlayerDao
     abstract fun teamObjectivesDao(): TeamObjectivesDao
     abstract fun trainingDao(): TrainingDao
     abstract fun teamDao(): TeamDao
-
 
     companion object {
         @Volatile

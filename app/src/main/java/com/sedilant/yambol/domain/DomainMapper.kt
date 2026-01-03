@@ -37,7 +37,7 @@ fun TaskEntity.mapToDomain(): TrainTaskDomainModel {
     return TrainTaskDomainModel(
         trainingTaskId = id,
         name = name,
-        concept = concept,
+        concepts = conceptsId,
         description = description,
         variables = variables,
     )

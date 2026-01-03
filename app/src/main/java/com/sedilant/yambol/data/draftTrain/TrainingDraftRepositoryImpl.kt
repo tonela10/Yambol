@@ -3,6 +3,7 @@ package com.sedilant.yambol.data.draftTrain
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import java.util.Calendar
 import java.util.Date
 import javax.inject.Inject
 
@@ -33,8 +34,8 @@ class TrainingDraftRepositoryImpl @Inject constructor(
                 // Create a new draft
                 val newTraining = Training(
                     date = Date(),
-                    duration = 90f,
-                    hour = getCurrentHourAsFloat(),
+                    endTime = 90f,
+                    startTime = getCurrentHourAsFloat(),
                     concepts = emptyList(),
                     tasks = emptyList(),
                     teamId = 0
@@ -44,8 +45,8 @@ class TrainingDraftRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             val newTraining = Training(
                 date = Date(),
-                duration = 90f,
-                hour = getCurrentHourAsFloat(),
+                endTime = 90f,
+                startTime = getCurrentHourAsFloat(),
                 concepts = emptyList(),
                 tasks = emptyList(),
                 teamId = 0
@@ -55,9 +56,9 @@ class TrainingDraftRepositoryImpl @Inject constructor(
     }
 
     private fun getCurrentHourAsFloat(): Float {
-        val calendar = java.util.Calendar.getInstance()
-        val hour = calendar.get(java.util.Calendar.HOUR_OF_DAY)
-        val minute = calendar.get(java.util.Calendar.MINUTE)
+        val calendar = Calendar.getInstance()
+        val hour = calendar.get(Calendar.HOUR_OF_DAY)
+        val minute = calendar.get(Calendar.MINUTE)
         return hour + (minute / 60f)
     }
 
@@ -66,7 +67,7 @@ class TrainingDraftRepositoryImpl @Inject constructor(
         date: Date?,
         endTime: Float?,
         startTime: Float?,
-        concepts: List<String>?,
+        concepts: List<Long>?,
         teamId: Long?
     ) {
         val current = trainingDraftDao.getTrainingDraftById(id)
@@ -76,7 +77,7 @@ class TrainingDraftRepositoryImpl @Inject constructor(
             date = date?.time ?: current.date,
             endTime = endTime ?: current.endTime,
             startTime = startTime ?: current.startTime,
-            concepts = concepts?.joinToString(",") ?: current.concepts,
+            concepts = concepts ?: current.concepts,
             updatedAt = System.currentTimeMillis(),
             teamId = teamId ?: current.teamId
         )
@@ -110,9 +111,9 @@ class TrainingDraftRepositoryImpl @Inject constructor(
     }
 
     override fun observeDraft(id: String): Flow<Training?> {
-        return trainingDraftDao.getTasksForTrainingFlow(id).map { tasks ->
-            val trainingEntity = trainingDraftDao.getTrainingDraftById(id) ?: return@map null
-            trainingEntity.toDomain(tasks)
+        return trainingDraftDao.observeDraftById(id).map {
+            if (it == null) return@map null // throw an error or sommething when null
+            it.toDomain()
         }
     }
 

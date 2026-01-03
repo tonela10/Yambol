@@ -59,8 +59,8 @@ class CreateTrainBasicInfoViewModel @AssistedInject constructor(
                 if (draft != null) {
                     _uiState.value = UiStateNew.Success(
                         selectedDate = draft.date,
-                        startHour = draft.hour,
-                        endHour = draft.hour + (draft.duration / 60f), // change duration from endHour
+                        startHour = draft.startTime,
+                        endHour = draft.startTime + (draft.endTime / 60f), // change duration from endHour
                         teamsList = teamList,
                         selectedTeamId = teamId
                     )

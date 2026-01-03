@@ -81,7 +81,7 @@ private fun CreateTrainTasksScreenStateless(
     tasks: List<TaskUI> = emptyList(),
     isLoading: Boolean = false,
     onMove: (from: Int, to: Int) -> Unit,
-    onAddTask: (name: String, description: String, variation: List<String>, concepts: List<String>) -> Unit,
+    onAddTask: (name: String, description: String, variation: List<String>, concepts: List<Long>) -> Unit,
     onDeleteTask: (taskId: String) -> Unit
 ) {
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -111,7 +111,7 @@ private fun CreateTrainTasksScreenStateless(
                 ) {
                     AddTaskBottomSheet(
                         onAddTask = { name, description, variation, concepts ->
-                            onAddTask(name, description, variation, concepts)
+                            onAddTask(name, description, variation, listOf(1, 2)) // TODO change for the ids of the concepts
                             showBottomSheet = false
                         },
                         onDismiss = { showBottomSheet = false }

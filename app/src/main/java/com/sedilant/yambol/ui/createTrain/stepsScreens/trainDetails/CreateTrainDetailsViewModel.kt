@@ -51,8 +51,8 @@ class CreateTrainDetailsViewModel @AssistedInject constructor(
                         if (draft != null) {
                             val trainInfo = TrainInfo(
                                 date = formatDate(draft.date),
-                                hour = formatHour(draft.hour),
-                                duration = formatDuration(draft.duration),
+                                hour = formatHour(draft.startTime),
+                                duration = formatDuration(draft.endTime),
                                 team = "Equipo A" // TODO: Obtener del draft cuando se implemente
                             )
 
@@ -61,7 +61,7 @@ class CreateTrainDetailsViewModel @AssistedInject constructor(
                                 TaskUI(
                                     id = task.id,
                                     name = task.name,
-                                    concepts = task.concepts,
+                                    concepts = listOf(), // TODO task.concepts,
                                     description = task.description,
                                     variation = task.variation,
                                     duration = "" // Sin duración específica
@@ -70,7 +70,7 @@ class CreateTrainDetailsViewModel @AssistedInject constructor(
                             _uiState.value = CreateTrainDetailsUiState.Success(
                                 trainInfo = trainInfo,
                                 listOfTasks = tasksUI,
-                                listOfConcepts = draft.concepts
+                                listOfConcepts = listOf("") // TODO draft.concepts
                             )
                         } else {
                             _uiState.value = CreateTrainDetailsUiState.Error(
@@ -108,8 +108,8 @@ class CreateTrainDetailsViewModel @AssistedInject constructor(
                 val teamId = teamId
                 val trainId = createTrainUseCase(
                     date = draft?.date ?: Date(),
-                    time = draft?.hour ?: 0f,
-                    concepts = draft?.concepts ?: emptyList(),
+                    time = draft?.startTime ?: 0f,
+                    concepts = listOf(), // TODO ?.concepts ?: emptyList(),
                     teamId = teamId
                 )
 
@@ -118,7 +118,7 @@ class CreateTrainDetailsViewModel @AssistedInject constructor(
                         trainId = trainId,
                         name = task.name,
                         numberOfPlayer = 0,
-                        concept = task.concepts.firstOrNull() ?: "",
+                        concept = listOf(),// TODO task.concepts.firstOrNull() ?: "",
                         description = task.description,
                         variables = task.variation.split(",")
                     )
