@@ -21,12 +21,24 @@ interface TrainingDraftDao {
 
     @Query("UPDATE training_drafts SET updatedAt = :timestamp WHERE id = :id")
     suspend fun updateTimestamp(id: String, timestamp: Long = System.currentTimeMillis())
+    @Transaction
+    suspend fun updateTaskOrder(draftId: String, orderedTasks: List<TrainingTaskEntity>) {
+        orderedTasks.forEachIndexed { index, task ->
+            // Use the index from the loop to ensure 0, 1, 2... order
+            updateOrderIndex(task.id, index)
+        }
+        updateTimestamp(draftId)
+    }
+
+    @Query("UPDATE training_tasks SET orderIndex = :newIndex WHERE id = :taskId")
+    suspend fun updateOrderIndex(taskId: String, newIndex: Int)
 
     @Query("SELECT * FROM training_drafts WHERE id = :id")
     suspend fun getTrainingDraftById(id: String): TrainingDraftEntity?
 
+    @Transaction
     @Query("SELECT * FROM training_drafts WHERE id = :id")
-    fun observeDraftById(id:String): Flow<TrainingWithTasks?>
+    fun observeDraftById(id: String): Flow<TrainingWithTasks?>
 
     @Query("SELECT * FROM training_drafts WHERE isCompleted = 0 ORDER BY updatedAt DESC")
     fun getAllDrafts(): Flow<List<TrainingDraftEntity>>

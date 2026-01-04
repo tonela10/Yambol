@@ -36,7 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sedilant.yambol.R
 import com.sedilant.yambol.domain.models.TrainDomainModel
-import com.sedilant.yambol.domain.models.TrainTaskDomainModel
+import com.sedilant.yambol.domain.models.TaskDomain
 import com.sedilant.yambol.ui.theme.YambolTheme
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -228,7 +228,7 @@ fun TrainingInfoCard(
 }
 
 @Composable
-fun TaskCard(task: TrainTaskDomainModel) {
+fun TaskCard(task: TaskDomain) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
@@ -365,14 +365,14 @@ private fun TrainingDetailsScreenPreview() {
                     teamId = 1
                 ),
                 taskList = listOf(
-                    TrainTaskDomainModel(
+                    TaskDomain(
                         trainingTaskId = 1,
                         name = "Ball Control Drill",
                         concepts = listOf(),  //"Dribbling",
                         description = "Practice dribbling through cones with both feet, focusing on close ball control and quick direction changes.",
                         variables = listOf("Speed", "Distance", "Cone spacing")
                     ),
-                    TrainTaskDomainModel(
+                    TaskDomain(
                         trainingTaskId = 2,
                         name = "Shooting Practice",
                         concepts = listOf(),  //"Dribbling",

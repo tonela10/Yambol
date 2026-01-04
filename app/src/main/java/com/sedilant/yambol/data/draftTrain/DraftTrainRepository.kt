@@ -15,6 +15,7 @@ interface TrainingDraftRepository {
         concepts: List<Long>? = null,
         teamId: Long? = null
     )
+    suspend fun updateTasksList(trainingId: String, tasks: List<Task>)
     suspend fun addTask(trainingId: String, task: Task)
     suspend fun updateTask(trainingId: String, task: Task)
     suspend fun removeTask(trainingId: String, taskId: String)

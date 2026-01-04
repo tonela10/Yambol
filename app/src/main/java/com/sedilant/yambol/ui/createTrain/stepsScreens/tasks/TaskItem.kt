@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.sedilant.yambol.ui.createTrain.stepsScreens.concepts.Concept
 import sh.calvin.reorderable.ReorderableCollectionItemScope
 
 @Composable
@@ -105,7 +106,7 @@ fun TaskItemPreview() {
         task = TaskUI(
             id = "1",
             name = "Sentadillas",
-            concepts = listOf("Fuerza", "Piernas"),
+            concepts = listOf(Concept(1, "Sentadillas")),
             description = "3 series de 12 repeticiones",
             variation = "Con barra libre",
             duration = "20 minutos"

@@ -3,6 +3,7 @@ package com.sedilant.yambol.ui.createTrain.stepsScreens.tasks
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,7 +19,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -28,12 +28,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -44,23 +42,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.sedilant.yambol.ui.createTrain.stepsScreens.concepts.Concept
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 internal fun AddTaskBottomSheet(
-    onAddTask: (name: String, description: String, concepts: List<String>, variants: List<String>) -> Unit,
-    onDismiss: () -> Unit
+    onAddTask: (name: String, description: String, concepts: List<Long>, variants: List<String>) -> Unit,
+    onDismiss: () -> Unit,
+    concepts: List<Concept> // These are all available concepts in the database
 ) {
     var taskName by remember { mutableStateOf("") }
     var taskDescription by remember { mutableStateOf("") }
-    var conceptInput by remember { mutableStateOf("") }
-    val currentConcepts = remember { mutableStateListOf<String>() }
-    val taskVariants = remember {
-        mutableStateListOf(
-            "Var 1",
-            "Var 2"
-        )
-    }
+
+    val selectedConceptIds = remember { mutableStateListOf<Long>() }
+
+    val taskVariants = remember { mutableStateListOf("Var 1") }
 
     Column(
         modifier = Modifier
@@ -74,137 +70,79 @@ internal fun AddTaskBottomSheet(
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = onDismiss) {
-                Icon(
-                    imageVector = Icons.Default.Close,
-                    contentDescription = "Cerrar",
-                    tint = MaterialTheme.colorScheme.onSurface
-                )
+                Icon(Icons.Default.Close, contentDescription = "Cerrar")
             }
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = "Nuevo ejercicio",
                 style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
+                fontWeight = FontWeight.Bold
             )
         }
+
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Campo: Nombre del ejercicio
-        Text(
-            text = "Nombre del ejercicio",
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(horizontal = 8.dp)
-        )
-        Spacer(modifier = Modifier.height(4.dp))
+        // Exercise Name
+        Text("Nombre del ejercicio", style = MaterialTheme.typography.labelLarge)
         OutlinedTextField(
             value = taskName,
             onValueChange = { taskName = it },
             placeholder = { Text("Ej. Tiro libre") },
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            shape = RoundedCornerShape(12.dp),
-            colors = OutlinedTextFieldDefaults.colors()
+            shape = RoundedCornerShape(12.dp)
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Campo: Descripción
-        Text(
-            text = "Descripción",
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(horizontal = 8.dp)
-        )
-        Spacer(modifier = Modifier.height(4.dp))
+        // Description
+        Text("Descripción", style = MaterialTheme.typography.labelLarge)
         OutlinedTextField(
             value = taskDescription,
             onValueChange = { taskDescription = it },
-            placeholder = { Text("Describe los pasos y objetivos del ejercicio...") },
+            placeholder = { Text("Describe los pasos...") },
             modifier = Modifier.fillMaxWidth(),
-            minLines = 3, // Multi-line
-            maxLines = 5,
-            shape = RoundedCornerShape(12.dp),
-            colors = OutlinedTextFieldDefaults.colors()
+            minLines = 3,
+            shape = RoundedCornerShape(12.dp)
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Chips
-        Text(
-            text = "Concepto",
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(horizontal = 8.dp)
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        OutlinedTextField(
-            value = conceptInput,
-            onValueChange = {
-                conceptInput = it
-                // Here can be add the logic to suggest concepts or add when pressing Enter
-            },
-            placeholder = { Text("Buscar o crear concepto...") },
-            leadingIcon = {
-                Icon(imageVector = Icons.Default.Search, contentDescription = "Buscar")
-            },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            shape = RoundedCornerShape(12.dp),
-            colors = OutlinedTextFieldDefaults.colors()
-        )
-
-        // Example of adding a concept when pressing Enter (just for simulation)
-        LaunchedEffect(conceptInput) {
-            if (conceptInput.endsWith("\n") && conceptInput.isNotBlank()) {
-                val newConcept = conceptInput.trim()
-                if (newConcept.isNotEmpty() && !currentConcepts.contains(newConcept)) {
-                    currentConcepts.add(newConcept)
-                }
-                conceptInput = ""
-            }
-        }
+        // Concept Selection Logic
+        Text("Seleccionar conceptos", style = MaterialTheme.typography.labelLarge)
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Concepts
+        // Render all available concepts as selectable chips
         FlowRow(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            currentConcepts.forEach { concept ->
+            concepts.forEach { concept ->
+                val isSelected = selectedConceptIds.contains(concept.id)
                 FilterChip(
-                    selected = true,
-                    onClick = { currentConcepts.remove(concept) },
-                    label = { Text(concept) },
-                    trailingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = "Eliminar concepto",
-                            modifier = Modifier.size(FilterChipDefaults.IconSize)
-                        )
+                    selected = isSelected,
+                    onClick = {
+                        if (isSelected) selectedConceptIds.remove(concept.id)
+                        else selectedConceptIds.add(concept.id)
                     },
-                    colors = FilterChipDefaults.filterChipColors(
-                        selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                        selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                        selectedTrailingIconColor = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
+                    label = { Text(concept.conceptName) },
+                    leadingIcon = if (isSelected) {
+                        {
+                            Icon(
+                                Icons.Default.Add,
+                                null,
+                                Modifier.size(FilterChipDefaults.IconSize)
+                            )
+                        }
+                    } else null
                 )
             }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Variants
-        Text(
-            text = "Variantes",
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(horizontal = 8.dp)
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-
+        // Variants Section
+        Text("Variantes", style = MaterialTheme.typography.labelLarge)
         taskVariants.forEachIndexed { index, variant ->
             Row(
                 modifier = Modifier
@@ -214,65 +152,45 @@ internal fun AddTaskBottomSheet(
             ) {
                 OutlinedTextField(
                     value = variant,
-                    onValueChange = { newValue ->
-                        taskVariants[index] = newValue
-                    },
+                    onValueChange = { taskVariants[index] = it },
                     modifier = Modifier.weight(1f),
-                    singleLine = true,
-                    shape = RoundedCornerShape(12.dp),
-                    colors = OutlinedTextFieldDefaults.colors()
+                    shape = RoundedCornerShape(12.dp)
                 )
-                Spacer(modifier = Modifier.width(8.dp))
-                IconButton(
-                    onClick = { taskVariants.removeAt(index) },
-                    modifier = Modifier.size(48.dp) // Ajustar tamaño del IconButton
-                ) {
+                IconButton(onClick = { taskVariants.removeAt(index) }) {
                     Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = "Eliminar variante",
-                        tint = MaterialTheme.colorScheme.error // Color rojo para eliminar
+                        Icons.Default.Delete,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.error
                     )
                 }
             }
         }
-        // Botón para añadir nueva variante
+
         TextButton(onClick = { taskVariants.add("") }) {
-            Icon(imageVector = Icons.Default.Add, contentDescription = "Añadir variante")
-            Spacer(modifier = Modifier.width(8.dp))
+            Icon(Icons.Default.Add, null)
             Text("Añadir variante")
         }
 
-
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Botones de acción (Cancelar y Guardar)
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp),
-            horizontalArrangement = Arrangement.SpaceAround,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            OutlinedButton(
-                onClick = onDismiss,
-                modifier = Modifier.weight(1f)
-            ) {
+        // Action Buttons
+        Row(modifier = Modifier.fillMaxWidth()) {
+            OutlinedButton(onClick = onDismiss, modifier = Modifier.weight(1f)) {
                 Text("Cancelar")
             }
             Spacer(modifier = Modifier.width(16.dp))
             Button(
                 onClick = {
-                    //  onAddTask: (name: String, description: String, concepts: List<String>, variants: List<String>) -> Unit,
                     onAddTask(
                         taskName,
                         taskDescription,
-                        currentConcepts.toList(),
-                        taskVariants.filter { it.isNotBlank() }.toList() // variants
+                        selectedConceptIds.toList(),
+                        taskVariants.filter { it.isNotBlank() }.toList()
                     )
                     onDismiss()
                 },
                 modifier = Modifier.weight(1f),
-                enabled = taskName.isNotBlank() // Solo habilitar si el nombre no está vacío
+                enabled = taskName.isNotBlank()
             ) {
                 Text("Guardar")
             }
@@ -283,12 +201,23 @@ internal fun AddTaskBottomSheet(
 @Preview(showBackground = true, name = "1. Preview: Bottom Sheet Añadir Tarea")
 @Composable
 private fun AddTaskBottomSheetPreview() {
+    // Mock data for the preview
+    val mockConcepts = listOf(
+        Concept(id = 1L, conceptName = "Tiro", isSelected = false),
+        Concept(id = 2L, conceptName = "Defensa", isSelected = false),
+        Concept(id = 3L, conceptName = "Pase", isSelected = false),
+        Concept(id = 4L, conceptName = "Rebote", isSelected = false),
+        Concept(id = 5L, conceptName = "Táctica", isSelected = false)
+    )
+
     MaterialTheme {
         Surface {
-            // Pasamos lambdas vacías, ya que la lógica de guardado no importa en la preview
             AddTaskBottomSheet(
-                onAddTask = { _, _, _, _ -> },
-                onDismiss = {}
+                onAddTask = { name, desc, conceptIds, variants ->
+                    // No action needed for preview
+                },
+                onDismiss = {},
+                concepts = mockConcepts
             )
         }
     }

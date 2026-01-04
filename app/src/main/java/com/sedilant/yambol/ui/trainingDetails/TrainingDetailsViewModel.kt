@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sedilant.yambol.domain.get.GetTrainWithTrainTaskByTrainIdUseCase
 import com.sedilant.yambol.domain.models.TrainDomainModel
-import com.sedilant.yambol.domain.models.TrainTaskDomainModel
+import com.sedilant.yambol.domain.models.TaskDomain
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -46,7 +46,7 @@ sealed interface TrainingDetailsUiState {
     data object Loading : TrainingDetailsUiState
     data class Success(
         val train: TrainDomainModel,
-        val taskList: List<TrainTaskDomainModel>
+        val taskList: List<TaskDomain>
     ) : TrainingDetailsUiState
 }
 

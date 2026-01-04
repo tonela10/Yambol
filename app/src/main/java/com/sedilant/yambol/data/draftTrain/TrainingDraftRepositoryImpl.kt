@@ -84,6 +84,30 @@ class TrainingDraftRepositoryImpl @Inject constructor(
         trainingDraftDao.updateTrainingDraft(updated)
     }
 
+    // TODO check and improve how this is manage
+    override suspend fun updateTasksList(trainingId: String, tasks: List<Task>) {
+        // 1. Convert domain tasks to entities
+        // 2. The mapIndexed ensures the orderIndex is exactly 0, 1, 2... based on list position
+        val entities = tasks.mapIndexed { index, task ->
+            task.toEntity(trainingId, index)
+        }
+
+        // 3. We insert/replace. This updates orderIndex for everyone.
+        trainingDraftDao.insertTasks(entities)
+
+        // 4. Important: If the 'tasks' list passed is smaller than the DB (item deleted),
+        // you need to remove the ones not present in the new list.
+        val existingTasks = trainingDraftDao.getTasksForTraining(trainingId)
+        val newIds = entities.map { it.id }
+        existingTasks.forEach { existing ->
+            if (existing.id !in newIds) {
+                trainingDraftDao.deleteTask(existing.id)
+            }
+        }
+
+        trainingDraftDao.updateTimestamp(trainingId)
+    }
+
     override suspend fun addTask(trainingId: String, task: Task) {
         val existingTasks = trainingDraftDao.getTasksForTraining(trainingId)
         val newOrderIndex = existingTasks.size

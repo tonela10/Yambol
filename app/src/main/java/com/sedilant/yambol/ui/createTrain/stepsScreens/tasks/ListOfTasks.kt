@@ -35,10 +35,10 @@ internal fun ListOfTasks(
         if (listOfTasks.isEmpty() && !isLoading) {
             Column(
                 modifier = Modifier
-                    .fillMaxSize() // Ocupamos todo el espacio disponible
+                    .fillMaxSize()
                     .padding(32.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center // Centramos el mensaje verticalmente
+                verticalArrangement = Arrangement.Center
             ) {
                 Text(
                     text = "No hay ejercicios todavía",

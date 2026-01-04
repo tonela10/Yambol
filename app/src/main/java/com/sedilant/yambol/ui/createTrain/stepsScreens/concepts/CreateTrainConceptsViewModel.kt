@@ -107,5 +107,5 @@ class CreateTrainConceptsViewModel @Inject constructor(
 data class Concept(
     val id: Long,
     val conceptName: String,
-    val isSelected: Boolean
+    val isSelected: Boolean = false
 )
