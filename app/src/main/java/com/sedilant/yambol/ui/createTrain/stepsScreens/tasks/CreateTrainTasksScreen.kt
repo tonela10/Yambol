@@ -55,7 +55,8 @@ fun CreateTrainTasksScreen(
         onBack = onBack,
         onNext = onNext, // saveStepData removed as it's now reactive
         onClose = onClose,
-        onClearError = viewModel::clearError
+        onClearError = viewModel::clearError,
+        onTaskSelected = viewModel::onTaskSelected
     )
 }
 
@@ -69,9 +70,11 @@ private fun CreateTrainTasksScreenStateless(
     onClearError: () -> Unit,
     onMove: (from: Int, to: Int) -> Unit,
     onAddTask: (name: String, description: String, variation: List<String>, concepts: List<Long>) -> Unit,
+    onTaskSelected: (TaskUI) -> Unit,
     onDeleteTask: (taskId: String) -> Unit
 ) {
-    var showBottomSheet by remember { mutableStateOf(false) }
+    var showCreateTaskBottomSheet by remember { mutableStateOf(false) }
+    var showExistingTasksBottomSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     CreateTrainScaffold(
@@ -114,10 +117,10 @@ private fun CreateTrainTasksScreenStateless(
                         style = MaterialTheme.typography.titleLarge
                     )
 
-                    AddTaskButton(onClick = { showBottomSheet = true })
+                    AddTaskButton(onClick = { showCreateTaskBottomSheet = true })
 
                     OutlinedButton(
-                        onClick = { /* TODO: existing exercises */ },
+                        onClick = { showExistingTasksBottomSheet = true },
                         modifier = Modifier
                             .padding(horizontal = 16.dp, vertical = 8.dp)
                             .fillMaxWidth()
@@ -128,9 +131,9 @@ private fun CreateTrainTasksScreenStateless(
                         Text(text = "Añadir Ejercicio existente")
                     }
 
-                    if (uiState.tasks.isNotEmpty()) {
+                    if (uiState.draftTasks.isNotEmpty()) {
                         Text(
-                            text = "${uiState.tasks.size} ejercicio(s) añadido(s)",
+                            text = "${uiState.draftTasks.size} ejercicio(s) añadido(s)",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
@@ -138,7 +141,7 @@ private fun CreateTrainTasksScreenStateless(
                     }
 
                     ListOfTasks(
-                        listOfTasks = uiState.tasks,
+                        listOfTasks = uiState.draftTasks,
                         onMove = onMove,
                         onDelete = onDeleteTask,
                         isLoading = false,
@@ -146,18 +149,34 @@ private fun CreateTrainTasksScreenStateless(
 
 
                     // Bottom Sheet Logic
-                    if (showBottomSheet) {
+                    if (showCreateTaskBottomSheet) {
                         ModalBottomSheet(
-                            onDismissRequest = { showBottomSheet = false },
+                            onDismissRequest = { showCreateTaskBottomSheet = false },
                             sheetState = sheetState
                         ) {
                             AddTaskBottomSheet(
                                 onAddTask = { name, description, concepts, variation ->
                                     onAddTask(name, description, variation, concepts)
-                                    showBottomSheet = false
+                                    showCreateTaskBottomSheet = false
                                 },
-                                onDismiss = { showBottomSheet = false },
+                                onDismiss = { showCreateTaskBottomSheet = false },
                                 concepts = uiState.listOfConcept,
+                            )
+                        }
+                    }
+
+                    if (showExistingTasksBottomSheet) {
+                        ModalBottomSheet(
+                            onDismissRequest = { showExistingTasksBottomSheet = false },
+                            sheetState = sheetState
+                        ) {
+                            AddExistingTaskBottomSheet(
+                                existingTasks = uiState.existingTasks,
+                                onTaskSelected = { task ->
+                                    onTaskSelected(task)
+                                    showExistingTasksBottomSheet = false
+                                },
+                                onDismiss = { showExistingTasksBottomSheet = false }
                             )
                         }
                     }

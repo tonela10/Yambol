@@ -19,12 +19,16 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * This ViewModel is expose an ui state that have all existing tasks ( todo with the current concepts)
+ * create new tasks in and expose the draft task to the ui
+ */
 @HiltViewModel
 @OptIn(ExperimentalCoroutinesApi::class)
 class CreateTrainTasksViewModel @Inject constructor(
     private val draftRepository: TrainingDraftRepository,
     private val conceptsRepository: ConceptRepository,
-  //  private val getAllTaskUseCase: GetAllTaskUseCase // Optional: if needed for existing exercises
+    private val getAllTaskUseCase: GetAllTaskUseCase
 ) : ViewModel() {
 
     private val _draftId = MutableStateFlow<String?>(null)
@@ -37,13 +41,14 @@ class CreateTrainTasksViewModel @Inject constructor(
         .flatMapLatest { id ->
             combine(
                 draftRepository.observeDraft(id),
-                _manualError
-            ) { draft, manualError ->
+                _manualError,
+                getAllTaskUseCase()
+            ) { draft, manualError, existingTasksList ->
                 when {
                     manualError != null -> UiStateNew.Error(manualError)
                     draft != null -> {
                         UiStateNew.Success(
-                            tasks = draft.tasks.map { task ->
+                            draftTasks = draft.tasks.map { task ->
                                 TaskUI(
                                     id = task.id,
                                     name = task.name,
@@ -57,7 +62,7 @@ class CreateTrainTasksViewModel @Inject constructor(
                                         },
                                     description = task.description,
                                     variation = task.variation,
-                                    duration = "0"
+                                    duration = "0" // TODO the duration of the task, but for now we keep it like this
                                 )
                             },
                             listOfConcept = conceptsRepository.getListOfConcepts(draft.concepts)
@@ -67,6 +72,22 @@ class CreateTrainTasksViewModel @Inject constructor(
                                         conceptName = concept.name,
                                     )
                                 },
+                            existingTasks = existingTasksList.map { existingTask ->
+                                TaskUI(
+                                    id = existingTask.trainingTaskId.toString(),
+                                    name = existingTask.name,
+                                    concepts = conceptsRepository.getListOfConcepts(existingTask.concepts)
+                                        .map {
+                                            Concept(
+                                                id = it.id,
+                                                conceptName = it.name,
+                                            )
+                                        },
+                                    description = existingTask.description,
+                                    variation = existingTask.variables.toString(),
+                                    duration = "0" // TODO
+                                )
+                            }
                         )
                     }
 
@@ -123,6 +144,27 @@ class CreateTrainTasksViewModel @Inject constructor(
         }
     }
 
+    fun onTaskSelected(task: TaskUI) {
+        val id = _draftId.value ?: return
+        if (task.name.isBlank()) return
+
+        viewModelScope.launch {
+            try {
+                val newTask = Task(
+                    id = task.id,
+                    name = task.name.trim(),
+                    concepts = task.concepts.map { it.id },
+                    description = task.description.trim(),
+                    variation = task.variation,
+                )
+                draftRepository.addTask(id, newTask)
+            } catch (e: Exception) {
+                _manualError.value = "Error al añadir tarea"
+            }
+        }
+
+    }
+
     /**
      * Reorder tasks by updating the whole list in the repository.
      *  // TODO adjust how to change the order in the repository
@@ -132,7 +174,7 @@ class CreateTrainTasksViewModel @Inject constructor(
         val id = _draftId.value ?: return
 
         if (currentState is UiStateNew.Success) {
-            val currentTasks = currentState.tasks.toMutableList()
+            val currentTasks = currentState.draftTasks.toMutableList()
             if (from !in currentTasks.indices || to !in currentTasks.indices) return
 
             val movedTask = currentTasks.removeAt(from)
@@ -157,7 +199,7 @@ class CreateTrainTasksViewModel @Inject constructor(
                         variation = taskUI.variation
                     )
                 }
-                    draftRepository.updateTasksList(id, domainTasks)
+                draftRepository.updateTasksList(id, domainTasks)
             } catch (e: Exception) {
                 _manualError.value = "Error al guardar orden"
             }
@@ -183,7 +225,12 @@ class CreateTrainTasksViewModel @Inject constructor(
     }
 
     sealed interface UiStateNew {
-        data class Success(val tasks: List<TaskUI>, val listOfConcept: List<Concept>) : UiStateNew
+        data class Success(
+            val draftTasks: List<TaskUI>,
+            val listOfConcept: List<Concept>,
+            val existingTasks: List<TaskUI>
+        ) : UiStateNew
+
         data class Error(val message: String) : UiStateNew
         data object Loading : UiStateNew
     }
