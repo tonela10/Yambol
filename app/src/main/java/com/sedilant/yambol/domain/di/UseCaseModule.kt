@@ -14,6 +14,8 @@ import com.sedilant.yambol.domain.UpdateTeamObjectiveUseCaseImpl
 import com.sedilant.yambol.domain.UpdateTeamUseCase
 import com.sedilant.yambol.domain.delete.DeletePlayerUseCase
 import com.sedilant.yambol.domain.delete.DeletePlayerUseCaseImpl
+import com.sedilant.yambol.domain.get.GetAllTaskUseCase
+import com.sedilant.yambol.domain.get.GetAllTasksUseCaseImpl
 import com.sedilant.yambol.domain.get.GetAllTrainsByTeamIdUseCase
 import com.sedilant.yambol.domain.get.GetAllTrainsByTeamIdUseCaseImpl
 import com.sedilant.yambol.domain.get.GetLastTrainOfTeamUseCase
@@ -108,4 +110,7 @@ abstract class UseCaseModule {
 
     @Binds
     abstract fun bindDeletePlayerUseCase(impl: DeletePlayerUseCaseImpl): DeletePlayerUseCase
+
+    @Binds
+    abstract fun bindGetAllTasksUseCase(impl: GetAllTasksUseCaseImpl): GetAllTaskUseCase
 }

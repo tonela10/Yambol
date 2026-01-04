@@ -21,10 +21,10 @@ import java.util.UUID
 data class TrainingTaskEntity(
     @PrimaryKey
     val id: String = UUID.randomUUID().toString(),
-    val trainingId: String, // FK hacia training_drafts
+    val trainingId: String, // FK
     val name: String,
-    val concepts: String, // Lista serializada como "concepto1,concepto2,concepto3"
+    val conceptIds: List<Long>,
     val description: String,
-    val variation: String, // Asumo que "var" es "variation"
-    val orderIndex: Int = 0 // Para mantener el orden de las tareas
+    val variation: String,
+    val orderIndex: Int = 0
 )

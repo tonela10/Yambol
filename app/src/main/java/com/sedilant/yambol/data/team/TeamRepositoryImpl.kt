@@ -71,4 +71,8 @@ class TeamRepositoryImpl @Inject constructor(
     override suspend fun getLastTrainWithTrainTaskByTeamId(teamId: Long): Long {
         return trainingDao.getLastTrainWithTrainTaskByTeamId(teamId)
     }
+
+    override fun getAllTasks(): Flow<List<TaskEntity>> {
+        return trainingDao.getAllTasks()
+    }
 }

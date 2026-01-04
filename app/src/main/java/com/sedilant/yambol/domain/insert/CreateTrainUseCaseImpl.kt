@@ -8,7 +8,7 @@ import javax.inject.Inject
 class CreateTrainUseCaseImpl @Inject constructor(
     private val teamRepository: TeamRepository
 ) : CreateTrainUseCase {
-    override suspend fun invoke(date: Date, time: Float, concepts: List<String>, teamId: Long): Long {
+    override suspend fun invoke(date: Date, time: Float, concepts: List<Long>, teamId: Long): Long {
         return teamRepository.insertTrain(
             TrainEntity(
                 date = date.time,

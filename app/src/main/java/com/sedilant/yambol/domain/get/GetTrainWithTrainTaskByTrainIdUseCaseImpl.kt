@@ -16,7 +16,7 @@ class GetTrainWithTrainTaskByTrainIdUseCaseImpl @Inject constructor(
             trainId = it.train.id,
             date = Date(it.train.date),
             time = it.train.time,
-            concepts = it.train.concepts,
+            conceptIds = it.train.concepts,
             teamId = it.train.teamId,
             trains = it.tasks.map { it.mapToDomain() }
         )

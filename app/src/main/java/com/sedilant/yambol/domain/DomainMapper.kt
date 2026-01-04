@@ -4,7 +4,7 @@ import com.sedilant.yambol.data.team.TaskEntity
 import com.sedilant.yambol.data.team.TeamEntity
 import com.sedilant.yambol.data.team.player.PlayerEntity
 import com.sedilant.yambol.domain.models.TeamDomainModel
-import com.sedilant.yambol.domain.models.TrainTaskDomainModel
+import com.sedilant.yambol.domain.models.TaskDomain
 import com.sedilant.yambol.ui.home.models.PlayerUiModel
 
 fun TeamEntity.mapToDomain(): TeamDomainModel {
@@ -33,11 +33,11 @@ fun PlayerUiModel.mapToEntity(): PlayerEntity {
 }
 
 
-fun TaskEntity.mapToDomain(): TrainTaskDomainModel {
-    return TrainTaskDomainModel(
+fun TaskEntity.mapToDomain(): TaskDomain {
+    return TaskDomain(
         trainingTaskId = id,
         name = name,
-        concept = concept,
+        concepts = conceptsId,
         description = description,
         variables = variables,
     )

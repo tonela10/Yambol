@@ -1,8 +1,5 @@
 package com.sedilant.yambol.ui.createTrain.stepsScreens.basicInfo
 
-import android.annotation.SuppressLint
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,93 +10,85 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material.icons.rounded.AccessTimeFilled
+import androidx.compose.material.icons.rounded.CalendarMonth
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TimePicker
+import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.sedilant.yambol.domain.models.TeamDomainModel
 import com.sedilant.yambol.ui.createTrain.commonComposables.CreateTrainScaffold
 import com.sedilant.yambol.ui.createTrain.commonComposables.TeamSelectionDropdown
-import com.sedilant.yambol.ui.createTrain.commonComposables.TimeWheelPicker
-import java.time.LocalDate
-import java.time.YearMonth
-import java.time.format.TextStyle
-import java.util.Calendar
+import com.sedilant.yambol.ui.theme.YambolTheme
+import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 @Composable
-public fun CreateTrainBasicInfoScreen(
+fun CreateTrainBasicInfoScreen(
     onClose: () -> Unit,
     onNext: () -> Unit,
-    viewModel: CreateTrainBasicInfoViewModel = hiltViewModel()
-) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    uiState.error?.let { error ->
-        LaunchedEffect(error) {
-            // TODO here we can show a snackBar or something
-            viewModel.clearError()
+    teamId: Long,
+    viewModel: CreateTrainBasicInfoViewModel = hiltViewModel(
+        creationCallback = { factory: CreateTrainBasicInfoViewModelFactory ->
+            factory.create(teamId = teamId)
         }
-    }
+    )
+) {
+
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     CreateTrainBasicInfoScreenStateless(
         onClose = onClose,
         onNext = {
-            viewModel.saveStepData() // Guardar antes de avanzar
+            viewModel.saveStepData()
             onNext()
         },
         uiState = uiState,
         onTeamSelected = viewModel::onTeamSelected,
         onDateSelected = viewModel::onDateSelected,
-        onTimeChange = viewModel::onTimeChanged,
-        onDurationChange = viewModel::onDurationChanged
+        onStartTimeChanged = viewModel::onStartTimeChanged,
+        onEndTimeChanged = viewModel::onEndTimeChanged
     )
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun CreateTrainBasicInfoScreenStateless(
+    uiState: CreateTrainBasicInfoViewModel.UiStateNew,
     onClose: () -> Unit,
     onNext: () -> Unit,
-    uiState: CreateTrainBasicInfoViewModel.UiState,
-    onTeamSelected: (String) -> Unit,
+    onTeamSelected: (Long) -> Unit,
     onDateSelected: (Date) -> Unit,
-    onTimeChange: (Int, Int) -> Unit,
-    onDurationChange: (Int, Int) -> Unit
+    onStartTimeChanged: (Int, Int) -> Unit,
+    onEndTimeChanged: (Int, Int) -> Unit
 ) {
-    // Convertir Float a horas y minutos para la UI
-    val selectedHours = uiState.selectedHour.toInt()
-    val selectedMinutes = ((uiState.selectedHour - selectedHours) * 60).toInt()
-
-    val durationHours = (uiState.selectedDuration / 60).toInt()
-    val durationMinutes = (uiState.selectedDuration % 60).toInt()
-
     CreateTrainScaffold(
         title = "Nuevo entrenamiento",
         onCloseClick = onClose,
@@ -113,326 +102,249 @@ private fun CreateTrainBasicInfoScreenStateless(
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState()),
         ) {
-            // Loading indicator
-            if (uiState.isLoading) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
+            when (uiState) {
+                is CreateTrainBasicInfoViewModel.UiStateNew.Error -> {
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text(text = uiState.message, color = MaterialTheme.colorScheme.error)
+                    }
+                }
+
+                CreateTrainBasicInfoViewModel.UiStateNew.Loading -> {
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .padding(32.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        LoadingIndicator()
+                    }
+                }
+
+                is CreateTrainBasicInfoViewModel.UiStateNew.Success -> {
+                    SuccessState(
+                        selectedDate = uiState.selectedDate,
+                        startHourFloat = uiState.startHour,
+                        endHourFloat = uiState.endHour,
+                        onDateSelected = onDateSelected,
+                        onStartTimeChanged = onStartTimeChanged,
+                        onEndTimeChanged = onEndTimeChanged
+                    )
+
+                    Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                        Text("¿Qué equipo entrena?", style = MaterialTheme.typography.titleMedium)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        TeamSelectionDropdown(
+                            teams = uiState.teamsList,
+                            selectedTeamId = uiState.selectedTeamId,
+                            onTeamSelected = onTeamSelected
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
             }
-
-            // Date Section
-            Text(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                text = "Fecha",
-                color = MaterialTheme.colorScheme.primary,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-            )
-
-            // Calendar
-            DateSelector(
-                selectedDate = uiState.selectedDate,
-                onDateSelected = onDateSelected
-            )
-
-            // Time and Duration Section
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalAlignment = Alignment.Top
-            ) {
-                // Hour
-                TimeSelector(
-                    title = "Hora",
-                    modifier = Modifier.weight(1f),
-                    selectedHour = selectedHours,
-                    selectedMinute = selectedMinutes,
-                    onTimeChange = onTimeChange
-                )
-
-                // Duration
-                TimeSelector(
-                    title = "Duración",
-                    modifier = Modifier.weight(1f),
-                    selectedHour = durationHours,
-                    selectedMinute = durationMinutes,
-                    onTimeChange = onDurationChange
-                )
-            }
-
-            // Team Selection
-            TeamSelectionDropdown(
-                teams = listOf(),
-                selectedTeamId = 0,
-                onTeamSelected = {}
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TimeSelector(
-    title: String,
-    modifier: Modifier = Modifier,
-    selectedHour: Int,
-    selectedMinute: Int,
-    onTimeChange: (Int, Int) -> Unit
-) {
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = title,
-            color = MaterialTheme.colorScheme.primary,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-
-        TimeWheelPicker(
-            selectedHour = selectedHour,
-            selectedMinute = selectedMinute,
-            onTimeChange = onTimeChange
-        )
-    }
-}
-
-
-@SuppressLint("NewApi")
-@Composable
-fun DateSelector(
+private fun SuccessState(
     selectedDate: Date,
-    onDateSelected: (Date) -> Unit
+    startHourFloat: Float,
+    endHourFloat: Float,
+    onDateSelected: (Date) -> Unit,
+    onStartTimeChanged: (Int, Int) -> Unit,
+    onEndTimeChanged: (Int, Int) -> Unit
 ) {
-    // Convertir Date a LocalDate para trabajar con YearMonth
-    val calendar = Calendar.getInstance().apply { time = selectedDate }
-    val selectedLocalDate = LocalDate.of(
-        calendar.get(Calendar.YEAR),
-        calendar.get(Calendar.MONTH) + 1,
-        calendar.get(Calendar.DAY_OF_MONTH)
-    )
+    var showDatePicker by remember { mutableStateOf(false) }
+    var showStartTimePicker by remember { mutableStateOf(false) }
+    var showEndTimePicker by remember { mutableStateOf(false) }
 
-    var currentMonth by remember(selectedLocalDate) {
-        mutableStateOf(YearMonth.from(selectedLocalDate))
+    // Converters for Display
+    val dateFormatter = remember { SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()) }
+
+    fun floatToTimeString(value: Float): String {
+        val h = value.toInt()
+        val m = ((value - h) * 60).toInt()
+        return "%02d:%02d".format(h, m)
     }
+
+    // Picker States
+    val datePickerState = rememberDatePickerState(initialSelectedDateMillis = selectedDate.time)
+
+    val startH = startHourFloat.toInt()
+    val startM = ((startHourFloat - startH) * 60).toInt()
+    val startTimeState =
+        rememberTimePickerState(initialHour = startH, initialMinute = startM, is24Hour = true)
+
+    val endH = endHourFloat.toInt()
+    val endM = ((endHourFloat - endH) * 60).toInt()
+    val endTimeState =
+        rememberTimePickerState(initialHour = endH, initialMinute = endM, is24Hour = true)
 
     Column(
         modifier = Modifier
-            .fillMaxWidth()
             .padding(16.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .background(MaterialTheme.colorScheme.primaryContainer)
-            .padding(16.dp)
+            .fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        // Month Navigation Header
-        Row(
+        Text("Detalles del entrenamiento", style = MaterialTheme.typography.titleMedium)
+
+        // Date Field
+        OutlinedTextField(
+            value = dateFormatter.format(selectedDate),
+            onValueChange = {},
+            label = { Text("Fecha") },
+            readOnly = true,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = { currentMonth = currentMonth.minusMonths(1) }) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                    contentDescription = "Mes anterior",
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            }
+                .clickable { showDatePicker = true },
+            enabled = false,
+            colors = OutlinedTextFieldDefaults.colors(
+                disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                disabledBorderColor = MaterialTheme.colorScheme.outline,
+                disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                disabledTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant
+            ),
+            trailingIcon = { Icon(Icons.Rounded.CalendarMonth, null) }
+        )
 
-            Text(
-                text = "${
-                    currentMonth.month.getDisplayName(TextStyle.FULL, Locale("es", "ES"))
-                        .replaceFirstChar {
-                            if (it.isLowerCase()) it.titlecase(Locale("es", "ES"))
-                            else it.toString()
-                        }
-                } ${currentMonth.year}",
-                color = MaterialTheme.colorScheme.primary,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            // Start Time Field
+            OutlinedTextField(
+                value = floatToTimeString(startHourFloat),
+                onValueChange = {},
+                label = { Text("Inicio") },
+                readOnly = true,
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable { showStartTimePicker = true },
+                enabled = false,
+                colors = OutlinedTextFieldDefaults.colors(
+                    disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                    disabledBorderColor = MaterialTheme.colorScheme.outline,
+                    disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    disabledTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant
+                ),
+                trailingIcon = { Icon(Icons.Rounded.AccessTimeFilled, null) }
             )
 
-            IconButton(onClick = { currentMonth = currentMonth.plusMonths(1) }) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                    contentDescription = "Mes siguiente",
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            }
-        }
-
-        // Days of week header
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            listOf("D", "L", "M", "X", "J", "V", "S").forEach { day ->
-                Text(
-                    text = day,
-                    color = MaterialTheme.colorScheme.secondary,
-                    fontSize = 12.sp,
-                    modifier = Modifier.weight(1f),
-                    textAlign = TextAlign.Center
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Calendar Grid
-        CalendarGrid(
-            yearMonth = currentMonth,
-            selectedDate = selectedLocalDate,
-            onDaySelected = { day ->
-                // Convertir el día seleccionado a Date
-                val newDate = currentMonth.atDay(day)
-                val newCalendar = Calendar.getInstance().apply {
-                    set(Calendar.YEAR, newDate.year)
-                    set(Calendar.MONTH, newDate.monthValue - 1)
-                    set(Calendar.DAY_OF_MONTH, newDate.dayOfMonth)
-                    // Mantener la hora actual
-                    set(Calendar.HOUR_OF_DAY, calendar.get(Calendar.HOUR_OF_DAY))
-                    set(Calendar.MINUTE, calendar.get(Calendar.MINUTE))
-                    set(Calendar.SECOND, 0)
-                    set(Calendar.MILLISECOND, 0)
-                }
-                onDateSelected(newCalendar.time)
-            },
-            primaryBlue = MaterialTheme.colorScheme.primary,
-            textSecondary = MaterialTheme.colorScheme.secondary
-        )
-    }
-}
-
-@SuppressLint("NewApi")
-@Composable
-fun CalendarGrid(
-    yearMonth: YearMonth,
-    selectedDate: LocalDate,
-    onDaySelected: (Int) -> Unit,
-    primaryBlue: Color,
-    textSecondary: Color
-) {
-    val firstDayOfMonth = yearMonth.atDay(1)
-    val daysInMonth = yearMonth.lengthOfMonth()
-    val firstDayOfWeek = firstDayOfMonth.dayOfWeek.value % 7
-
-    // Verificar si la fecha seleccionada está en el mes actual
-    val selectedDay = if (selectedDate.year == yearMonth.year &&
-        selectedDate.month == yearMonth.month) {
-        selectedDate.dayOfMonth
-    } else {
-        null
-    }
-
-    val today = LocalDate.now()
-    val isCurrentMonth = yearMonth.year == today.year && yearMonth.month == today.month
-
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(7),
-        modifier = Modifier.height(250.dp),
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
-    ) {
-        // Empty cells before first day
-        items(firstDayOfWeek) {
-            Spacer(modifier = Modifier.size(40.dp))
-        }
-
-        // Days of month
-        items(daysInMonth) { index ->
-            val day = index + 1
-            val isSelected = day == selectedDay
-            val isToday = isCurrentMonth && day == today.dayOfMonth
-
-            Box(
+            // End Time Field
+            OutlinedTextField(
+                value = floatToTimeString(endHourFloat),
+                onValueChange = {},
+                label = { Text("Fin") },
+                readOnly = true,
                 modifier = Modifier
-                    .size(40.dp)
-                    .clip(CircleShape)
-                    .background(
-                        when {
-                            isSelected -> primaryBlue
-                            isToday -> primaryBlue.copy(alpha = 0.2f)
-                            else -> Color.Transparent
-                        }
-                    )
-                    .border(
-                        width = if (isToday && !isSelected) 1.dp else 0.dp,
-                        color = if (isToday && !isSelected) primaryBlue else Color.Transparent,
-                        shape = CircleShape
-                    )
-                    .clickable { onDaySelected(day) },
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = day.toString(),
-                    color = when {
-                        isSelected -> Color.White
-                        isToday -> primaryBlue
-                        else -> textSecondary
-                    },
-                    fontWeight = when {
-                        isSelected || isToday -> FontWeight.Bold
-                        else -> FontWeight.Normal
-                    }
-                )
-            }
+                    .weight(1f)
+                    .clickable { showEndTimePicker = true },
+                enabled = false,
+                colors = OutlinedTextFieldDefaults.colors(
+                    disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                    disabledBorderColor = MaterialTheme.colorScheme.outline,
+                    disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    disabledTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant
+                ),
+                trailingIcon = { Icon(Icons.Rounded.AccessTimeFilled, null) }
+            )
         }
+    }
+
+    // --- Dialog Logic ---
+    if (showDatePicker) {
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    datePickerState.selectedDateMillis?.let { onDateSelected(Date(it)) }
+                    showDatePicker = false
+                }) { Text("OK") }
+            }
+        ) { DatePicker(state = datePickerState) }
+    }
+
+    if (showStartTimePicker) {
+        TimePickerDialog(
+            onDismissRequest = { showStartTimePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    onStartTimeChanged(startTimeState.hour, startTimeState.minute)
+                    showStartTimePicker = false
+                }) { Text("OK") }
+            }
+        ) { TimePicker(state = startTimeState) }
+    }
+
+    if (showEndTimePicker) {
+        TimePickerDialog(
+            onDismissRequest = { showEndTimePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    onEndTimeChanged(endTimeState.hour, endTimeState.minute)
+                    showEndTimePicker = false
+                }) { Text("OK") }
+            }
+        ) { TimePicker(state = endTimeState) }
     }
 }
 
-/**
- * Extension para convertir Date a LocalDate de forma segura
- */
-@SuppressLint("NewApi")
-fun Date.toLocalDate(): LocalDate {
-    val calendar = Calendar.getInstance().apply { time = this@toLocalDate }
-    return LocalDate.of(
-        calendar.get(Calendar.YEAR),
-        calendar.get(Calendar.MONTH) + 1,
-        calendar.get(Calendar.DAY_OF_MONTH)
+@Composable
+fun TimePickerDialog(
+    onDismissRequest: () -> Unit,
+    confirmButton: @Composable () -> Unit,
+    content: @Composable () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismissRequest,
+        confirmButton = confirmButton,
+        text = { content() }
     )
-}
-
-/**
- * Extension para convertir LocalDate a Date
- */
-@SuppressLint("NewApi")
-fun LocalDate.toDate(): Date {
-    return Calendar.getInstance().apply {
-        set(Calendar.YEAR, this@toDate.year)
-        set(Calendar.MONTH, this@toDate.monthValue - 1)
-        set(Calendar.DAY_OF_MONTH, this@toDate.dayOfMonth)
-        set(Calendar.HOUR_OF_DAY, 0)
-        set(Calendar.MINUTE, 0)
-        set(Calendar.SECOND, 0)
-        set(Calendar.MILLISECOND, 0)
-    }.time
 }
 
 @Preview(showBackground = true)
 @Composable
 fun BasicInfoScreenPreview() {
     MaterialTheme {
-        CreateTrainBasicInfoScreenStateless(
-            onClose = {},
-            onNext = {},
-            uiState = CreateTrainBasicInfoViewModel.UiState(),
-            onTeamSelected = {},
-            onTimeChange = { _, _ -> },
-            onDurationChange = { _, _ -> },
-            onDateSelected = {}
-        )
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            CreateTrainBasicInfoScreenStateless(
+                onClose = {},
+                onNext = {},
+                uiState = CreateTrainBasicInfoViewModel.UiStateNew.Success(
+                    teamsList = listOf(TeamDomainModel(1, "Cachos"), TeamDomainModel(2, "Cachos2")),
+                    selectedTeamId = 1,
+                    selectedDate = Date(), // Current Date
+                    startHour = 17.5f,    // 17:30
+                    endHour = 19.0f       // 19:00
+                ),
+                onTeamSelected = {},
+                onStartTimeChanged = { _, _ -> },
+                onEndTimeChanged = { _, _ -> },
+                onDateSelected = {}
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, device = "spec:width=411dp,height=891dp")
+@Composable
+private fun SuccessStatePreview() {
+    YambolTheme() {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            SuccessState(
+                selectedDate = Date(),
+                startHourFloat = 17.5f,
+                endHourFloat = 18.5f,
+                onDateSelected = {},
+                onStartTimeChanged = { _, _ -> },
+                onEndTimeChanged = { _, _ -> }
+            )
+        }
     }
 }

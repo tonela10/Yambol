@@ -10,7 +10,7 @@ data class TaskEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val name: String,
-    val concept: String, // TODO check if list is needed
+    val conceptsId: List<Long>, // TODO check if list is needed
     val description: String,
     val corrections: String?,
     val variables: List<String>?,

@@ -24,4 +24,5 @@ interface TeamRepository {
     suspend fun insertTrainTask(trainTaskEntity: TaskEntity): Long
     suspend fun insertTrainCrossTrainTask(trainCrossTrainTaskEntity: TrainCrossTrainTaskEntity)
     suspend fun getLastTrainWithTrainTaskByTeamId(teamId: Long): Long?
+    fun getAllTasks(): Flow<List<TaskEntity>>
 }

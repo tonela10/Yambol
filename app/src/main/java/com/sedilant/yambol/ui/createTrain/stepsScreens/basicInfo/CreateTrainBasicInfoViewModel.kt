@@ -4,23 +4,34 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sedilant.yambol.data.draftTrain.TrainingDraftRepository
+import com.sedilant.yambol.domain.get.GetTeamsUseCase
+import com.sedilant.yambol.domain.models.TeamDomainModel
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import java.util.Calendar
 import java.util.Date
-import javax.inject.Inject
 
-@HiltViewModel
-class CreateTrainBasicInfoViewModel @Inject constructor(
+/*
+    TODO it is not recovering well the endTime
+ */
+
+@HiltViewModel(assistedFactory = CreateTrainBasicInfoViewModelFactory::class)
+class CreateTrainBasicInfoViewModel @AssistedInject constructor(
+    @Assisted private val teamId: Long,
     private val repository: TrainingDraftRepository,
-    private val savedStateHandle: SavedStateHandle
+    private val getAllTeamsUseCase: GetTeamsUseCase,
+    private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(UiState())
-    public val uiState: StateFlow<UiState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow<UiStateNew>(UiStateNew.Loading)
+    public val uiState: StateFlow<UiStateNew> = _uiState.asStateFlow()
 
     private var draftId: String?
         get() = savedStateHandle.get<String>(KEY_DRAFT_ID)
@@ -37,97 +48,94 @@ class CreateTrainBasicInfoViewModel @Inject constructor(
      */
     private fun loadOrCreateActiveDraft() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
+            _uiState.value = UiStateNew.Loading
 
             try {
+                val teamList = getAllTeamsUseCase().first()
                 val id = repository.getOrCreateActiveDraft()
                 draftId = id
 
                 val draft = repository.getDraft(id)
                 if (draft != null) {
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            selectedDate = draft.date,
-                            selectedHour = draft.hour,
-                            selectedDuration = draft.duration
-                        )
-                    }
+                    _uiState.value = UiStateNew.Success(
+                        selectedDate = draft.date,
+                        startHour = draft.startTime,
+                        endHour = draft.startTime + (draft.endTime / 60f), // change duration from endHour
+                        teamsList = teamList,
+                        selectedTeamId = teamId
+                    )
                 } else {
-                    _uiState.update { it.copy(isLoading = false) }
-                }
-            } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        error = "Error al cargar el borrador: ${e.message}"
+                    _uiState.value = UiStateNew.Success(
+                        selectedDate = Date(),
+                        teamsList = teamList,
+                        selectedTeamId = teamId,
+                        startHour = getCurrentHourAsFloat(),
+                        endHour = getCurrentHourAsFloat() + 1f,
                     )
                 }
+            } catch (e: Exception) {
+                _uiState.value = UiStateNew.Error("Error al cargar el borrador: ${e.message}")
             }
         }
     }
 
-    /**
-     * Actualiza la fecha seleccionada
-     */
-    public fun onDateSelected(date: Date) {
-        _uiState.update { it.copy(selectedDate = date) }
-        saveDateToRepository(date)
+    fun onDateSelected(date: Date) {
+        val currentState = _uiState.value
+        if (currentState is UiStateNew.Success) {
+            _uiState.value = currentState.copy(selectedDate = date)
+            saveDateToRepository(date)
+        }
     }
 
-    /**
-     * Actualiza la hora seleccionada
-     */
-    public fun onTimeChanged(hour: Int, minute: Int) {
+    fun onStartTimeChanged(hour: Int, minute: Int) {
         val hourAsFloat = hour + (minute / 60f)
-        _uiState.update { it.copy(selectedHour = hourAsFloat) }
-        saveTimeToRepository(hourAsFloat)
+        val currentState = _uiState.value
+        if (currentState is UiStateNew.Success) {
+            _uiState.value = currentState.copy(startHour = hourAsFloat)
+            saveTimeToRepository(hourAsFloat)
+        }
     }
 
-    /**
-     * Actualiza la duración seleccionada
-     */
-    public fun onDurationChanged(hour: Int, minute: Int) {
-        val durationInMinutes = (hour * 60) + minute
-        _uiState.update { it.copy(selectedDuration = durationInMinutes.toFloat()) }
-        saveDurationToRepository(durationInMinutes.toFloat())
+    fun onEndTimeChanged(hour: Int, minute: Int) {
+        val hourAsFloat = hour + (minute / 60f)
+        val currentState = _uiState.value
+        if (currentState is UiStateNew.Success) {
+            _uiState.value = currentState.copy(endHour = hourAsFloat)
+            saveDurationToRepository(hourAsFloat)
+        }
     }
 
     /**
      * Actualiza el equipo seleccionado
      */
-    public fun onTeamSelected(team: String) {
-        _uiState.update { it.copy(selectedTeam = team) }
-        // El team se puede guardar como concepto o en otro campo según tu modelo
+    fun onTeamSelected(teamId: Long) {
+        val currentState = _uiState.value
+        if (currentState is UiStateNew.Success) {
+            _uiState.value = currentState.copy(selectedTeamId = teamId)
+        }
     }
 
     /**
      * Guarda todos los datos del paso actual antes de avanzar
      */
-    public fun saveStepData() {
+    fun saveStepData() {
         val id = draftId ?: return
-
-        viewModelScope.launch {
-            try {
-                repository.updateTrainingData(
-                    id = id,
-                    date = _uiState.value.selectedDate,
-                    hour = _uiState.value.selectedHour,
-                    duration = _uiState.value.selectedDuration
-                )
-            } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(error = "Error al guardar: ${e.message}")
+        val currentState = _uiState.value
+        if (currentState is UiStateNew.Success) {
+            viewModelScope.launch {
+                try {
+                    repository.updateTrainingData(
+                        id = id,
+                        date = currentState.selectedDate,
+                        startTime = currentState.startHour,
+                        endTime = currentState.endHour,
+                        teamId = currentState.selectedTeamId
+                    )
+                } catch (e: Exception) {
+                    _uiState.value = UiStateNew.Error("Error al guardar: ${e.message}")
                 }
             }
         }
-    }
-
-    /**
-     * Limpia el error mostrado
-     */
-    public fun clearError() {
-        _uiState.update { it.copy(error = null) }
     }
 
     // Private methods
@@ -142,7 +150,7 @@ class CreateTrainBasicInfoViewModel @Inject constructor(
                     date = date
                 )
             } catch (e: Exception) {
-                // Log error silently
+                // TODO Log error not silently
             }
         }
     }
@@ -154,10 +162,10 @@ class CreateTrainBasicInfoViewModel @Inject constructor(
             try {
                 repository.updateTrainingData(
                     id = id,
-                    hour = hour
+                    startTime = hour
                 )
             } catch (e: Exception) {
-                // Log error silently
+                // TODO  Log error not silently
             }
         }
     }
@@ -169,32 +177,40 @@ class CreateTrainBasicInfoViewModel @Inject constructor(
             try {
                 repository.updateTrainingData(
                     id = id,
-                    duration = duration
+                    endTime = duration
                 )
             } catch (e: Exception) {
-                // Log error silently
+                //TODO Log error not silently
             }
         }
     }
 
     private fun getCurrentHourAsFloat(): Float {
-        val calendar = java.util.Calendar.getInstance()
-        val hour = calendar.get(java.util.Calendar.HOUR_OF_DAY)
-        val minute = calendar.get(java.util.Calendar.MINUTE)
+        val calendar = Calendar.getInstance()
+        val hour = calendar.get(Calendar.HOUR_OF_DAY)
+        val minute = calendar.get(Calendar.MINUTE)
         return hour + (minute / 60f)
     }
 
-    data class UiState(
-        val isLoading: Boolean = true,
-        val error: String? = null,
-        val teamsList: List<String> = emptyList(),
-        val selectedTeam: String = "",
-        val selectedDate: Date = Date(),
-        val selectedHour: Float = 0f, // Hora en formato decimal (ej: 17.5 = 17:30)
-        val selectedDuration: Float = 90f // Duración en minutos
-    )
+    sealed interface UiStateNew {
+        data object Loading : UiStateNew
+        data class Error(val message: String) : UiStateNew
+        data class Success(
+            val teamsList: List<TeamDomainModel>,
+            val selectedTeamId: Long,
+            val selectedDate: Date = Date(),
+            val startHour: Float,
+            val endHour: Float,
+        ) : UiStateNew
+    }
+
 
     companion object {
         private const val KEY_DRAFT_ID = "draft_id"
     }
+}
+
+@AssistedFactory
+interface CreateTrainBasicInfoViewModelFactory {
+    fun create(teamId: Long): CreateTrainBasicInfoViewModel
 }

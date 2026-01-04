@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
 import com.sedilant.yambol.data.queries.TrainWithTrainTask
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TrainingDao {
@@ -18,6 +19,9 @@ interface TrainingDao {
 
     @Query("SELECT id FROM train WHERE teamId = :teamId ORDER BY id DESC LIMIT 1")
     suspend fun getLastTrainWithTrainTaskByTeamId(teamId: Long): Long
+
+    @Query("SELECT * FROM train_task")
+    fun getAllTasks(): Flow<List<TaskEntity>>
 
     @Insert
     suspend fun insertTrain(trainEntity: TrainEntity): Long

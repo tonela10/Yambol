@@ -36,7 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sedilant.yambol.R
 import com.sedilant.yambol.domain.models.TrainDomainModel
-import com.sedilant.yambol.domain.models.TrainTaskDomainModel
+import com.sedilant.yambol.domain.models.TaskDomain
 import com.sedilant.yambol.ui.theme.YambolTheme
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -116,7 +116,7 @@ fun TrainingDetailsScreenStateless(
                         TrainingInfoCard(
                             date = formatDate(uiState.train.date),
                             time = formatDuration(uiState.train.time),
-                            concepts = uiState.train.concepts
+                            concepts = emptyList() // TODO uiState.train.concepts
                         )
                     }
                     item {
@@ -228,7 +228,7 @@ fun TrainingInfoCard(
 }
 
 @Composable
-fun TaskCard(task: TrainTaskDomainModel) {
+fun TaskCard(task: TaskDomain) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
@@ -255,7 +255,7 @@ fun TaskCard(task: TrainTaskDomainModel) {
                     shape = MaterialTheme.shapes.small
                 ) {
                     Text(
-                        text = task.concept,
+                        text = "test", // task.concepts,
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onPrimaryContainer,
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
@@ -361,21 +361,21 @@ private fun TrainingDetailsScreenPreview() {
                     id = 1,
                     date = Date(),
                     time = 1.5f,
-                    concepts = listOf("Dribbling", "Shooting", "Defense"),
+                    concepts = emptyList(),
                     teamId = 1
                 ),
                 taskList = listOf(
-                    TrainTaskDomainModel(
+                    TaskDomain(
                         trainingTaskId = 1,
                         name = "Ball Control Drill",
-                        concept = "Dribbling",
+                        concepts = listOf(),  //"Dribbling",
                         description = "Practice dribbling through cones with both feet, focusing on close ball control and quick direction changes.",
                         variables = listOf("Speed", "Distance", "Cone spacing")
                     ),
-                    TrainTaskDomainModel(
+                    TaskDomain(
                         trainingTaskId = 2,
                         name = "Shooting Practice",
-                        concept = "Shooting",
+                        concepts = listOf(),  //"Dribbling",
                         description = "Target practice from various angles and distances to improve accuracy and power.",
                         variables = listOf("Distance", "Angle", "Target zones")
                     )
@@ -396,7 +396,7 @@ private fun TrainingDetailsScreenEmptyPreview() {
                     id = 1,
                     date = Date(),
                     time = 1f,
-                    concepts = listOf("Basic Skills"),
+                    concepts = emptyList(),
                     teamId = 1
                 ),
                 taskList = emptyList()

@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sedilant.yambol.ui.createTrain.commonComposables.CreateTrainScaffold
+import com.sedilant.yambol.ui.createTrain.stepsScreens.concepts.Concept
 import com.sedilant.yambol.ui.createTrain.stepsScreens.tasks.TaskUI
 
 @Composable
@@ -203,7 +204,7 @@ private fun TaskItemDetail(task: TaskUI) {
             if (task.concepts.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = task.concepts.joinToString(", "),
+                    text = task.concepts.joinToString(", ") { it.conceptName },
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -301,7 +302,7 @@ private fun CreateTrainDetailsScreenPreview() {
                     name = "Sentadillas",
                     description = "3x12 con barra libre",
                     variation = "Con barra libre",
-                    concepts = listOf("Fuerza", "Piernas")
+                    concepts = listOf(Concept(1, "Sentadillas")),
                 )
             ),
             listOfConcepts = listOf("Tiro en suspensión", "Defensa individual")

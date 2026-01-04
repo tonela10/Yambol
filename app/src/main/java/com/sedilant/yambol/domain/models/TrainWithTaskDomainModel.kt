@@ -6,7 +6,7 @@ data class TrainWithTaskDomainModel(
     val trainId: Long,
     val date: Date,
     val time: Float,
-    val concepts: List<String>,
+    val conceptIds: List<Long>,
     val teamId: Long,
-    val trains: List<TrainTaskDomainModel>
+    val trains: List<TaskDomain>
 )

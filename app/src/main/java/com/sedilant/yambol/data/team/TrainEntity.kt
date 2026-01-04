@@ -14,6 +14,6 @@ data class TrainEntity(
     val id: Long = 0,
     val date: Long,
     val time: Float,
-    val concepts: List<String>,
+    val concepts: List<Long>,
     val teamId: Long
 )

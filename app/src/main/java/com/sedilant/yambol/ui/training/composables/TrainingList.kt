@@ -133,7 +133,7 @@ private fun TrainingItem(
                             fontWeight = FontWeight.Medium
                         )
 
-                        ConceptsRow(concepts = training.concepts)
+                        ConceptsRow(concepts = emptyList()) // TODO change with the new concepts management
                     }
                 }
             }
@@ -193,26 +193,21 @@ private fun TrainingListPreview() {
                 id = 1,
                 date = Date(),
                 time = 1.5f,
-                concepts = listOf(
-                    "Dribbling",
-                    "Ball handling",
-                    "Basic moves",
-                    "Footwork so fast that anyone can see"
-                ),
+                concepts = emptyList(),
                 teamId = 1
             ),
             TrainDomainModel(
                 id = 2,
                 date = Date(System.currentTimeMillis() + 86400000), // Tomorrow
                 time = 2f,
-                concepts = listOf("Shooting", "Free throws"),
+                concepts = emptyList(),
                 teamId = 1
             ),
             TrainDomainModel(
                 id = 3,
                 date = Date(System.currentTimeMillis() + 172800000), // Day after tomorrow
                 time = 1f,
-                concepts = listOf("Defense", "Man-to-man", "Zone defense"),
+                concepts = emptyList(),
                 teamId = 1
             )
         )

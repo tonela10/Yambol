@@ -2,84 +2,131 @@ package com.sedilant.yambol.ui.createTrain.stepsScreens.tasks
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sedilant.yambol.data.draftTrain.TrainingDraftRepository
 import com.sedilant.yambol.data.draftTrain.Task
+import com.sedilant.yambol.data.draftTrain.TrainingDraftRepository
+import com.sedilant.yambol.data.team.concept.ConceptRepository
+import com.sedilant.yambol.domain.get.GetAllTaskUseCase
+import com.sedilant.yambol.ui.createTrain.stepsScreens.concepts.Concept
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * This ViewModel is expose an ui state that have all existing tasks ( todo with the current concepts)
+ * create new tasks in and expose the draft task to the ui
+ */
 @HiltViewModel
+@OptIn(ExperimentalCoroutinesApi::class)
 class CreateTrainTasksViewModel @Inject constructor(
-    private val repository: TrainingDraftRepository
+    private val draftRepository: TrainingDraftRepository,
+    private val conceptsRepository: ConceptRepository,
+    private val getAllTaskUseCase: GetAllTaskUseCase
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(UiState())
-    val uiState: StateFlow<UiState> = _uiState.asStateFlow()
+    private val _draftId = MutableStateFlow<String?>(null)
 
-    private var draftId: String? = null
+    // Internal flow for transient errors (like failed network/db operations)
+    private val _manualError = MutableStateFlow<String?>(null)
+
+    val uiState: StateFlow<UiStateNew> = _draftId
+        .filterNotNull()
+        .flatMapLatest { id ->
+            combine(
+                draftRepository.observeDraft(id),
+                _manualError,
+                getAllTaskUseCase()
+            ) { draft, manualError, existingTasksList ->
+                when {
+                    manualError != null -> UiStateNew.Error(manualError)
+                    draft != null -> {
+                        UiStateNew.Success(
+                            draftTasks = draft.tasks.map { task ->
+                                TaskUI(
+                                    id = task.id,
+                                    name = task.name,
+                                    // Mapping IDs to names reactively
+                                    concepts = conceptsRepository.getListOfConcepts(task.concepts)
+                                        .map {
+                                            Concept(
+                                                id = it.id,
+                                                conceptName = it.name,
+                                            )
+                                        },
+                                    description = task.description,
+                                    variation = task.variation,
+                                    duration = "0" // TODO the duration of the task, but for now we keep it like this
+                                )
+                            },
+                            listOfConcept = conceptsRepository.getListOfConcepts(draft.concepts)
+                                .map { concept ->
+                                    Concept(
+                                        id = concept.id,
+                                        conceptName = concept.name,
+                                    )
+                                },
+                            existingTasks = existingTasksList.map { existingTask ->
+                                TaskUI(
+                                    id = existingTask.trainingTaskId.toString(),
+                                    name = existingTask.name,
+                                    concepts = conceptsRepository.getListOfConcepts(existingTask.concepts)
+                                        .map {
+                                            Concept(
+                                                id = it.id,
+                                                conceptName = it.name,
+                                            )
+                                        },
+                                    description = existingTask.description,
+                                    variation = existingTask.variables.toString(),
+                                    duration = "0" // TODO
+                                )
+                            }
+                        )
+                    }
+
+                    else -> UiStateNew.Error("No se pudo encontrar el borrador")
+                }
+            }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = UiStateNew.Loading
+        )
 
     init {
-        loadActiveDraft()
+        loadInitialData()
     }
 
-    /**
-     * Load the active draft and its tasks
-     */
-    private fun loadActiveDraft() {
+    private fun loadInitialData() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-
             try {
-                val id = repository.getOrCreateActiveDraft()
-                draftId = id
-
-                val draft = repository.getDraft(id)
-                if (draft != null) {
-                    val tasksUI = draft.tasks.map { task ->
-                        TaskUI(
-                            id = task.id,
-                            name = task.name,
-                            concepts = task.concepts,
-                            description = task.description,
-                            variation = task.variation,
-                            duration = ""
-                        )
-                    }
-
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            tasksList = tasksUI
-                        )
-                    }
-                } else {
-                    _uiState.update { it.copy(isLoading = false) }
-                }
+                val id = draftRepository.getOrCreateActiveDraft()
+                _draftId.value = id
             } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        error = "Error al cargar tareas: ${e.message}"
-                    )
-                }
+                _manualError.value = "Error al inicializar: ${e.message}"
             }
         }
     }
 
     /**
-     * Add a new task
+     * Add a new task directly to repository.
+     * The uiState will update automatically via observeDraft.
      */
     fun onAddTask(
         name: String,
         description: String = "",
         variation: List<String> = emptyList(),
-        concepts: List<String> = emptyList()
+        concepts: List<Long> = emptyList()
     ) {
-        val id = draftId ?: return
+        val id = _draftId.value ?: return
         if (name.isBlank()) return
 
         viewModelScope.launch {
@@ -90,123 +137,103 @@ class CreateTrainTasksViewModel @Inject constructor(
                     description = description.trim(),
                     variation = variation.toCommaSeparatedString().trim(),
                 )
-
-                repository.addTask(id, newTask)
-
-                val newTaskUI = TaskUI(
-                    id = newTask.id,
-                    name = newTask.name,
-                    concepts = newTask.concepts,
-                    description = newTask.description,
-                    variation = newTask.variation,
-                    duration = ""
-                )
-
-                _uiState.update { currentState ->
-                    currentState.copy(
-                        tasksList = currentState.tasksList + newTaskUI
-                    )
-                }
+                draftRepository.addTask(id, newTask)
             } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(error = "Error al añadir tarea: ${e.message}")
-                }
+                _manualError.value = "Error al añadir tarea"
             }
         }
     }
 
-    /**
-     * Reorder the task when the user moves it
-     */
-    fun onTasksMove(from: Int, to: Int) {
-        val currentTasks = _uiState.value.tasksList.toMutableList()
-        if (from < 0 || from >= currentTasks.size || to < 0 || to >= currentTasks.size) {
-            return
-        }
-
-        // Reorder memory
-        val movedTask = currentTasks.removeAt(from)
-        currentTasks.add(to, movedTask)
-
-        _uiState.update { it.copy(tasksList = currentTasks) }
-
-        // Save the new orden in the repository
-        saveTasksOrder(currentTasks)
-    }
-
-    /**
-     * Save the tasks order in the repository
-     */
-    private fun saveTasksOrder(tasks: List<TaskUI>) {
-        val id = draftId ?: return
+    fun onTaskSelected(task: TaskUI) {
+        val id = _draftId.value ?: return
+        if (task.name.isBlank()) return
 
         viewModelScope.launch {
             try {
+                val newTask = Task(
+                    id = task.id,
+                    name = task.name.trim(),
+                    concepts = task.concepts.map { it.id },
+                    description = task.description.trim(),
+                    variation = task.variation,
+                )
+                draftRepository.addTask(id, newTask)
+            } catch (e: Exception) {
+                _manualError.value = "Error al añadir tarea"
+            }
+        }
+
+    }
+
+    /**
+     * Reorder tasks by updating the whole list in the repository.
+     *  // TODO adjust how to change the order in the repository
+     */
+    fun onTasksMove(from: Int, to: Int) {
+        val currentState = uiState.value
+        val id = _draftId.value ?: return
+
+        if (currentState is UiStateNew.Success) {
+            val currentTasks = currentState.draftTasks.toMutableList()
+            if (from !in currentTasks.indices || to !in currentTasks.indices) return
+
+            val movedTask = currentTasks.removeAt(from)
+            currentTasks.add(to, movedTask)
+
+            saveTasksOrder(id, currentTasks)
+        }
+    }
+
+    // update the id's list in the draft
+    private fun saveTasksOrder(id: String, tasks: List<TaskUI>) {
+        viewModelScope.launch {
+            try {
+                // Re-mapping UI tasks back to Domain Tasks for the repository
                 val domainTasks = tasks.map { taskUI ->
                     Task(
                         id = taskUI.id,
                         name = taskUI.name,
-                        concepts = taskUI.concepts,
+                        // Note: You might need to preserve concept IDs here
+                        concepts = emptyList(), // TODO preserve the concepts here
                         description = taskUI.description,
                         variation = taskUI.variation
                     )
                 }
-
-                domainTasks.forEachIndexed { index, task ->
-                    repository.updateTask(id, task)
-                }
+                draftRepository.updateTasksList(id, domainTasks)
             } catch (e: Exception) {
-                // Log error silently
+                _manualError.value = "Error al guardar orden"
             }
         }
     }
 
     /**
-     * Remove a task
+     * Remove a task. UI updates automatically.
      */
     fun onDeleteTask(taskId: String) {
-        val id = draftId ?: return
-
+        val id = _draftId.value ?: return
         viewModelScope.launch {
             try {
-                repository.removeTask(id, taskId)
-
-                _uiState.update { currentState ->
-                    currentState.copy(
-                        tasksList = currentState.tasksList.filter { it.id != taskId }
-                    )
-                }
+                draftRepository.removeTask(id, taskId)
             } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(error = "Error al eliminar tarea: ${e.message}")
-                }
+                _manualError.value = "Error al eliminar tarea"
             }
         }
     }
 
-    /**
-     * Guarda el paso actual antes de avanzar al siguiente
-     *  TODO remove this method
-     */
-    fun saveStepData() {
-        // Las tareas ya se guardan automáticamente al añadirlas/reordenarlas
-        // Este método existe por consistencia con los otros ViewModels
-    }
-
-    /**
-     * Clean the shown error
-     */
     fun clearError() {
-        _uiState.update { it.copy(error = null) }
+        _manualError.value = null
     }
 
-    data class UiState(
-        val isLoading: Boolean = false,
-        val error: String? = null,
-        val tasksList: List<TaskUI> = emptyList()
-    )
+    sealed interface UiStateNew {
+        data class Success(
+            val draftTasks: List<TaskUI>,
+            val listOfConcept: List<Concept>,
+            val existingTasks: List<TaskUI>
+        ) : UiStateNew
+
+        data class Error(val message: String) : UiStateNew
+        data object Loading : UiStateNew
+    }
 }
 
-private fun List<String>.toCommaSeparatedString(): String {
-    return this.joinToString(separator = ",")
-}
+private fun List<String>.toCommaSeparatedString(): String = joinToString(",")

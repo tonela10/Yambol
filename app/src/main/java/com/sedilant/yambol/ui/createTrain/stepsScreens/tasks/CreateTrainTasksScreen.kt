@@ -23,11 +23,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,52 +41,41 @@ import com.sedilant.yambol.ui.createTrain.commonComposables.CreateTrainScaffold
 @Composable
 fun CreateTrainTasksScreen(
     onBack: () -> Unit,
-    onNext: () -> Unit, // Navegar a la siguiente pantalla del flow
+    onNext: () -> Unit,
     onClose: () -> Unit,
     viewModel: CreateTrainTasksViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    // Show error if any
-    uiState.error?.let { error ->
-        LaunchedEffect(error) {
-            // Show a snackBar or something
-            viewModel.clearError()
-        }
-    }
-
     CreateTrainTasksScreenStateless(
-        tasks = uiState.tasksList,
-        isLoading = uiState.isLoading,
+        uiState = uiState,
         onMove = viewModel::onTasksMove,
         onAddTask = viewModel::onAddTask,
         onDeleteTask = viewModel::onDeleteTask,
         onBack = onBack,
-        onNext = {
-            viewModel.saveStepData() // Save before continue
-            onNext()
-        },
-        onClose = onClose
+        onNext = onNext, // saveStepData removed as it's now reactive
+        onClose = onClose,
+        onClearError = viewModel::clearError,
+        onTaskSelected = viewModel::onTaskSelected
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CreateTrainTasksScreenStateless(
+    uiState: CreateTrainTasksViewModel.UiStateNew,
     onBack: () -> Unit,
     onNext: () -> Unit,
     onClose: () -> Unit,
-    tasks: List<TaskUI> = emptyList(),
-    isLoading: Boolean = false,
+    onClearError: () -> Unit,
     onMove: (from: Int, to: Int) -> Unit,
-    onAddTask: (name: String, description: String, variation: List<String>, concepts: List<String>) -> Unit,
+    onAddTask: (name: String, description: String, variation: List<String>, concepts: List<Long>) -> Unit,
+    onTaskSelected: (TaskUI) -> Unit,
     onDeleteTask: (taskId: String) -> Unit
 ) {
-    var showBottomSheet by remember { mutableStateOf(false) }
-    val sheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true,
-        confirmValueChange = { it != SheetValue.Hidden }
-    )
+    var showCreateTaskBottomSheet by remember { mutableStateOf(false) }
+    var showExistingTasksBottomSheet by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     CreateTrainScaffold(
         title = "Nuevo Entrenamiento",
@@ -104,70 +91,97 @@ private fun CreateTrainTasksScreenStateless(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            if (showBottomSheet) {
-                ModalBottomSheet(
-                    onDismissRequest = { showBottomSheet = false },
-                    sheetState = sheetState
-                ) {
-                    AddTaskBottomSheet(
-                        onAddTask = { name, description, variation, concepts ->
-                            onAddTask(name, description, variation, concepts)
-                            showBottomSheet = false
-                        },
-                        onDismiss = { showBottomSheet = false }
+            // Handle different UI states
+            when (uiState) {
+                is CreateTrainTasksViewModel.UiStateNew.Loading -> {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
+                    }
+                }
+
+                is CreateTrainTasksViewModel.UiStateNew.Error -> {
+                    // Centralized error view or a Snackbar
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(text = uiState.message, color = MaterialTheme.colorScheme.error)
+                            Button(onClick = onClearError) { Text("Reintentar") }
+                        }
+                    }
+                }
+
+                is CreateTrainTasksViewModel.UiStateNew.Success -> {
+                    Text(
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                        text = "¿QUÉ EJERCICIOS HARÁS?",
+                        color = MaterialTheme.colorScheme.primary,
+                        style = MaterialTheme.typography.titleLarge
                     )
+
+                    AddTaskButton(onClick = { showCreateTaskBottomSheet = true })
+
+                    OutlinedButton(
+                        onClick = { showExistingTasksBottomSheet = true },
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                            .fillMaxWidth()
+                            .height(40.dp)
+                    ) {
+                        Icon(imageVector = Icons.Default.Add, contentDescription = null)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(text = "Añadir Ejercicio existente")
+                    }
+
+                    if (uiState.draftTasks.isNotEmpty()) {
+                        Text(
+                            text = "${uiState.draftTasks.size} ejercicio(s) añadido(s)",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+                        )
+                    }
+
+                    ListOfTasks(
+                        listOfTasks = uiState.draftTasks,
+                        onMove = onMove,
+                        onDelete = onDeleteTask,
+                        isLoading = false,
+                    )
+
+
+                    // Bottom Sheet Logic
+                    if (showCreateTaskBottomSheet) {
+                        ModalBottomSheet(
+                            onDismissRequest = { showCreateTaskBottomSheet = false },
+                            sheetState = sheetState
+                        ) {
+                            AddTaskBottomSheet(
+                                onAddTask = { name, description, concepts, variation ->
+                                    onAddTask(name, description, variation, concepts)
+                                    showCreateTaskBottomSheet = false
+                                },
+                                onDismiss = { showCreateTaskBottomSheet = false },
+                                concepts = uiState.listOfConcept,
+                            )
+                        }
+                    }
+
+                    if (showExistingTasksBottomSheet) {
+                        ModalBottomSheet(
+                            onDismissRequest = { showExistingTasksBottomSheet = false },
+                            sheetState = sheetState
+                        ) {
+                            AddExistingTaskBottomSheet(
+                                existingTasks = uiState.existingTasks,
+                                onTaskSelected = { task ->
+                                    onTaskSelected(task)
+                                    showExistingTasksBottomSheet = false
+                                },
+                                onDismiss = { showExistingTasksBottomSheet = false }
+                            )
+                        }
+                    }
                 }
             }
-
-            if (isLoading) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
-            }
-
-            Text(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                text = "¿QUÉ EJERCICIOS HARÁS?",
-                color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.titleLarge
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-
-            AddTaskButton(onClick = { showBottomSheet = true })
-
-            OutlinedButton(
-                onClick = {}, // TODO navigate to existing exercises screen
-                modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxWidth()
-                    .height(36.dp)
-            ) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(text = "Añadir Ejercicio existente")
-            }
-
-            // Task counter
-            if (tasks.isNotEmpty()) {
-                Text(
-                    text = "${tasks.size} ejercicio(s) añadido(s)",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                )
-            }
-
-            ListOfTasks(
-                listOfTasks = tasks,
-                onMove = onMove,
-                onDelete = onDeleteTask,
-                isLoading = isLoading,
-            )
         }
     }
 }
