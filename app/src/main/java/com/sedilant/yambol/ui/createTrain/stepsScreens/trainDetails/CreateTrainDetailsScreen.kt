@@ -204,7 +204,7 @@ private fun TaskItemDetail(task: TaskUI) {
             if (task.concepts.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = task.concepts.joinToString(", "),
+                    text = task.concepts.joinToString(", ") { it.conceptName },
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.primary
                 )

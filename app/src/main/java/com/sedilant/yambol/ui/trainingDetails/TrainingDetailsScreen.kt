@@ -116,7 +116,7 @@ fun TrainingDetailsScreenStateless(
                         TrainingInfoCard(
                             date = formatDate(uiState.train.date),
                             time = formatDuration(uiState.train.time),
-                            concepts = uiState.train.concepts
+                            concepts = emptyList() // TODO uiState.train.concepts
                         )
                     }
                     item {
@@ -361,7 +361,7 @@ private fun TrainingDetailsScreenPreview() {
                     id = 1,
                     date = Date(),
                     time = 1.5f,
-                    concepts = listOf("Dribbling", "Shooting", "Defense"),
+                    concepts = emptyList(),
                     teamId = 1
                 ),
                 taskList = listOf(
@@ -396,7 +396,7 @@ private fun TrainingDetailsScreenEmptyPreview() {
                     id = 1,
                     date = Date(),
                     time = 1f,
-                    concepts = listOf("Basic Skills"),
+                    concepts = emptyList(),
                     teamId = 1
                 ),
                 taskList = emptyList()

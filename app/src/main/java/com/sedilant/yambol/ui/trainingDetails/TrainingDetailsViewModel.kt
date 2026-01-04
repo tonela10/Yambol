@@ -32,7 +32,7 @@ class TrainingDetailsViewModel @AssistedInject constructor(
                         id = trainInfo.trainId,
                         date = trainInfo.date,
                         time = trainInfo.time,
-                        concepts = trainInfo.concepts,
+                        concepts = trainInfo.conceptIds,
                         teamId = trainInfo.teamId
                     ),
                     taskList = trainInfo.trains
