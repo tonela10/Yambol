@@ -2,6 +2,7 @@ package com.sedilant.yambol.data.firebaseAuth
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -26,10 +27,13 @@ interface AuthRepository {
     fun getAuthStateFlow(): Flow<FirebaseUser?>
     suspend fun signInWithEmail(email: String, password: String): AuthResult<FirebaseUser>
     suspend fun signUpWithEmail(email: String, password: String): AuthResult<FirebaseUser>
+    suspend fun signInWithGoogle(idToken: String): AuthResult<FirebaseUser>
     suspend fun signOut(): AuthResult<Unit>
     suspend fun deleteAccount(): AuthResult<Unit>
     suspend fun sendPasswordResetEmail(email: String): AuthResult<Unit>
     suspend fun reloadUser(): AuthResult<Unit>
+    suspend fun sendEmailVerification(): AuthResult<Unit>
+    suspend fun checkEmailVerified(): AuthResult<Boolean>
 }
 
 /**
@@ -170,6 +174,60 @@ class AuthRepositoryImpl @Inject constructor(
             if (user != null) {
                 user.reload().await()
                 AuthResult.Success(Unit)
+            } else {
+                AuthResult.Error(Exception("No user is currently signed in"))
+            }
+        } catch (e: Exception) {
+            AuthResult.Error(e)
+        }
+    }
+
+    /**
+     * Sign in with Google using ID token
+     */
+    override suspend fun signInWithGoogle(idToken: String): AuthResult<FirebaseUser> {
+        return try {
+            val credential = GoogleAuthProvider.getCredential(idToken, null)
+            val result = auth.signInWithCredential(credential).await()
+            val user = result.user
+
+            if (user != null) {
+                AuthResult.Success(user)
+            } else {
+                AuthResult.Error(Exception("Google sign in failed: User is null"))
+            }
+        } catch (e: Exception) {
+            AuthResult.Error(e)
+        }
+    }
+
+    /**
+     * Send email verification to the current user
+     */
+    override suspend fun sendEmailVerification(): AuthResult<Unit> {
+        return try {
+            val user = currentUser
+            if (user != null) {
+                user.sendEmailVerification().await()
+                AuthResult.Success(Unit)
+            } else {
+                AuthResult.Error(Exception("No user is currently signed in"))
+            }
+        } catch (e: Exception) {
+            AuthResult.Error(e)
+        }
+    }
+
+    /**
+     * Check if the current user's email is verified
+     * Reloads user data first to get the latest verification status
+     */
+    override suspend fun checkEmailVerified(): AuthResult<Boolean> {
+        return try {
+            val user = currentUser
+            if (user != null) {
+                user.reload().await()
+                AuthResult.Success(user.isEmailVerified)
             } else {
                 AuthResult.Error(Exception("No user is currently signed in"))
             }

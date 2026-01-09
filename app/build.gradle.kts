@@ -65,8 +65,14 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.auth)
-    implementation("com.firebaseui:firebase-ui-auth:9.0.0")
+    implementation(libs.firebase.ui.auth)
     implementation(libs.firebase.firestore.ktx)
+
+    // Google Sign-In
+    implementation(libs.play.services.auth)
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.googleid)
 
     // Room
     implementation(libs.androidx.room.ktx)
