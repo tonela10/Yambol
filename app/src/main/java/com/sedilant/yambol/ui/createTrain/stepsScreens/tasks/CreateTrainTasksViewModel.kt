@@ -4,7 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sedilant.yambol.data.draftTrain.Task
 import com.sedilant.yambol.data.draftTrain.TrainingDraftRepository
-import com.sedilant.yambol.data.team.concept.ConceptRepository
+import com.sedilant.yambol.data.firebaseAuth.AuthRepository
+import com.sedilant.yambol.data.firestore.ConceptRepository
 import com.sedilant.yambol.domain.get.GetAllTaskUseCase
 import com.sedilant.yambol.ui.createTrain.stepsScreens.concepts.Concept
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,7 +29,8 @@ import javax.inject.Inject
 class CreateTrainTasksViewModel @Inject constructor(
     private val draftRepository: TrainingDraftRepository,
     private val conceptsRepository: ConceptRepository,
-    private val getAllTaskUseCase: GetAllTaskUseCase
+    private val getAllTaskUseCase: GetAllTaskUseCase,
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private val _draftId = MutableStateFlow<String?>(null)
@@ -39,6 +41,10 @@ class CreateTrainTasksViewModel @Inject constructor(
     val uiState: StateFlow<UiStateNew> = _draftId
         .filterNotNull()
         .flatMapLatest { id ->
+            val userId = authRepository.currentUser?.uid ?: return@flatMapLatest MutableStateFlow(
+                UiStateNew.Error("User not logged in")
+            )
+
             combine(
                 draftRepository.observeDraft(id),
                 _manualError,
@@ -47,13 +53,18 @@ class CreateTrainTasksViewModel @Inject constructor(
                 when {
                     manualError != null -> UiStateNew.Error(manualError)
                     draft != null -> {
+                        // Async fetch for concepts
+                        val conceptIds =
+                            (draft.tasks.flatMap { it.concepts } + draft.concepts + existingTasksList.flatMap { it.concepts }).distinct()
+                        val conceptsMap = conceptsRepository.getConceptsByIds(userId, conceptIds)
+                            .associateBy { it.id }
+
                         UiStateNew.Success(
                             draftTasks = draft.tasks.map { task ->
                                 TaskUI(
                                     id = task.id,
                                     name = task.name,
-                                    // Mapping IDs to names reactively
-                                    concepts = conceptsRepository.getListOfConcepts(task.concepts)
+                                    concepts = task.concepts.mapNotNull { conceptsMap[it] }
                                         .map {
                                             Concept(
                                                 id = it.id,
@@ -62,21 +73,21 @@ class CreateTrainTasksViewModel @Inject constructor(
                                         },
                                     description = task.description,
                                     variation = task.variation,
-                                    duration = "0" // TODO the duration of the task, but for now we keep it like this
+                                    duration = "0"
                                 )
                             },
-                            listOfConcept = conceptsRepository.getListOfConcepts(draft.concepts)
-                                .map { concept ->
+                            listOfConcept = draft.concepts.mapNotNull { conceptsMap[it] }
+                                .map {
                                     Concept(
-                                        id = concept.id,
-                                        conceptName = concept.name,
+                                        id = it.id,
+                                        conceptName = it.name,
                                     )
                                 },
                             existingTasks = existingTasksList.map { existingTask ->
                                 TaskUI(
-                                    id = existingTask.trainingTaskId.toString(),
+                                    id = existingTask.trainingTaskId,
                                     name = existingTask.name,
-                                    concepts = conceptsRepository.getListOfConcepts(existingTask.concepts)
+                                    concepts = existingTask.concepts.mapNotNull { conceptsMap[it] }
                                         .map {
                                             Concept(
                                                 id = it.id,
@@ -84,8 +95,9 @@ class CreateTrainTasksViewModel @Inject constructor(
                                             )
                                         },
                                     description = existingTask.description,
-                                    variation = existingTask.variables.toString(),
-                                    duration = "0" // TODO
+                                    variation = existingTask.variables.sorted()
+                                        .joinToString(","),
+                                    duration = "0"
                                 )
                             }
                         )
@@ -124,7 +136,7 @@ class CreateTrainTasksViewModel @Inject constructor(
         name: String,
         description: String = "",
         variation: List<String> = emptyList(),
-        concepts: List<Long> = emptyList()
+        concepts: List<String> = emptyList()
     ) {
         val id = _draftId.value ?: return
         if (name.isBlank()) return
