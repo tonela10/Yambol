@@ -35,7 +35,7 @@ data class TaskDto(
     override val id: String = "",
     val name: String = "",
     val description: String = "",
-    val variables: Map<String, String> = emptyMap(),
+    val variables: List<String> = emptyList(),
     val conceptIds: List<String> = emptyList(),
     override val userId: String = "",
     override val createdAt: Timestamp? = null,
@@ -46,7 +46,8 @@ data class TaskDto(
 data class TrainDto(
     override val id: String = "",
     val dateMillis: Long? = null,
-    val timeMillis: Long? = null,
+    val endTime: Float? = null,
+    val startTime: Float? = null,
     val teamId: String = "",
     val taskIds: List<String> = emptyList(),
     val conceptIds: List<String> = emptyList(),
@@ -59,7 +60,17 @@ data class TrainDto(
 data class ConceptDto(
     override val id: String = "",
     val name: String = "",
+    override val userId: String = "",
+    override val createdAt: Timestamp? = null,
+    override val updatedAt: Timestamp? = null,
+    override val localId: Long? = null
+) : FirestoreEntityMeta
+
+data class TeamObjectiveDto(
+    override val id: String = "",
+    val title: String = "",
     val teamId: String = "",
+    val isCompleted: Boolean = false,
     override val userId: String = "",
     override val createdAt: Timestamp? = null,
     override val updatedAt: Timestamp? = null,
