@@ -177,7 +177,7 @@ private fun AddExistingTaskPreview() {
         TaskUI(
             id = "1",
             name = "Rueda de entradas",
-            concepts = listOf(Concept(1, "Finalizaciones"), Concept(2, "Táctica")),
+            concepts = listOf(Concept("1", "Finalizaciones"), Concept("2", "Táctica")),
             description = "Entradas por derecha e izquierda",
             variation = "Sin defensa",
             duration = "0"
@@ -185,7 +185,7 @@ private fun AddExistingTaskPreview() {
         TaskUI(
             id = "2",
             name = "3x3 Continuo",
-            concepts = listOf(Concept(1, "Finalizaciones"), Concept(2, "Táctica")),
+            concepts = listOf(Concept("1", "Finalizaciones"), Concept("2", "Táctica")),
             description = "Juego real a media pista",
             variation = "Con comodín",
             duration = "0"
@@ -193,7 +193,7 @@ private fun AddExistingTaskPreview() {
         TaskUI(
             id = "3",
             name = "Tiros libres",
-            concepts = listOf(Concept(1, "Finalizaciones"), Concept(2, "Táctica")),
+            concepts = listOf(Concept("1", "Finalizaciones"), Concept("2", "Táctica")),
             description = "Series de 10 tiros",
             variation = "Bajo presión",
             duration = "0"

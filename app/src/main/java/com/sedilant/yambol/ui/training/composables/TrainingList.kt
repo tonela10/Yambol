@@ -35,7 +35,7 @@ import java.util.Locale
 fun TrainingList(
     modifier: Modifier = Modifier,
     trainings: List<TrainDomainModel>,
-    onTrainingClick: (Long) -> Unit = {},
+    onTrainingClick: (String) -> Unit = {},
 ) {
     LazyColumn(
         modifier = modifier.fillMaxSize(),
@@ -190,25 +190,25 @@ private fun TrainingListPreview() {
     MaterialTheme {
         val sampleTrainings = listOf(
             TrainDomainModel(
-                id = 1,
+                id = "1",
                 date = Date(),
                 time = 1.5f,
                 concepts = emptyList(),
-                teamId = 1
+                teamId = "1"
             ),
             TrainDomainModel(
-                id = 2,
+                id = "2",
                 date = Date(System.currentTimeMillis() + 86400000), // Tomorrow
                 time = 2f,
                 concepts = emptyList(),
-                teamId = 1
+                teamId = "1"
             ),
             TrainDomainModel(
-                id = 3,
+                id = "3",
                 date = Date(System.currentTimeMillis() + 172800000), // Day after tomorrow
                 time = 1f,
                 concepts = emptyList(),
-                teamId = 1
+                teamId = "1"
             )
         )
 

@@ -1,14 +1,26 @@
 package com.sedilant.yambol.domain.insert
 
-import com.sedilant.yambol.data.team.player.PlayerRepository
-import com.sedilant.yambol.domain.mapToEntity
+import com.sedilant.yambol.data.firebaseAuth.AuthRepository
+import com.sedilant.yambol.data.firestore.PlayerDto
+import com.sedilant.yambol.data.firestore.PlayerRepository
 import com.sedilant.yambol.ui.home.models.PlayerUiModel
 import javax.inject.Inject
 
 class InsertPlayersUseCaseImpl @Inject constructor(
     private val playerRepository: PlayerRepository,
+    private val authRepository: AuthRepository
 ) : InsertPlayersUseCase {
     override suspend fun invoke(players: List<PlayerUiModel>) {
-        playerRepository.insertPlayers(players.map { it.mapToEntity() })
+        val userId = authRepository.currentUser?.uid ?: return
+        players.forEach { player ->
+            playerRepository.upsert(
+                PlayerDto(
+                    name = player.name.lowercase(),
+                    number = player.number.toIntOrNull(),
+                    teamId = player.teamId,
+                    userId = userId
+                )
+            )
+        }
     }
 }

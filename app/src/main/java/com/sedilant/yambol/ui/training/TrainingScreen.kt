@@ -36,8 +36,8 @@ import java.util.Date
 @Composable
 fun TrainingScreen(
     modifier: Modifier = Modifier,
-    onTrainClicked: (Long) -> Unit,
-    onNavigateToCreateTraining: (Long) -> Unit,
+    onTrainClicked: (String) -> Unit,
+    onNavigateToCreateTraining: (String) -> Unit,
     trainingViewModel: TrainingViewModel = hiltViewModel()
 ) {
 
@@ -56,9 +56,9 @@ fun TrainingScreen(
 private fun TrainingScreenStateless(
     modifier: Modifier = Modifier,
     uiState: TrainingUiState,
-    onTeamChange: (Long) -> Unit,
-    onTrainClicked: (Long) -> Unit,
-    onNavigateToCreateTraining: (Long) -> Unit,
+    onTeamChange: (String) -> Unit,
+    onTrainClicked: (String) -> Unit,
+    onNavigateToCreateTraining: (String) -> Unit,
 ) {
     var selectedDateFilter by remember { mutableStateOf(DateFilter.ALL) }
 
@@ -141,38 +141,38 @@ private fun TrainingScreenPreview() {
             uiState = TrainingUiState.Success(
                 trainList = listOf(
                     TrainDomainModel(
-                        id = 1,
+                        id = "1",
                         date = Date(),
                         time = 1.5f,
                         concepts = listOf(),
-                        teamId = 1
+                        teamId = "1"
                     ),
                     TrainDomainModel(
-                        id = 2,
+                        id = "2",
                         date = Date(System.currentTimeMillis() + 86400000),
                         time = 2f,
                         concepts = listOf(),
-                        teamId = 1
+                        teamId = "1"
                     ),
                     TrainDomainModel(
-                        id = 3,
+                        id = "3",
                         date = Date(System.currentTimeMillis() + 172800000),
                         time = 1f,
                         concepts = listOf(),
-                        teamId = 1
+                        teamId = "1"
                     )
                 ),
                 teamList = listOf(
                     TeamUiModel(
                         name = "Cachos",
-                        id = 1
+                        id = "1"
                     ),
                     TeamUiModel(
                         name = "Adidas",
-                        id = 1
+                        id = "2"
                     )
                 ),
-                currentTeamId = 1
+                currentTeamId = "1"
             ),
             modifier = Modifier,
             onTeamChange = {},

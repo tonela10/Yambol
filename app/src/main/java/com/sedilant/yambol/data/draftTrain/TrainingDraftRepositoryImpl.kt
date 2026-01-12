@@ -38,7 +38,7 @@ class TrainingDraftRepositoryImpl @Inject constructor(
                     startTime = getCurrentHourAsFloat(),
                     concepts = emptyList(),
                     tasks = emptyList(),
-                    teamId = 0
+                    teamId = ""
                 )
                 createDraft(newTraining)
             }
@@ -49,7 +49,7 @@ class TrainingDraftRepositoryImpl @Inject constructor(
                 startTime = getCurrentHourAsFloat(),
                 concepts = emptyList(),
                 tasks = emptyList(),
-                teamId = 0
+                teamId = ""
             )
             createDraft(newTraining)
         }
@@ -67,8 +67,8 @@ class TrainingDraftRepositoryImpl @Inject constructor(
         date: Date?,
         endTime: Float?,
         startTime: Float?,
-        concepts: List<Long>?,
-        teamId: Long?
+        concepts: List<String>?,
+        teamId: String?
     ) {
         val current = trainingDraftDao.getTrainingDraftById(id)
             ?: return // TODO ADD EXCEPTION OIE CARALHO ESTO NO EXISTE POS POR ALGUNA RAZÓN QUE NO COMMPRENDO

@@ -2,10 +2,10 @@ package com.sedilant.yambol.domain.insert
 
 interface CreateTrainTaskUseCase {
     suspend operator fun invoke(
-        trainId: Long,
+        taskId: String,
+        trainId: String? = null,
         name: String,
-        numberOfPlayer: Int,
-        concept: List<Long>,
+        concept: List<String>,
         description: String,
         variables: List<String>
     )

@@ -44,7 +44,7 @@ import java.util.Locale
 
 @Composable
 fun TrainingDetailsScreen(
-    trainId: Long,
+    trainId: String,
     onNavigateBack: () -> Unit,
     trainingDetailsViewModel: TrainingDetailsViewModel = hiltViewModel(
         creationCallback = { factory: TrainingDetailsViewModelFactory ->
@@ -358,22 +358,22 @@ private fun TrainingDetailsScreenPreview() {
         TrainingDetailsScreenStateless(
             uiState = TrainingDetailsUiState.Success(
                 train = TrainDomainModel(
-                    id = 1,
+                    id = "1",
                     date = Date(),
                     time = 1.5f,
                     concepts = emptyList(),
-                    teamId = 1
+                    teamId = "1"
                 ),
                 taskList = listOf(
                     TaskDomain(
-                        trainingTaskId = 1,
+                        trainingTaskId = "1",
                         name = "Ball Control Drill",
                         concepts = listOf(),  //"Dribbling",
                         description = "Practice dribbling through cones with both feet, focusing on close ball control and quick direction changes.",
                         variables = listOf("Speed", "Distance", "Cone spacing")
                     ),
                     TaskDomain(
-                        trainingTaskId = 2,
+                        trainingTaskId = "2",
                         name = "Shooting Practice",
                         concepts = listOf(),  //"Dribbling",
                         description = "Target practice from various angles and distances to improve accuracy and power.",
@@ -393,11 +393,11 @@ private fun TrainingDetailsScreenEmptyPreview() {
         TrainingDetailsScreenStateless(
             uiState = TrainingDetailsUiState.Success(
                 train = TrainDomainModel(
-                    id = 1,
+                    id = "1",
                     date = Date(),
                     time = 1f,
                     concepts = emptyList(),
-                    teamId = 1
+                    teamId = "1"
                 ),
                 taskList = emptyList()
             ),

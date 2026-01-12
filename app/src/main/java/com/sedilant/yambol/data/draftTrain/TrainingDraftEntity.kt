@@ -13,10 +13,10 @@ data class TrainingDraftEntity(
     val date: Long,
     val endTime: Float,
     val startTime: Float,
-    val concepts: List<Long>,
+    val concepts: List<String>,
     val isCompleted: Boolean = false, // false = draft, true = finalize
     val createdAt: Long = System.currentTimeMillis(),
     val updatedAt: Long = System.currentTimeMillis(),
     @ColumnInfo(name = "team_id")
-    val teamId: Long
+    val teamId: String
 )

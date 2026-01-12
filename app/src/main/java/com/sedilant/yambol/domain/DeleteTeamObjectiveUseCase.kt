@@ -1,7 +1,5 @@
 package com.sedilant.yambol.domain
 
 interface DeleteTeamObjectiveUseCase {
-    suspend operator fun invoke(
-        objectiveId: Int, description: String, isFinish: Boolean, teamId: Long
-    )
+    suspend operator fun invoke(teamObjectiveId: String)
 }

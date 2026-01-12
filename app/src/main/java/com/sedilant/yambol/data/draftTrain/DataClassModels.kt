@@ -8,15 +8,15 @@ data class Training(
     val date: Date,
     val endTime: Float,
     val startTime: Float,
-    val concepts: List<Long>,
+    val concepts: List<String>,
     val tasks: List<Task>,
-    val teamId: Long
+    val teamId: String
 )
 
 data class Task(
     val id: String = UUID.randomUUID().toString(),
     val name: String,
-    val concepts: List<Long>,
+    val concepts: List<String>,
     val description: String,
     val variation: String
 )

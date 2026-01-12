@@ -47,14 +47,14 @@ import com.sedilant.yambol.ui.createTrain.stepsScreens.concepts.Concept
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 internal fun AddTaskBottomSheet(
-    onAddTask: (name: String, description: String, concepts: List<Long>, variants: List<String>) -> Unit,
+    onAddTask: (name: String, description: String, concepts: List<String>, variants: List<String>) -> Unit,
     onDismiss: () -> Unit,
     concepts: List<Concept> // These are all available concepts in the database
 ) {
     var taskName by remember { mutableStateOf("") }
     var taskDescription by remember { mutableStateOf("") }
 
-    val selectedConceptIds = remember { mutableStateListOf<Long>() }
+    val selectedConceptIds = remember { mutableStateListOf<String>() }
 
     val taskVariants = remember { mutableStateListOf("Var 1") }
 
@@ -203,11 +203,11 @@ internal fun AddTaskBottomSheet(
 private fun AddTaskBottomSheetPreview() {
     // Mock data for the preview
     val mockConcepts = listOf(
-        Concept(id = 1L, conceptName = "Tiro", isSelected = false),
-        Concept(id = 2L, conceptName = "Defensa", isSelected = false),
-        Concept(id = 3L, conceptName = "Pase", isSelected = false),
-        Concept(id = 4L, conceptName = "Rebote", isSelected = false),
-        Concept(id = 5L, conceptName = "Táctica", isSelected = false)
+        Concept(id = "1", conceptName = "Tiro", isSelected = false),
+        Concept(id = "2", conceptName = "Defensa", isSelected = false),
+        Concept(id = "3", conceptName = "Pase", isSelected = false),
+        Concept(id = "4", conceptName = "Rebote", isSelected = false),
+        Concept(id = "5", conceptName = "Táctica", isSelected = false)
     )
 
     MaterialTheme {
