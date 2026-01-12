@@ -23,7 +23,7 @@ import com.sedilant.yambol.ui.createTrain.stepsScreens.trainDetails.CreateTrainD
 @Composable
 fun CreateTrainScreenV2(
     onCancel: () -> Unit,
-    teamId: Long,
+    teamId: String,
 ) {
     val viewModel: CreateTrainV2ViewModel = hiltViewModel(
         creationCallback = { factory: CreateTrainV2ViewModelFactory ->
