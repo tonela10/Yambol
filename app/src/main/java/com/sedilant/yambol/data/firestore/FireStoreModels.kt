@@ -70,7 +70,7 @@ data class TeamObjectiveDto(
     override val id: String = "",
     val title: String = "",
     val teamId: String = "",
-    val isCompleted: Boolean = false,
+    var completed: Boolean = false,
     override val userId: String = "",
     override val createdAt: Timestamp? = null,
     override val updatedAt: Timestamp? = null,

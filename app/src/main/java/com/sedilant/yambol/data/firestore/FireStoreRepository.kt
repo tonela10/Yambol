@@ -2,10 +2,11 @@ package com.sedilant.yambol.data.firestore
 
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.CollectionReference
-import com.google.firebase.firestore.FieldPath
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -19,6 +20,7 @@ object FirestoreCollections {
     const val CONCEPTS = "concepts"
     const val TEAM_OBJECTIVES = "team_objectives"
 }
+
 // TODO split the different repositories into different files
 interface TeamRepository {
     fun upsert(team: TeamDto): String
@@ -31,24 +33,47 @@ interface PlayerRepository {
     fun upsert(player: PlayerDto): String
     fun update(playerId: String, name: String, number: Int)
     fun delete(playerId: String)
-    fun listByTeam(userId: String, teamId: String, onResult: (List<PlayerDto>) -> Unit, onError: (Exception) -> Unit)
+    fun listByTeam(
+        userId: String,
+        teamId: String,
+        onResult: (List<PlayerDto>) -> Unit,
+        onError: (Exception) -> Unit
+    )
+
     fun listByTeamFlow(userId: String, teamId: String): Flow<List<PlayerDto>>
     suspend fun getPlayerById(playerId: String): PlayerDto?
-    suspend fun isJerseyNumberTaken(userId: String, teamId: String, jerseyNumber: Int, excludePlayerId: String? = null): Boolean
+    suspend fun isJerseyNumberTaken(
+        userId: String,
+        teamId: String,
+        jerseyNumber: Int,
+        excludePlayerId: String? = null
+    ): Boolean
 }
 
 interface TaskRepository {
     fun upsert(task: TaskDto): String
     fun listByUser(userId: String, onResult: (List<TaskDto>) -> Unit, onError: (Exception) -> Unit)
     fun listByUserFlow(userId: String): Flow<List<TaskDto>>
-    fun getByIds(userId: String, ids: List<String>, onResult: (List<TaskDto>) -> Unit, onError: (Exception) -> Unit)
+    fun getByIds(
+        userId: String,
+        ids: List<String>,
+        onResult: (List<TaskDto>) -> Unit,
+        onError: (Exception) -> Unit
+    )
+
     suspend fun getTasksByIds(userId: String, ids: List<String>): List<TaskDto>
 }
 
 interface TrainRepository {
     fun upsert(train: TrainDto): String
     fun addTaskToTrain(trainId: String, taskId: String)
-    fun listByTeam(userId: String, teamId: String, onResult: (List<TrainDto>) -> Unit, onError: (Exception) -> Unit)
+    fun listByTeam(
+        userId: String,
+        teamId: String,
+        onResult: (List<TrainDto>) -> Unit,
+        onError: (Exception) -> Unit
+    )
+
     fun listByTeamFlow(userId: String, teamId: String): Flow<List<TrainDto>>
     suspend fun getLastTrainId(userId: String, teamId: String): String?
     suspend fun getTrainById(trainId: String): TrainDto?
@@ -56,9 +81,21 @@ interface TrainRepository {
 
 interface ConceptRepository {
     fun upsert(concept: ConceptDto): String
-    fun listByTeam(userId: String, teamId: String, onResult: (List<ConceptDto>) -> Unit, onError: (Exception) -> Unit)
-    fun listByTeamFlow(userId: String, teamId: String): Flow<List<ConceptDto>>
-    fun getByIds(userId: String, ids: List<String>, onResult: (List<ConceptDto>) -> Unit, onError: (Exception) -> Unit)
+    fun listByTeam(
+        userId: String,
+        teamId: String,
+        onResult: (List<ConceptDto>) -> Unit,
+        onError: (Exception) -> Unit
+    )
+
+    fun listByUserFlow(userId: String): Flow<List<ConceptDto>>
+    fun getByIds(
+        userId: String,
+        ids: List<String>,
+        onResult: (List<ConceptDto>) -> Unit,
+        onError: (Exception) -> Unit
+    )
+
     fun getByIdsFlow(userId: String, ids: List<String>): Flow<List<ConceptDto>>
     suspend fun getConceptsByIds(userId: String, ids: List<String>): List<ConceptDto>
 }
@@ -74,9 +111,13 @@ interface TeamObjectiveRepository {
 abstract class BaseFirestoreRepository<T : FirestoreEntityMeta>(
     private val collection: CollectionReference
 ) {
-    protected fun docRef(id: String): DocumentReference = if (id.isBlank()) collection.document() else collection.document(id)
+    protected fun docRef(id: String): DocumentReference =
+        if (id.isBlank()) collection.document() else collection.document(id)
 
-    protected fun mapDocs(snapshot: com.google.firebase.firestore.QuerySnapshot, clazz: Class<out T>): List<T> =
+    protected fun mapDocs(
+        snapshot: com.google.firebase.firestore.QuerySnapshot,
+        clazz: Class<out T>
+    ): List<T> =
         snapshot.documents.mapNotNull { it.toObject(clazz)?.copyId(it.id) }
 
     // Utility to copy the id into the DTO without reflection in consumers
@@ -93,8 +134,9 @@ abstract class BaseFirestoreRepository<T : FirestoreEntityMeta>(
     }
 
     // Flow helper
+    // Ensure the snapshot listener properly handles updates
     protected fun observeQuery(
-        query: com.google.firebase.firestore.Query,
+        query: Query,
         clazz: Class<out T>
     ): Flow<List<T>> = callbackFlow {
         val registration = query.addSnapshotListener { snapshot, error ->
@@ -103,7 +145,11 @@ abstract class BaseFirestoreRepository<T : FirestoreEntityMeta>(
                 return@addSnapshotListener
             }
             if (snapshot != null) {
-                trySend(mapDocs(snapshot, clazz))
+                try {
+                    trySend(mapDocs(snapshot, clazz))
+                } catch (e: Exception) {
+                    close(e)
+                }
             }
         }
         awaitClose { registration.remove() }
@@ -128,7 +174,11 @@ class FirestoreTeamRepository(
         }
     }
 
-    override fun listByUser(userId: String, onResult: (List<TeamDto>) -> Unit, onError: (Exception) -> Unit) {
+    override fun listByUser(
+        userId: String,
+        onResult: (List<TeamDto>) -> Unit,
+        onError: (Exception) -> Unit
+    ) {
         db.collection(FirestoreCollections.TEAMS)
             .whereEqualTo("userId", userId)
             .get()
@@ -146,7 +196,8 @@ class FirestoreTeamRepository(
 
 class FirestorePlayerRepository(
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
-) : PlayerRepository, BaseFirestoreRepository<PlayerDto>(db.collection(FirestoreCollections.PLAYERS)) {
+) : PlayerRepository,
+    BaseFirestoreRepository<PlayerDto>(db.collection(FirestoreCollections.PLAYERS)) {
 
     override fun upsert(player: PlayerDto): String {
         val doc = docRef(player.id)
@@ -175,7 +226,12 @@ class FirestorePlayerRepository(
         }
     }
 
-    override fun listByTeam(userId: String, teamId: String, onResult: (List<PlayerDto>) -> Unit, onError: (Exception) -> Unit) {
+    override fun listByTeam(
+        userId: String,
+        teamId: String,
+        onResult: (List<PlayerDto>) -> Unit,
+        onError: (Exception) -> Unit
+    ) {
         db.collection(FirestoreCollections.PLAYERS)
             .whereEqualTo("userId", userId)
             .whereEqualTo("teamId", teamId)
@@ -198,7 +254,12 @@ class FirestorePlayerRepository(
         return snapshot.toObject(PlayerDto::class.java)?.copy(id = snapshot.id)
     }
 
-    override suspend fun isJerseyNumberTaken(userId: String, teamId: String, jerseyNumber: Int, excludePlayerId: String?): Boolean {
+    override suspend fun isJerseyNumberTaken(
+        userId: String,
+        teamId: String,
+        jerseyNumber: Int,
+        excludePlayerId: String?
+    ): Boolean {
         // We can do this with a query.
         // Need kotlinx-coroutines-play-services to check result.
         // Or wrap it. Let's assume we can use await() or similar.
@@ -239,7 +300,11 @@ class FirestoreTaskRepository(
         return doc.id
     }
 
-    override fun listByUser(userId: String, onResult: (List<TaskDto>) -> Unit, onError: (Exception) -> Unit) {
+    override fun listByUser(
+        userId: String,
+        onResult: (List<TaskDto>) -> Unit,
+        onError: (Exception) -> Unit
+    ) {
         db.collection(FirestoreCollections.TASKS)
             .whereEqualTo("userId", userId)
             .get()
@@ -254,7 +319,12 @@ class FirestoreTaskRepository(
         )
     }
 
-    override fun getByIds(userId: String, ids: List<String>, onResult: (List<TaskDto>) -> Unit, onError: (Exception) -> Unit) {
+    override fun getByIds(
+        userId: String,
+        ids: List<String>,
+        onResult: (List<TaskDto>) -> Unit,
+        onError: (Exception) -> Unit
+    ) {
         if (ids.isEmpty()) {
             onResult(emptyList())
             return
@@ -305,7 +375,12 @@ class FirestoreTrainRepository(
         }
     }
 
-    override fun listByTeam(userId: String, teamId: String, onResult: (List<TrainDto>) -> Unit, onError: (Exception) -> Unit) {
+    override fun listByTeam(
+        userId: String,
+        teamId: String,
+        onResult: (List<TrainDto>) -> Unit,
+        onError: (Exception) -> Unit
+    ) {
         db.collection(FirestoreCollections.TRAINS)
             .whereEqualTo("userId", userId)
             .whereEqualTo("teamId", teamId)
@@ -350,46 +425,52 @@ class FirestoreTrainRepository(
 
 class FirestoreConceptRepository(
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
-) : ConceptRepository, BaseFirestoreRepository<ConceptDto>(db.collection(FirestoreCollections.CONCEPTS)) {
+) : ConceptRepository,
+    BaseFirestoreRepository<ConceptDto>(db.collection(FirestoreCollections.CONCEPTS)) {
 
     override fun upsert(concept: ConceptDto): String {
         val doc = docRef(concept.id)
         val now = Timestamp.now()
-        val payload = concept.copy(id = doc.id, createdAt = concept.createdAt ?: now, updatedAt = now)
+        val payload =
+            concept.copy(id = doc.id, createdAt = concept.createdAt ?: now, updatedAt = now)
         doc.set(payload)
         return doc.id
     }
 
-    override fun listByTeam(userId: String, teamId: String, onResult: (List<ConceptDto>) -> Unit, onError: (Exception) -> Unit) {
+    override fun listByTeam(
+        userId: String,
+        teamId: String,
+        onResult: (List<ConceptDto>) -> Unit,
+        onError: (Exception) -> Unit
+    ) {
         db.collection(FirestoreCollections.CONCEPTS)
             .whereEqualTo("userId", userId)
             .whereEqualTo("teamId", teamId)
             .get()
-            .addOnSuccessListener { snapshot -> onResult(mapDocs(snapshot, ConceptDto::class.java)) }
+            .addOnSuccessListener { snapshot ->
+                onResult(
+                    mapDocs(
+                        snapshot,
+                        ConceptDto::class.java
+                    )
+                )
+            }
             .addOnFailureListener(onError)
     }
 
-    override fun listByTeamFlow(userId: String, teamId: String): Flow<List<ConceptDto>> {
-        // If concepts are global to user, ignoring teamId. But if filtered by teamId, use it.
-        // Assuming user wants Concepts per user, as discussed in previous turns "concepts/{autoId}" with userId.
-        // But the previous ConceptDto doesn't have teamId in the DATA class I read above.
-        // Wait, the data class I read in FireStoreModels.kt for ConceptDto was:
-        // data class ConceptDto( ... val name: String = "", override val userId: String = "" ... )
-        // It did NOT have teamId.
-        // However, the `ConceptRepository` interface has `listByTeam(userId, teamId)`.
-        // If the model doesn't have teamId, I cannot filter by it.
-        // I will assume for now I filter by userId only if teamId is not present efficiently or just ignore teamId if model lacks it.
-        // Let's re-read the FireStoreModels.kt content I got.
-        // Line 62: data class ConceptDto(...) : FirestoreEntityMeta
-        // It has NO teamId.
-        // So I will implement listByTeamFlow as listByUserFlow effectively, or filter client side, but server side filter by userId is safer.
+    override fun listByUserFlow(userId: String): Flow<List<ConceptDto>> {
         return observeQuery(
             db.collection(FirestoreCollections.CONCEPTS).whereEqualTo("userId", userId),
             ConceptDto::class.java
         )
     }
 
-    override fun getByIds(userId: String, ids: List<String>, onResult: (List<ConceptDto>) -> Unit, onError: (Exception) -> Unit) {
+    override fun getByIds(
+        userId: String,
+        ids: List<String>,
+        onResult: (List<ConceptDto>) -> Unit,
+        onError: (Exception) -> Unit
+    ) {
         if (ids.isEmpty()) {
             onResult(emptyList())
             return
@@ -398,18 +479,25 @@ class FirestoreConceptRepository(
             .whereEqualTo("userId", userId)
             .whereIn(FieldPath.documentId(), ids)
             .get()
-            .addOnSuccessListener { snapshot -> onResult(mapDocs(snapshot, ConceptDto::class.java)) }
+            .addOnSuccessListener { snapshot ->
+                onResult(
+                    mapDocs(
+                        snapshot,
+                        ConceptDto::class.java
+                    )
+                )
+            }
             .addOnFailureListener(onError)
     }
 
     override fun getByIdsFlow(userId: String, ids: List<String>): Flow<List<ConceptDto>> {
-         if (ids.isEmpty()) return kotlinx.coroutines.flow.flowOf(emptyList())
-         return observeQuery(
+        if (ids.isEmpty()) return kotlinx.coroutines.flow.flowOf(emptyList())
+        return observeQuery(
             db.collection(FirestoreCollections.CONCEPTS)
                 .whereEqualTo("userId", userId)
                 .whereIn(FieldPath.documentId(), ids),
             ConceptDto::class.java
-         )
+        )
     }
 
     override suspend fun getConceptsByIds(userId: String, ids: List<String>): List<ConceptDto> {
@@ -435,12 +523,14 @@ class FirestoreConceptRepository(
 
 class FirestoreTeamObjectiveRepository(
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
-) : TeamObjectiveRepository, BaseFirestoreRepository<TeamObjectiveDto>(db.collection(FirestoreCollections.TEAM_OBJECTIVES)) {
+) : TeamObjectiveRepository,
+    BaseFirestoreRepository<TeamObjectiveDto>(db.collection(FirestoreCollections.TEAM_OBJECTIVES)) {
 
     override fun upsert(objective: TeamObjectiveDto): String {
         val doc = docRef(objective.id)
         val now = Timestamp.now()
-        val payload = objective.copy(id = doc.id, createdAt = objective.createdAt ?: now, updatedAt = now)
+        val payload =
+            objective.copy(id = doc.id, createdAt = objective.createdAt ?: now, updatedAt = now)
         doc.set(payload)
         return doc.id
     }

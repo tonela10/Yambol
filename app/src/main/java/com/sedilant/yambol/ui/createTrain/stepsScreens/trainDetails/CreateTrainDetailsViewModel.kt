@@ -32,7 +32,7 @@ class CreateTrainDetailsViewModel @AssistedInject constructor(
     private val createTrainUseCase: CreateTrainUseCase,
     private val createTrainTaskUseCase: CreateTrainTaskUseCase,
     private val getTeamsUseCase: GetTeamsUseCase, // TODO create a getTeamByIdUseCase
-    private val authRepository: AuthRepository // Injecting AuthRepository to get userId
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private val _uiState =
@@ -56,6 +56,8 @@ class CreateTrainDetailsViewModel @AssistedInject constructor(
                 // Assuming we can get userId somehow or I need to inject AuthRepository.
                 // CreateTrainDetailsViewModel does NOT inject AuthRepository yet.
                 // I will add it to the constructor.
+                val userId = authRepository.currentUser?.uid
+                    ?: throw IllegalStateException("User not logged in")
 
                 val teamName = getTeamsUseCase().first().first { it.id == teamId }.name
                 val id = draftRepository.getOrCreateActiveDraft()
@@ -76,15 +78,10 @@ class CreateTrainDetailsViewModel @AssistedInject constructor(
                             // Convertir tareas del dominio a TaskUI para la vista
                             val tasksUI = draft.tasks.map { task ->
                                 // Get concept names from concept IDs
-                                val userId = authRepository.currentUser?.uid ?: ""
-                                val conceptNames = if (userId.isNotEmpty()) {
-                                    conceptRepository.getConceptsByIds(
-                                        userId,
-                                        task.concepts
-                                    ).map { concept -> concept.name }
-                                } else {
-                                    emptyList()
-                                }
+                                val conceptNames = conceptRepository.getConceptsByIds(
+                                    userId,
+                                    task.concepts
+                                ).map { concept -> concept.name }
 
                                 TaskUI(
                                     id = task.id,

@@ -36,7 +36,7 @@ class CreateTeamViewModel @Inject constructor(
 ) : ViewModel() {
 
     private lateinit var listOfTeams: List<String>
-    var teamId: Long = 0
+    var teamId: String = ""
     private var listOfPlayers: MutableList<PlayerUiModel> = mutableListOf()
 
     private val teamNameFlow = MutableStateFlow(ValueAndValidation())

@@ -60,9 +60,9 @@ import kotlinx.coroutines.launch
 @Composable
 fun TaskList(
     listOfTask: List<TeamObjectivesUiModel>,
-    onToggleObjectiveStatus: (Int) -> Unit,
-    onDeleteObjective: (Int, String, Boolean) -> Unit,
-    onUpdateObjective: (Int, String) -> Unit,
+    onToggleObjectiveStatus: (String, Boolean) -> Unit,
+    onDeleteObjective: (String) -> Unit,
+    onUpdateObjective: (String, String, Boolean) -> Unit,
     onSaveNewObjective: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -142,18 +142,15 @@ fun TaskList(
                     listOfTask.forEach { task ->
                         ObjectiveItem(
                             objective = task,
-                            onToggleStatus = { onToggleObjectiveStatus(task.id) },
+                            onToggleStatus = { onToggleObjectiveStatus(task.id, !task.isFinish) },
                             onDelete = {
-                                onDeleteObjective(
-                                    task.id,
-                                    task.description,
-                                    task.isFinish
-                                )
+                                onDeleteObjective(task.id)
                             },
                             onUpdate = { newDescription ->
                                 onUpdateObjective(
                                     task.id,
-                                    newDescription
+                                    newDescription,
+                                    task.isFinish
                                 )
                             }
                         )
@@ -391,13 +388,13 @@ private fun TaskListPreview() {
     YambolTheme {
         TaskList(
             listOf(
-                TeamObjectivesUiModel("Correr 10 minutos", false, 1),
-                TeamObjectivesUiModel("Ejercicio de bote", false, 2),
-                TeamObjectivesUiModel("Que todos metan dos libre", true, 3),
+                TeamObjectivesUiModel("Correr 10 minutos", false, "1"),
+                TeamObjectivesUiModel("Ejercicio de bote", false, "2"),
+                TeamObjectivesUiModel("Que todos metan dos libre", true, "3"),
             ),
-            onToggleObjectiveStatus = {},
-            onDeleteObjective = { _, _, _ -> },
-            onUpdateObjective = { _, _ -> },
+            onToggleObjectiveStatus = { _, _ -> },
+            onDeleteObjective = { _ -> },
+            onUpdateObjective = { _, _, _ -> },
             onSaveNewObjective = {},
 
             )
@@ -410,9 +407,9 @@ private fun EmptyTaskListPreview() {
     YambolTheme {
         TaskList(
             listOf(),
-            onToggleObjectiveStatus = {},
-            onDeleteObjective = { _, _, _ -> },
-            onUpdateObjective = { _, _ -> },
+            onToggleObjectiveStatus = { _, _ -> },
+            onDeleteObjective = { _ -> },
+            onUpdateObjective = { _, _, _ -> },
             onSaveNewObjective = {},
         )
     }
@@ -602,7 +599,7 @@ private fun CreateObjectiveBottomSheetPreview() {
 private fun ObjectiveOptionsBottomSheetPreview() {
     YambolTheme {
         ObjectiveOptionsBottomSheetContent(
-            objective = TeamObjectivesUiModel("Correr 10 minutos", false, 1),
+            objective = TeamObjectivesUiModel("Correr 10 minutos", false, "1"),
             onEdit = {},
             onDelete = {},
             onCancel = {}
