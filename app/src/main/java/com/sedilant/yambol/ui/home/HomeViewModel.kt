@@ -81,13 +81,18 @@ class HomeViewModel @Inject constructor(
 
     fun onToggleObjectiveStatus(objectiveId: String, isCompleted: Boolean) {
         viewModelScope.launch {
-            toggleTeamObjectiveUseCase(objectiveId, isCompleted)
+            toggleTeamObjectiveUseCase(objectiveId, !isCompleted)
         }
     }
 
-    fun onUpdateObjective(objectiveId: String, newDescription: String) {
+    fun onUpdateObjective(objectiveId: String, newDescription: String, isCompleted: Boolean) {
         viewModelScope.launch {
-            updateTeamObjectiveUseCase(objectiveId, newDescription = newDescription)
+            updateTeamObjectiveUseCase(
+                objectiveId = objectiveId,
+                newDescription = newDescription,
+                isCompleted = isCompleted,
+                teamId = currentTeamFlow.value ?: return@launch
+            )
         }
     }
 

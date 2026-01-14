@@ -84,7 +84,7 @@ private fun HomeScreenStateless(
     onCreateTeam: () -> Unit,
     onSaveNewObjective: (String) -> Unit,
     onToggleObjectiveStatus: (String, Boolean) -> Unit,
-    onUpdateObjective: (String, String) -> Unit,
+    onUpdateObjective: (String, String, Boolean) -> Unit,
     onDeleteTeamObjective: (String) -> Unit,
     onLastTrainClick: (String) -> Unit,
     onEditTeam: (String) -> Unit,
@@ -146,7 +146,13 @@ private fun HomeScreenStateless(
                     homeUiState.listOfObjectives,
                     onToggleObjectiveStatus = onToggleObjectiveStatus,
                     onDeleteObjective = onDeleteTeamObjective,
-                    onUpdateObjective = onUpdateObjective,
+                    onUpdateObjective = { id, newDescription, isCompleted ->
+                        onUpdateObjective(
+                            id,
+                            newDescription,
+                            isCompleted
+                        )
+                    },
                     onSaveNewObjective = onSaveNewObjective,
                     modifier = Modifier.padding(bottom = 24.dp)
                 )
@@ -446,7 +452,7 @@ private fun HomeScreenPreview() {
             onTeamChange = {},
             onSaveNewObjective = {},
             onToggleObjectiveStatus = { _, _ -> },
-            onUpdateObjective = { _, _ -> },
+            onUpdateObjective = { _, _, _ -> },
             onDeleteTeamObjective = { _ -> },
             onLastTrainClick = { },
             editTeamState = EditTeamState.Hidden,

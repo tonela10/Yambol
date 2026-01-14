@@ -62,7 +62,7 @@ fun TaskList(
     listOfTask: List<TeamObjectivesUiModel>,
     onToggleObjectiveStatus: (String, Boolean) -> Unit,
     onDeleteObjective: (String) -> Unit,
-    onUpdateObjective: (String, String) -> Unit,
+    onUpdateObjective: (String, String, Boolean) -> Unit,
     onSaveNewObjective: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -142,7 +142,7 @@ fun TaskList(
                     listOfTask.forEach { task ->
                         ObjectiveItem(
                             objective = task,
-                            onToggleStatus = { onToggleObjectiveStatus(task.id, !task.isFinish) },
+                            onToggleStatus = { onToggleObjectiveStatus(task.id, task.isFinish) },
                             onDelete = {
                                 onDeleteObjective(task.id)
                             },
@@ -150,6 +150,7 @@ fun TaskList(
                                 onUpdateObjective(
                                     task.id,
                                     newDescription,
+                                    task.isFinish
                                 )
                             }
                         )
@@ -393,7 +394,7 @@ private fun TaskListPreview() {
             ),
             onToggleObjectiveStatus = { _, _ -> },
             onDeleteObjective = { _ -> },
-            onUpdateObjective = { _, _ -> },
+            onUpdateObjective = { _, _, _ -> },
             onSaveNewObjective = {},
 
             )
@@ -408,7 +409,7 @@ private fun EmptyTaskListPreview() {
             listOf(),
             onToggleObjectiveStatus = { _, _ -> },
             onDeleteObjective = { _ -> },
-            onUpdateObjective = { _, _ -> },
+            onUpdateObjective = { _, _, _ -> },
             onSaveNewObjective = {},
         )
     }

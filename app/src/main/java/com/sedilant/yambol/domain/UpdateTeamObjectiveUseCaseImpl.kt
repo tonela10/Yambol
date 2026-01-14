@@ -12,13 +12,17 @@ class UpdateTeamObjectiveUseCaseImpl @Inject constructor(
     override suspend fun invoke(
         objectiveId: String,
         newDescription: String,
+        isCompleted: Boolean,
+        teamId: String
     ) {
         val userId = authRepository.currentUser?.uid ?: return
         repository.upsert(
             TeamObjectiveDto(
                 id = objectiveId,
                 title = newDescription,
-                userId = userId
+                userId = userId,
+                completed = isCompleted,
+                teamId = teamId
             )
         )
     }

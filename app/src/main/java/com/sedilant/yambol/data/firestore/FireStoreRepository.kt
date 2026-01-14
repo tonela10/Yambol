@@ -170,7 +170,8 @@ class FirestoreTeamRepository(
 
     override fun updateName(teamId: String, name: String) {
         if (teamId.isNotBlank()) {
-            db.collection(FirestoreCollections.TEAMS).document(teamId).update("name", name)
+            db.collection(FirestoreCollections.TEAMS).document(teamId)
+                .update(TeamDto::name.name, name)
         }
     }
 
@@ -180,7 +181,7 @@ class FirestoreTeamRepository(
         onError: (Exception) -> Unit
     ) {
         db.collection(FirestoreCollections.TEAMS)
-            .whereEqualTo("userId", userId)
+            .whereEqualTo(TeamDto::userId.name, userId)
             .get()
             .addOnSuccessListener { snapshot -> onResult(mapDocs(snapshot, TeamDto::class.java)) }
             .addOnFailureListener(onError)
@@ -188,7 +189,7 @@ class FirestoreTeamRepository(
 
     override fun listByUserFlow(userId: String): Flow<List<TeamDto>> {
         return observeQuery(
-            db.collection(FirestoreCollections.TEAMS).whereEqualTo("userId", userId),
+            db.collection(FirestoreCollections.TEAMS).whereEqualTo(TeamDto::userId.name, userId),
             TeamDto::class.java
         )
     }
@@ -212,9 +213,9 @@ class FirestorePlayerRepository(
             db.collection(FirestoreCollections.PLAYERS).document(playerId)
                 .update(
                     mapOf(
-                        "name" to name,
-                        "number" to number,
-                        "updatedAt" to Timestamp.now()
+                        PlayerDto::name.name to name,
+                        PlayerDto::number.name to number,
+                        PlayerDto::updatedAt.name to Timestamp.now()
                     )
                 )
         }
@@ -233,8 +234,8 @@ class FirestorePlayerRepository(
         onError: (Exception) -> Unit
     ) {
         db.collection(FirestoreCollections.PLAYERS)
-            .whereEqualTo("userId", userId)
-            .whereEqualTo("teamId", teamId)
+            .whereEqualTo(PlayerDto::userId.name, userId)
+            .whereEqualTo(PlayerDto::teamId.name, teamId)
             .get()
             .addOnSuccessListener { snapshot -> onResult(mapDocs(snapshot, PlayerDto::class.java)) }
             .addOnFailureListener(onError)
@@ -243,8 +244,8 @@ class FirestorePlayerRepository(
     override fun listByTeamFlow(userId: String, teamId: String): Flow<List<PlayerDto>> {
         return observeQuery(
             db.collection(FirestoreCollections.PLAYERS)
-                .whereEqualTo("userId", userId)
-                .whereEqualTo("teamId", teamId),
+                .whereEqualTo(PlayerDto::userId.name, userId)
+                .whereEqualTo(PlayerDto::teamId.name, teamId),
             PlayerDto::class.java
         )
     }
@@ -270,9 +271,9 @@ class FirestorePlayerRepository(
 
         try {
             val query = db.collection(FirestoreCollections.PLAYERS)
-                .whereEqualTo("userId", userId)
-                .whereEqualTo("teamId", teamId)
-                .whereEqualTo("number", jerseyNumber)
+                .whereEqualTo(PlayerDto::userId.name, userId)
+                .whereEqualTo(PlayerDto::teamId.name, teamId)
+                .whereEqualTo(PlayerDto::number.name, jerseyNumber)
 
             val snapshot = query.get().await() // Assuming await is imported or I'll add import
             if (snapshot.isEmpty) return false
@@ -306,7 +307,7 @@ class FirestoreTaskRepository(
         onError: (Exception) -> Unit
     ) {
         db.collection(FirestoreCollections.TASKS)
-            .whereEqualTo("userId", userId)
+            .whereEqualTo(TaskDto::userId.name, userId)
             .get()
             .addOnSuccessListener { snapshot -> onResult(mapDocs(snapshot, TaskDto::class.java)) }
             .addOnFailureListener(onError)
@@ -314,7 +315,7 @@ class FirestoreTaskRepository(
 
     override fun listByUserFlow(userId: String): Flow<List<TaskDto>> {
         return observeQuery(
-            db.collection(FirestoreCollections.TASKS).whereEqualTo("userId", userId),
+            db.collection(FirestoreCollections.TASKS).whereEqualTo(TaskDto::userId.name, userId),
             TaskDto::class.java
         )
     }
@@ -330,7 +331,7 @@ class FirestoreTaskRepository(
             return
         }
         db.collection(FirestoreCollections.TASKS)
-            .whereEqualTo("userId", userId)
+            .whereEqualTo(TaskDto::userId.name, userId)
             .whereIn(FieldPath.documentId(), ids)
             .get()
             .addOnSuccessListener { snapshot -> onResult(mapDocs(snapshot, TaskDto::class.java)) }
@@ -345,7 +346,7 @@ class FirestoreTaskRepository(
         return try {
             val validIds = ids.take(10) // Limit to 10 for safety in this migration step
             val snapshot = db.collection(FirestoreCollections.TASKS)
-                .whereEqualTo("userId", userId)
+                .whereEqualTo(TaskDto::userId.name, userId)
                 .whereIn(FieldPath.documentId(), validIds)
                 .get()
                 .await()
@@ -371,7 +372,7 @@ class FirestoreTrainRepository(
     override fun addTaskToTrain(trainId: String, taskId: String) {
         if (trainId.isNotBlank() && taskId.isNotBlank()) {
             db.collection(FirestoreCollections.TRAINS).document(trainId)
-                .update("taskIds", FieldValue.arrayUnion(taskId))
+                .update(TrainDto::taskIds.name, FieldValue.arrayUnion(taskId))
         }
     }
 
@@ -382,8 +383,8 @@ class FirestoreTrainRepository(
         onError: (Exception) -> Unit
     ) {
         db.collection(FirestoreCollections.TRAINS)
-            .whereEqualTo("userId", userId)
-            .whereEqualTo("teamId", teamId)
+            .whereEqualTo(TrainDto::userId.name, userId)
+            .whereEqualTo(TrainDto::teamId.name, teamId)
             .get()
             .addOnSuccessListener { snapshot -> onResult(mapDocs(snapshot, TrainDto::class.java)) }
             .addOnFailureListener(onError)
@@ -392,8 +393,8 @@ class FirestoreTrainRepository(
     override fun listByTeamFlow(userId: String, teamId: String): Flow<List<TrainDto>> {
         return observeQuery(
             db.collection(FirestoreCollections.TRAINS)
-                .whereEqualTo("userId", userId)
-                .whereEqualTo("teamId", teamId),
+                .whereEqualTo(TrainDto::userId.name, userId)
+                .whereEqualTo(TrainDto::teamId.name, teamId),
             TrainDto::class.java
         )
     }
@@ -401,11 +402,11 @@ class FirestoreTrainRepository(
     override suspend fun getLastTrainId(userId: String, teamId: String): String? {
         try {
             val snapshot = db.collection(FirestoreCollections.TRAINS)
-                .whereEqualTo("userId", userId)
-                .whereEqualTo("teamId", teamId)
+                .whereEqualTo(TrainDto::userId.name, userId)
+                .whereEqualTo(TrainDto::teamId.name, teamId)
                 // Assuming we want the last created one, or last date? Room query was "ORDER BY id DESC".
                 // Auto-inc ID usually correlates with creation time.
-                .orderBy("dateMillis", com.google.firebase.firestore.Query.Direction.DESCENDING)
+                .orderBy(TrainDto::dateMillis.name, Query.Direction.DESCENDING)
                 .limit(1)
                 .get()
                 .await()
@@ -444,8 +445,7 @@ class FirestoreConceptRepository(
         onError: (Exception) -> Unit
     ) {
         db.collection(FirestoreCollections.CONCEPTS)
-            .whereEqualTo("userId", userId)
-            .whereEqualTo("teamId", teamId)
+            .whereEqualTo(ConceptDto::userId.name, userId)
             .get()
             .addOnSuccessListener { snapshot ->
                 onResult(
@@ -460,7 +460,8 @@ class FirestoreConceptRepository(
 
     override fun listByUserFlow(userId: String): Flow<List<ConceptDto>> {
         return observeQuery(
-            db.collection(FirestoreCollections.CONCEPTS).whereEqualTo("userId", userId),
+            db.collection(FirestoreCollections.CONCEPTS)
+                .whereEqualTo(ConceptDto::userId.name, userId),
             ConceptDto::class.java
         )
     }
@@ -476,7 +477,7 @@ class FirestoreConceptRepository(
             return
         }
         db.collection(FirestoreCollections.CONCEPTS)
-            .whereEqualTo("userId", userId)
+            .whereEqualTo(ConceptDto::userId.name, userId)
             .whereIn(FieldPath.documentId(), ids)
             .get()
             .addOnSuccessListener { snapshot ->
@@ -494,7 +495,7 @@ class FirestoreConceptRepository(
         if (ids.isEmpty()) return kotlinx.coroutines.flow.flowOf(emptyList())
         return observeQuery(
             db.collection(FirestoreCollections.CONCEPTS)
-                .whereEqualTo("userId", userId)
+                .whereEqualTo(ConceptDto::userId.name, userId)
                 .whereIn(FieldPath.documentId(), ids),
             ConceptDto::class.java
         )
@@ -508,7 +509,7 @@ class FirestoreConceptRepository(
             val result = mutableListOf<ConceptDto>()
             for (chunk in chunks) {
                 val snapshot = db.collection(FirestoreCollections.CONCEPTS)
-                    .whereEqualTo("userId", userId)
+                    .whereEqualTo(ConceptDto::userId.name, userId)
                     .whereIn(FieldPath.documentId(), chunk)
                     .get()
                     .await()
@@ -544,8 +545,8 @@ class FirestoreTeamObjectiveRepository(
     override fun listByTeamFlow(userId: String, teamId: String): Flow<List<TeamObjectiveDto>> {
         return observeQuery(
             db.collection(FirestoreCollections.TEAM_OBJECTIVES)
-                .whereEqualTo("userId", userId)
-                .whereEqualTo("teamId", teamId),
+                .whereEqualTo(TeamObjectiveDto::userId.name, userId)
+                .whereEqualTo(TeamObjectiveDto::teamId.name, teamId),
             TeamObjectiveDto::class.java
         )
     }
@@ -553,7 +554,7 @@ class FirestoreTeamObjectiveRepository(
     override suspend fun toggleCompletion(objectiveId: String, isCompleted: Boolean) {
         if (objectiveId.isNotBlank()) {
             db.collection(FirestoreCollections.TEAM_OBJECTIVES).document(objectiveId)
-                .update("isCompleted", isCompleted).await()
+                .update(TeamObjectiveDto::completed.name, isCompleted).await()
         }
     }
 }
