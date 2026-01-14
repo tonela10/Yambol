@@ -14,7 +14,7 @@ class InsertTeamObjectiveUseCaseImpl @Inject constructor(
         teamObjectiveRepository.upsert(
             TeamObjectiveDto(
                 title = description,
-                isCompleted = false,
+                completed = false,
                 teamId = teamId,
                 userId = userId
             )

@@ -22,7 +22,6 @@ class GetPlayersByTeamIdUseCaseImpl @Inject constructor(
                     number = dto.number.toString(),
                     id = dto.id,
                     teamId = dto.teamId,
-                    position = "" // TODO: Add position to PlayerDto and here
                 )
             }
         }

@@ -49,7 +49,7 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     homeViewModel: HomeViewModel = hiltViewModel(),
     onCreateTeam: () -> Unit,
-    onLastTrainClick: (Long) -> Unit
+    onLastTrainClick: (String) -> Unit
 ) {
     val homeUiState = homeViewModel.uiState.collectAsState(
         initial = HomeUiState.Loading
@@ -62,7 +62,7 @@ fun HomeScreen(
         modifier = modifier,
         homeUiState = homeUiState,
         editTeamState = editTeamState,
-        onTeamChange = { homeViewModel.onTeamChange(it) },
+        onTeamChange = homeViewModel::onTeamChange,
         onCreateTeam = onCreateTeam,
         onSaveNewObjective = homeViewModel::onSaveNewObjective,
         onToggleObjectiveStatus = homeViewModel::onToggleObjectiveStatus,
@@ -80,13 +80,13 @@ private fun HomeScreenStateless(
     modifier: Modifier = Modifier,
     homeUiState: HomeUiState,
     editTeamState: EditTeamState,
-    onTeamChange: (Long) -> Unit,
+    onTeamChange: (String) -> Unit,
     onCreateTeam: () -> Unit,
     onSaveNewObjective: (String) -> Unit,
-    onToggleObjectiveStatus: (Int) -> Unit,
-    onUpdateObjective: (Int, String) -> Unit,
-    onDeleteTeamObjective: (Int, String, Boolean) -> Unit,
-    onLastTrainClick: (Long) -> Unit,
+    onToggleObjectiveStatus: (String, Boolean) -> Unit,
+    onUpdateObjective: (String, String) -> Unit,
+    onDeleteTeamObjective: (String) -> Unit,
+    onLastTrainClick: (String) -> Unit,
     onEditTeam: (String) -> Unit,
     onUpdateTeamName: (String) -> Unit,
     onDismissEditTeam: () -> Unit,
@@ -197,9 +197,9 @@ fun SectionHeader(
 @Composable
 fun TeamTabs(
     modifier: Modifier = Modifier,
-    currentTeamId: Long,
+    currentTeamId: String,
     listOfTeams: List<TeamUiModel>,
-    onTeamChange: (Long) -> Unit,
+    onTeamChange: (String) -> Unit,
     onCreateTeam: () -> Unit,
     isAddTeamShow: Boolean = true,
 ) {
@@ -408,8 +408,8 @@ private fun PlayersRowPreview() {
     YambolTheme {
         PlayersRow(
             listOf(
-                PlayerUiModel("Antonio", "10", id = 0, teamId = 0),
-                PlayerUiModel("Luis", "44", id = 0, teamId = 0)
+                PlayerUiModel("Antonio", "10", id = "0", teamId = "0"),
+                PlayerUiModel("Luis", "44", id = "0", teamId = "0")
             ),
         )
     }
@@ -435,19 +435,19 @@ private fun HomeScreenPreview() {
             modifier = Modifier,
             onCreateTeam = {},
             homeUiState = HomeUiState.Success(
-                listOfTeams = listOf(TeamUiModel("Utebo", 1), TeamUiModel("Olivar", 2)),
+                listOfTeams = listOf(TeamUiModel("Utebo", "1"), TeamUiModel("Olivar", "2")),
                 listOfPlayer = listOf(
-                    PlayerUiModel("Antonio", "10", id = 0, teamId = 1),
-                    PlayerUiModel("Luis", "44", id = 1, teamId = 1)
+                    PlayerUiModel("Antonio", "10", id = "0", teamId = "1"),
+                    PlayerUiModel("Luis", "44", id = "1", teamId = "1")
                 ),
-                currentTeam = TeamUiModel("Utebo", 1),
+                currentTeam = TeamUiModel("Utebo", "1"),
                 listOfObjectives = listOf(),
             ),
             onTeamChange = {},
             onSaveNewObjective = {},
-            onToggleObjectiveStatus = {},
+            onToggleObjectiveStatus = { _, _ -> },
             onUpdateObjective = { _, _ -> },
-            onDeleteTeamObjective = { _, _, _ -> },
+            onDeleteTeamObjective = { _ -> },
             onLastTrainClick = { },
             editTeamState = EditTeamState.Hidden,
             onEditTeam = {},
