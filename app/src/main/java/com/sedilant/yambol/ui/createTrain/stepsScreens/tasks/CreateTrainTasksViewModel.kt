@@ -54,17 +54,18 @@ class CreateTrainTasksViewModel @Inject constructor(
                     manualError != null -> UiStateNew.Error(manualError)
                     draft != null -> {
                         // Async fetch for concepts
-                        val conceptIds =
-                            (draft.tasks.flatMap { it.concepts } + draft.concepts + existingTasksList.flatMap { it.concepts }).distinct()
-                        val conceptsMap = conceptsRepository.getConceptsByIds(userId, conceptIds)
-                            .associateBy { it.id }
-
+                val conceptIds =
+                    (draft.tasks.flatMap { it.concepts } + draft.conceptIds + existingTasksList.flatMap { it.concepts })
+                        .distinct()
+                        .filter { it.isNotBlank() }
+                        val conceptsMap =
+                            conceptsRepository.getConceptsByIds(userId = userId, ids = conceptIds)
                         UiStateNew.Success(
                             draftTasks = draft.tasks.map { task ->
                                 TaskUI(
                                     id = task.id,
                                     name = task.name,
-                                    concepts = task.concepts.mapNotNull { conceptsMap[it] }
+                                    concepts = conceptsMap.filter { task.concepts.contains(it.id) }
                                         .map {
                                             Concept(
                                                 id = it.id,
@@ -76,7 +77,7 @@ class CreateTrainTasksViewModel @Inject constructor(
                                     duration = "0"
                                 )
                             },
-                            listOfConcept = draft.concepts.mapNotNull { conceptsMap[it] }
+                            listOfConcept = conceptsMap
                                 .map {
                                     Concept(
                                         id = it.id,
@@ -87,7 +88,11 @@ class CreateTrainTasksViewModel @Inject constructor(
                                 TaskUI(
                                     id = existingTask.trainingTaskId,
                                     name = existingTask.name,
-                                    concepts = existingTask.concepts.mapNotNull { conceptsMap[it] }
+                                    concepts = conceptsMap.filter {
+                                        existingTask.concepts.contains(
+                                            it.id
+                                        )
+                                    }
                                         .map {
                                             Concept(
                                                 id = it.id,

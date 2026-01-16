@@ -142,7 +142,7 @@ class CreateTrainDetailsViewModel @AssistedInject constructor(
                     date = draft?.date ?: Date(),
                     startTime = draft?.startTime ?: 0f,
                     endTime = draft?.endTime ?: 0f,
-                    concepts = draft?.concepts ?: emptyList(),
+                    concepts = draft?.conceptIds ?: emptyList(),
                     teamId = teamId,
                 )
 

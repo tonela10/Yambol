@@ -45,7 +45,7 @@ class CreateTrainConceptsViewModel @Inject constructor(
                         Concept(
                             id = concept.id,
                             conceptName = concept.name,
-                            isSelected = draft.concepts.contains(concept.id),
+                            isSelected = draft.conceptIds.contains(concept.id),
                         )
                     }
                     UiState.Success(concepts = listOfConcepts)
@@ -81,10 +81,10 @@ class CreateTrainConceptsViewModel @Inject constructor(
             val draft = draftRepository.getDraft(id) ?: return@launch
 
             // IMPROVEMENT: Toggle logic (Add if missing, Remove if exists)
-            val newConcepts = if (draft.concepts.contains(conceptId)) {
-                draft.concepts.filter { it != conceptId }
+            val newConcepts = if (draft.conceptIds.contains(conceptId)) {
+                draft.conceptIds.filter { it != conceptId }
             } else {
-                draft.concepts + conceptId
+                draft.conceptIds + conceptId
             }
 
             draftRepository.updateTrainingData(
@@ -101,12 +101,13 @@ class CreateTrainConceptsViewModel @Inject constructor(
         val userId = authRepository.currentUser?.uid ?: return
 
         viewModelScope.launch {
-            conceptRepository.upsert(
+            val conceptId = conceptRepository.upsert(
                 ConceptDto(
                     name = name,
                     userId = userId,
                 )
             )
+            onConceptSelected(conceptId)
         }
     }
 

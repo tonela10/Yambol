@@ -36,7 +36,7 @@ class TrainingDraftRepositoryImpl @Inject constructor(
                     date = Date(),
                     endTime = 90f,
                     startTime = getCurrentHourAsFloat(),
-                    concepts = emptyList(),
+                    conceptIds = emptyList(),
                     tasks = emptyList(),
                     teamId = ""
                 )
@@ -47,7 +47,7 @@ class TrainingDraftRepositoryImpl @Inject constructor(
                 date = Date(),
                 endTime = 90f,
                 startTime = getCurrentHourAsFloat(),
-                concepts = emptyList(),
+                conceptIds = emptyList(),
                 tasks = emptyList(),
                 teamId = ""
             )
