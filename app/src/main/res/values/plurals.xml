@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Teams -->
+    <plurals name="teams_count">
+        <item quantity="one">%d team</item>
+        <item quantity="other">%d teams</item>
+    </plurals>
+
+    <!-- Players -->
+    <plurals name="players_count">
+        <item quantity="one">%d player</item>
+        <item quantity="other">%d players</item>
+    </plurals>
+
+    <!-- Tasks/Exercises -->
+    <plurals name="tasks_count">
+        <item quantity="one">%d task</item>
+        <item quantity="other">%d tasks</item>
+    </plurals>
+
+    <plurals name="exercises_count">
+        <item quantity="one">%d exercise</item>
+        <item quantity="other">%d exercises</item>
+    </plurals>
+
+    <!-- Concepts -->
+    <plurals name="concepts_count">
+        <item quantity="one">%d concept</item>
+        <item quantity="other">%d concepts</item>
+    </plurals>
+
+    <!-- Sessions -->
+    <plurals name="sessions_count">
+        <item quantity="one">%d session</item>
+        <item quantity="other">%d sessions</item>
+    </plurals>
+
+    <!-- Objectives -->
+    <plurals name="objectives_count">
+        <item quantity="one">%d objective</item>
+        <item quantity="other">%d objectives</item>
+    </plurals>
+
+    <!-- Generic items -->
+    <plurals name="items_added">
+        <item quantity="one">%d item added</item>
+        <item quantity="other">%d items added</item>
+    </plurals>
+
+    <plurals name="items_selected">
+        <item quantity="one">%d item selected</item>
+        <item quantity="other">%d items selected</item>
+    </plurals>
+
+    <plurals name="more_needed">
+        <item quantity="one">%d more needed</item>
+        <item quantity="other">%d more needed</item>
+    </plurals>
+</resources>
+

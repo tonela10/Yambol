@@ -28,9 +28,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.sedilant.yambol.R
 import com.sedilant.yambol.domain.models.TeamDomainModel
 import com.sedilant.yambol.ui.theme.YambolTheme
 
@@ -50,7 +52,7 @@ fun TeamSelectionDropdown(
                 .padding(horizontal = 16.dp, vertical = 16.dp)
         ) {
             Text(
-                text = "Equipo",
+                text = stringResource(R.string.team_label),
                 color = MaterialTheme.colorScheme.primary,
                 fontSize = 16.sp
             )
@@ -71,7 +73,7 @@ fun TeamSelectionDropdown(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = selectedTeam?.name ?: "Seleccionar equipo",
+                            text = selectedTeam?.name ?: stringResource(R.string.select_team),
                             color = MaterialTheme.colorScheme.primary,
                             fontSize = 14.sp
                         )

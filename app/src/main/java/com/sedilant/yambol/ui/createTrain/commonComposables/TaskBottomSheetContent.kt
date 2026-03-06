@@ -36,12 +36,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.sedilant.yambol.R
 import com.sedilant.yambol.ui.createTrain.TaskData
 import com.sedilant.yambol.ui.theme.YambolTheme
 
@@ -228,7 +230,7 @@ fun TaskBottomSheetContent(
 
             item {
                 Text(
-                    text = "Variables help you track and modify the task during training",
+                    text = stringResource(R.string.variables_help_text),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

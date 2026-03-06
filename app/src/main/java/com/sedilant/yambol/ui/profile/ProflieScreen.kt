@@ -48,6 +48,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -55,6 +56,7 @@ import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.exceptions.GetCredentialCancellationException
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.sedilant.yambol.R
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import kotlinx.coroutines.launch
@@ -245,11 +247,11 @@ private fun ProfileScreenStateless(
                 is ProfileUiState.Error -> {
                     AlertDialog(
                         onDismissRequest = onErrorDismiss,
-                        title = { Text("Error") },
+                        title = { Text(stringResource(R.string.error)) },
                         text = { Text(uiState.message) },
                         confirmButton = {
                             TextButton(onClick = onErrorDismiss) {
-                                Text("OK")
+                                Text(stringResource(R.string.ok))
                             }
                         },
                         icon = {
@@ -293,7 +295,7 @@ private fun AuthenticatedContent(
         ) {
             Icon(
                 imageVector = Icons.Default.Person,
-                contentDescription = "User Avatar",
+                contentDescription = stringResource(R.string.cd_user_avatar),
                 modifier = Modifier.size(80.dp),
                 tint = MaterialTheme.colorScheme.onPrimaryContainer
             )
@@ -349,7 +351,7 @@ private fun UserInfoCard(
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = "Account Information",
+                text = stringResource(R.string.account_information),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary
@@ -358,15 +360,15 @@ private fun UserInfoCard(
 
             InfoRow(
                 icon = Icons.Default.Email,
-                label = "Email",
+                label = stringResource(R.string.email_label),
                 value = email
             )
             Spacer(modifier = Modifier.height(12.dp))
 
             InfoRow(
                 icon = if (isVerified) Icons.Default.CheckCircle else Icons.Default.Warning,
-                label = "Email Verified",
-                value = if (isVerified) "Yes" else "No"
+                label = stringResource(R.string.email_verified_label),
+                value = if (isVerified) stringResource(R.string.yes) else stringResource(R.string.no)
             )
         }
     }
@@ -428,7 +430,7 @@ private fun ActionButtons(
                 modifier = Modifier.size(20.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text(text = "Sign Out", style = MaterialTheme.typography.bodyLarge)
+            Text(text = stringResource(R.string.sign_out), style = MaterialTheme.typography.bodyLarge)
         }
 
         OutlinedButton(
@@ -444,7 +446,7 @@ private fun ActionButtons(
                 modifier = Modifier.size(20.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text(text = "Delete Account", style = MaterialTheme.typography.bodyLarge)
+            Text(text = stringResource(R.string.delete_account), style = MaterialTheme.typography.bodyLarge)
         }
     }
 }
@@ -463,10 +465,10 @@ private fun DeleteAccountDialog(
                 tint = MaterialTheme.colorScheme.error
             )
         },
-        title = { Text(text = "Delete Account?", style = MaterialTheme.typography.titleLarge) },
+        title = { Text(text = stringResource(R.string.delete_account_title), style = MaterialTheme.typography.titleLarge) },
         text = {
             Text(
-                text = "This action cannot be undone. All your data will be permanently deleted.",
+                text = stringResource(R.string.delete_account_message),
                 style = MaterialTheme.typography.bodyMedium
             )
         },
@@ -474,10 +476,10 @@ private fun DeleteAccountDialog(
             Button(
                 onClick = onConfirm,
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
-            ) { Text("Delete") }
+            ) { Text(stringResource(R.string.delete)) }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
         }
     )
 }
@@ -509,7 +511,7 @@ private fun EmailVerificationContent(
         ) {
             Icon(
                 imageVector = Icons.Default.MarkEmailRead,
-                contentDescription = "Email Verification",
+                contentDescription = stringResource(R.string.cd_email_verification),
                 modifier = Modifier.size(64.dp),
                 tint = MaterialTheme.colorScheme.onPrimaryContainer
             )
@@ -518,7 +520,7 @@ private fun EmailVerificationContent(
         Spacer(modifier = Modifier.height(32.dp))
 
         Text(
-            text = "Verify Your Email",
+            text = stringResource(R.string.verify_your_email),
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface
@@ -527,7 +529,7 @@ private fun EmailVerificationContent(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "We've sent a verification email to:",
+            text = stringResource(R.string.verification_sent_to),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -544,7 +546,7 @@ private fun EmailVerificationContent(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "Please check your inbox and click the verification link to complete your registration.",
+            text = stringResource(R.string.verification_check_inbox),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(horizontal = 16.dp)
@@ -608,7 +610,7 @@ private fun EmailVerificationContent(
                 Spacer(modifier = Modifier.width(8.dp))
             }
             Text(
-                text = if (isChecking) "Checking..." else "I've Verified My Email",
+                text = if (isChecking) stringResource(R.string.checking) else stringResource(R.string.verified_my_email),
                 style = MaterialTheme.typography.titleMedium
             )
         }
@@ -638,7 +640,7 @@ private fun EmailVerificationContent(
                 Spacer(modifier = Modifier.width(8.dp))
             }
             Text(
-                text = if (isResending) "Sending..." else "Resend Verification Email",
+                text = if (isResending) stringResource(R.string.sending) else stringResource(R.string.resend_verification_email),
                 style = MaterialTheme.typography.titleMedium
             )
         }
@@ -650,7 +652,7 @@ private fun EmailVerificationContent(
             enabled = !isResending && !isChecking
         ) {
             Text(
-                text = "Cancel and Sign Out",
+                text = stringResource(R.string.cancel_and_sign_out),
                 color = MaterialTheme.colorScheme.error
             )
         }
@@ -942,4 +944,8 @@ private fun ProfileScreenErrorPreview() {
         onCancelVerification = {}
     )
 }
+
+
+
+
 

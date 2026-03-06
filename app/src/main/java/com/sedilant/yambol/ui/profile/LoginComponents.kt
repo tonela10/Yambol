@@ -44,6 +44,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -94,7 +95,7 @@ fun SignInContent(
         Spacer(modifier = Modifier.height(32.dp))
 
         Text(
-            text = "Welcome Back",
+            text = stringResource(R.string.welcome_back),
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface
@@ -103,7 +104,7 @@ fun SignInContent(
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = if (showPasswordField) "Enter your password" else "Sign in to your account",
+            text = if (showPasswordField) stringResource(R.string.enter_password) else stringResource(R.string.sign_in_to_account),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -119,7 +120,7 @@ fun SignInContent(
                 IconButton(onClick = onGoBackToEmail) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Go back"
+                        contentDescription = stringResource(R.string.go_back)
                     )
                 }
                 Text(
@@ -141,7 +142,7 @@ fun SignInContent(
                 OutlinedTextField(
                     value = email,
                     onValueChange = onEmailChange,
-                    label = { Text("Email") },
+                    label = { Text(stringResource(R.string.email_label)) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
                     isError = emailError != null,
@@ -169,7 +170,7 @@ fun SignInContent(
                     shape = MaterialTheme.shapes.medium
                 ) {
                     Text(
-                        text = "Continue with Email",
+                        text = stringResource(R.string.continue_with_email),
                         style = MaterialTheme.typography.titleMedium
                     )
                 }
@@ -185,7 +186,7 @@ fun SignInContent(
                 OutlinedTextField(
                     value = password,
                     onValueChange = onPasswordChange,
-                    label = { Text("Password") },
+                    label = { Text(stringResource(R.string.password_label)) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
                     isError = passwordError != null,
@@ -208,7 +209,7 @@ fun SignInContent(
                         IconButton(onClick = onTogglePasswordVisibility) {
                             Icon(
                                 imageVector = if (isPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                                contentDescription = "Toggle password visibility"
+                                contentDescription = stringResource(R.string.toggle_password_visibility)
                             )
                         }
                     },
@@ -225,7 +226,7 @@ fun SignInContent(
                     shape = MaterialTheme.shapes.medium
                 ) {
                     Text(
-                        text = "Sign In",
+                        text = stringResource(R.string.sign_in),
                         style = MaterialTheme.typography.titleMedium
                     )
                 }
@@ -241,7 +242,7 @@ fun SignInContent(
         ) {
             HorizontalDivider(modifier = Modifier.weight(1f))
             Text(
-                text = "  or  ",
+                text = stringResource(R.string.or_divider),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -261,7 +262,7 @@ fun SignInContent(
         // Navigate to Sign Up
         TextButton(onClick = onNavigateToSignUp) {
             Text(
-                text = "Don't have an account? Sign Up",
+                text = stringResource(R.string.no_account_sign_up),
                 color = MaterialTheme.colorScheme.primary
             )
         }
@@ -312,7 +313,7 @@ fun SignUpContent(
         Spacer(modifier = Modifier.height(32.dp))
 
         Text(
-            text = "Create Account",
+            text = stringResource(R.string.create_account),
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface
@@ -321,7 +322,7 @@ fun SignUpContent(
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "Sign up to get started",
+            text = stringResource(R.string.sign_up_get_started),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -332,7 +333,7 @@ fun SignUpContent(
         OutlinedTextField(
             value = email,
             onValueChange = onEmailChange,
-            label = { Text("Email") },
+            label = { Text(stringResource(R.string.email_label)) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             isError = emailError != null,
@@ -353,7 +354,7 @@ fun SignUpContent(
         OutlinedTextField(
             value = password,
             onValueChange = onPasswordChange,
-            label = { Text("Password") },
+            label = { Text(stringResource(R.string.password_label)) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             isError = password.isNotEmpty() && !passwordValidation.isValid,
@@ -369,7 +370,7 @@ fun SignUpContent(
                 IconButton(onClick = onTogglePasswordVisibility) {
                     Icon(
                         imageVector = if (isPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                        contentDescription = "Toggle password visibility"
+                        contentDescription = stringResource(R.string.toggle_password_visibility)
                     )
                 }
             },
@@ -388,7 +389,7 @@ fun SignUpContent(
         OutlinedTextField(
             value = confirmPassword,
             onValueChange = onConfirmPasswordChange,
-            label = { Text("Confirm Password") },
+            label = { Text(stringResource(R.string.confirm_password_label)) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             isError = confirmPasswordError != null,
@@ -411,7 +412,7 @@ fun SignUpContent(
                 IconButton(onClick = onToggleConfirmPasswordVisibility) {
                     Icon(
                         imageVector = if (isConfirmPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                        contentDescription = "Toggle password visibility"
+                        contentDescription = stringResource(R.string.toggle_password_visibility)
                     )
                 }
             },
@@ -429,7 +430,7 @@ fun SignUpContent(
             enabled = passwordValidation.isValid && confirmPassword == password && email.isNotBlank()
         ) {
             Text(
-                text = "Sign Up",
+                text = stringResource(R.string.sign_up),
                 style = MaterialTheme.typography.titleMedium
             )
         }
@@ -443,7 +444,7 @@ fun SignUpContent(
         ) {
             HorizontalDivider(modifier = Modifier.weight(1f))
             Text(
-                text = "  or  ",
+                text = stringResource(R.string.or_divider),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -463,7 +464,7 @@ fun SignUpContent(
         // Navigate to Sign In
         TextButton(onClick = onNavigateToSignIn) {
             Text(
-                text = "Already have an account? Sign In",
+                text = stringResource(R.string.already_have_account_sign_in),
                 color = MaterialTheme.colorScheme.primary
             )
         }
@@ -482,15 +483,15 @@ private fun PasswordRequirements(
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         PasswordRequirementItem(
-            text = "At least 6 characters",
+            text = stringResource(R.string.password_requirement_min_length),
             isMet = validation.hasMinLength
         )
         PasswordRequirementItem(
-            text = "At least 1 number",
+            text = stringResource(R.string.password_requirement_number),
             isMet = validation.hasNumber
         )
         PasswordRequirementItem(
-            text = "At least 1 symbol (!@#\$%^&*)",
+            text = stringResource(R.string.password_requirement_symbol),
             isMet = validation.hasSymbol
         )
     }
@@ -546,13 +547,13 @@ fun GoogleSignInButton(
         } else {
             Icon(
                 painter = painterResource(id = R.drawable.ic_google),
-                contentDescription = "Google",
+                contentDescription = stringResource(R.string.cd_google),
                 modifier = Modifier.size(24.dp),
                 tint = Color.Unspecified
             )
             Spacer(modifier = Modifier.width(12.dp))
             Text(
-                text = "Continue with Google",
+                text = stringResource(R.string.continue_with_google),
                 style = MaterialTheme.typography.titleMedium
             )
         }

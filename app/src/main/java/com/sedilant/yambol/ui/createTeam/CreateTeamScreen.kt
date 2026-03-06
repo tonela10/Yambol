@@ -38,6 +38,8 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -130,7 +132,7 @@ private fun CreateTeamScreenStateless(
                     }
 
                     CreateTeamUiState.Loading ->
-                        Text(text = "Loading...")
+                        Text(text = stringResource(R.string.loading))
                 }
             }
         }
@@ -157,7 +159,7 @@ private fun AddPlayer(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Add Team Players",
+            text = stringResource(R.string.add_team_players),
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onBackground,
@@ -167,7 +169,7 @@ private fun AddPlayer(
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "Add at least 5 players to create your team",
+            text = stringResource(R.string.add_at_least_players),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
@@ -195,7 +197,7 @@ private fun AddPlayer(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Player ${playersCount + 1}",
+                    text = stringResource(R.string.player_number, playersCount + 1),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.primary
@@ -289,7 +291,7 @@ private fun PlayerProgressIndicator(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Team Progress",
+                text = stringResource(R.string.team_progress),
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onPrimaryContainer
@@ -316,21 +318,21 @@ private fun PlayerProgressIndicator(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "$currentPlayers / $minPlayers players",
+                text = stringResource(R.string.players_progress, currentPlayers, minPlayers),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onPrimaryContainer
             )
 
             if (currentPlayers >= minPlayers) {
                 Text(
-                    text = "✓ Ready to finish!",
+                    text = stringResource(R.string.ready_to_finish),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.SemiBold
                 )
             } else {
                 Text(
-                    text = "${minPlayers - currentPlayers} more needed",
+                    text = pluralStringResource(R.plurals.more_needed, minPlayers - currentPlayers, minPlayers - currentPlayers),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
                 )
@@ -360,13 +362,13 @@ private fun FormButtons(
             shape = RoundedCornerShape(16.dp)
         ) {
             Text(
-                text = "Add Player",
+                text = stringResource(R.string.add_player),
                 style = MaterialTheme.typography.titleMedium
             )
             Spacer(modifier = Modifier.width(8.dp))
             Icon(
                 imageVector = Icons.AutoMirrored.Outlined.ArrowForward,
-                contentDescription = "Next Arrow"
+                contentDescription = stringResource(R.string.next)
             )
         }
 
@@ -400,7 +402,7 @@ private fun FormButtons(
                     shape = RoundedCornerShape(16.dp)
                 ) {
                     Text(
-                        text = "Create Team",
+                        text = stringResource(R.string.create_team),
                         style = MaterialTheme.typography.titleMedium
                     )
                 }
@@ -422,7 +424,7 @@ private fun AddTeamName(
     ) {
         // Header
         Text(
-            text = "Create Your Team",
+            text = stringResource(R.string.create_your_team),
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onBackground,
@@ -432,7 +434,7 @@ private fun AddTeamName(
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "Give your team a unique name",
+            text = stringResource(R.string.give_team_unique_name),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
@@ -456,7 +458,7 @@ private fun AddTeamName(
                 TextField(
                     value = teamName,
                     onValueChange = { updateTeam(it) },
-                    label = { Text("Team Name") },
+                    label = { Text(stringResource(R.string.team_label)) },
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions.Default.copy(
                         imeAction = ImeAction.Next,
@@ -474,7 +476,7 @@ private fun AddTeamName(
                 if (isErrorShow) {
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "The name is empty or already exists",
+                        text = stringResource(R.string.error_name_empty_or_exists),
                         color = MaterialTheme.colorScheme.error,
                         style = MaterialTheme.typography.bodySmall,
                         textAlign = TextAlign.Center

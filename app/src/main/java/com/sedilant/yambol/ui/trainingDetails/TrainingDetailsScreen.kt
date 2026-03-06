@@ -29,14 +29,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sedilant.yambol.R
-import com.sedilant.yambol.domain.models.TrainDomainModel
 import com.sedilant.yambol.domain.models.TaskDomain
+import com.sedilant.yambol.domain.models.TrainDomainModel
 import com.sedilant.yambol.ui.theme.YambolTheme
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -324,12 +325,12 @@ fun EmptyTasksCard() {
                 modifier = Modifier.size(48.dp)
             )
             Text(
-                text = "No tasks assigned",
+                text = stringResource(R.string.no_tasks_added),
                 style = MaterialTheme.typography.titleMedium,
                 textAlign = TextAlign.Center
             )
             Text(
-                text = "This training session doesn't have any tasks yet.",
+                text = stringResource(R.string.no_tasks_session),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
