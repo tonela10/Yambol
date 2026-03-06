@@ -1,9 +1,9 @@
 package com.sedilant.yambol.domain.models
 
 data class TaskDomain(
-    val trainingTaskId: Long,
+    val trainingTaskId: String,
     val name: String,
-    val concepts: List<Long>,
+    val concepts: List<String>,
     val description: String,
-    val variables: List<String>?
+    val variables: List<String>
 )

@@ -2,8 +2,9 @@ package com.sedilant.yambol.ui.createTrain.stepsScreens.trainDetails
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.sedilant.yambol.data.firebaseAuth.AuthRepository
 import com.sedilant.yambol.data.draftTrain.TrainingDraftRepository
-import com.sedilant.yambol.data.team.concept.ConceptRepository
+import com.sedilant.yambol.data.firestore.ConceptRepository
 import com.sedilant.yambol.domain.get.GetTeamsUseCase
 import com.sedilant.yambol.domain.insert.CreateTrainTaskUseCase
 import com.sedilant.yambol.domain.insert.CreateTrainUseCase
@@ -25,19 +26,19 @@ import java.util.Locale
 
 @HiltViewModel(assistedFactory = CreateTrainDetailsViewModelFactory::class)
 class CreateTrainDetailsViewModel @AssistedInject constructor(
-    @Assisted private val teamId: Long,
+    @Assisted private val teamId: String,
     private val draftRepository: TrainingDraftRepository,
     private val conceptRepository: ConceptRepository,
     private val createTrainUseCase: CreateTrainUseCase,
     private val createTrainTaskUseCase: CreateTrainTaskUseCase,
-    private val getTeamsUseCase: GetTeamsUseCase // TODO create a getTeamByIdUseCase
+    private val getTeamsUseCase: GetTeamsUseCase, // TODO create a getTeamByIdUseCase
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private val _uiState =
         MutableStateFlow<CreateTrainDetailsUiState>(CreateTrainDetailsUiState.Loading)
     val uiState: StateFlow<CreateTrainDetailsUiState> = _uiState.asStateFlow()
 
-    // ID del borrador
     private var draftId: String? = null
 
     init {
@@ -45,18 +46,26 @@ class CreateTrainDetailsViewModel @AssistedInject constructor(
     }
 
     /**
-     * Carga los detalles del entrenamiento desde el borrador activo.
+     * Loads training details from the active draft.
      */
     private fun loadTrainingDetails() {
         viewModelScope.launch {
             try {
+                // Get userId
+                // Ideally injected AuthRepository or maybe userId is provided in some UseCase or Manager.
+                // Assuming we can get userId somehow or I need to inject AuthRepository.
+                // CreateTrainDetailsViewModel does NOT inject AuthRepository yet.
+                // I will add it to the constructor.
+                val userId = authRepository.currentUser?.uid
+                    ?: throw IllegalStateException("User not logged in")
+
                 val teamName = getTeamsUseCase().first().first { it.id == teamId }.name
                 val id = draftRepository.getOrCreateActiveDraft()
                 draftId = id
                 draftId?.let { currentId ->
                     draftRepository.observeDraft(currentId).collect { draft ->
                         if (draft != null) {
-                            // Cálculo de duración: (Fin - Inicio) * 60 para obtener minutos
+                            // Calculate duration: (End - Start) * 60 to get minutes
                             val durationInMinutes = (draft.endTime - draft.startTime) * 60
 
                             val trainInfo = TrainInfo(
@@ -68,16 +77,21 @@ class CreateTrainDetailsViewModel @AssistedInject constructor(
 
                             // Convertir tareas del dominio a TaskUI para la vista
                             val tasksUI = draft.tasks.map { task ->
+                                // Get concept names from concept IDs
+                                val conceptNames = conceptRepository.getConceptsByIds(
+                                    userId,
+                                    task.concepts
+                                ).map { concept -> concept.name }
+
                                 TaskUI(
                                     id = task.id,
                                     name = task.name,
-                                    concepts = conceptRepository.getListOfConcepts(task.concepts)
-                                        .map { concept ->
-                                            Concept(
-                                                id = concept.id,
-                                                conceptName = concept.name
-                                            )
-                                        },
+                                    concepts = conceptNames.map { conceptName ->
+                                        Concept(
+                                            id = conceptName, // Assuming concept ID is the same as conceptName here or we just want to display it
+                                            conceptName = conceptName
+                                        )
+                                    },
                                     description = task.description,
                                     variation = task.variation,
                                     duration = ""
@@ -126,17 +140,18 @@ class CreateTrainDetailsViewModel @AssistedInject constructor(
                 // 1. Crear el entrenamiento principal
                 val trainId = createTrainUseCase(
                     date = draft?.date ?: Date(),
-                    time = draft?.startTime ?: 0f,
-                    concepts = draft?.concepts ?: emptyList(),
-                    teamId = teamId
+                    startTime = draft?.startTime ?: 0f,
+                    endTime = draft?.endTime ?: 0f,
+                    concepts = draft?.conceptIds ?: emptyList(),
+                    teamId = teamId,
                 )
 
                 // 2. Guardar cada tarea asociada al entrenamiento creado
                 draft?.tasks?.forEach { task ->
                     createTrainTaskUseCase(
+                        taskId = task.id,
                         trainId = trainId,
                         name = task.name,
-                        numberOfPlayer = 0,
                         concept = task.concepts,
                         description = task.description,
                         variables = task.variation.split(",")
@@ -207,5 +222,5 @@ data class TrainInfo(
 
 @AssistedFactory
 interface CreateTrainDetailsViewModelFactory {
-    fun create(teamId: Long): CreateTrainDetailsViewModel
+    fun create(teamId: String): CreateTrainDetailsViewModel
 }

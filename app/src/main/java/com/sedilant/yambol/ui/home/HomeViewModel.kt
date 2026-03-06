@@ -50,8 +50,8 @@ class HomeViewModel @Inject constructor(
         extraBufferCapacity = 0,
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
-    private val currentTeamFlow = MutableStateFlow<Long?>(null)
-    private var lastTrainId: Long? = null
+    private val currentTeamFlow = MutableStateFlow<String?>(null)
+    private var lastTrainId: String? = null
 
     private val _editTeamState = MutableStateFlow<EditTeamState>(EditTeamState.Hidden)
     val editTeamState: StateFlow<EditTeamState> = _editTeamState.asStateFlow()
@@ -64,7 +64,7 @@ class HomeViewModel @Inject constructor(
         setupUiStateFlow()
     }
 
-    fun onTeamChange(newTeamId: Long) {
+    fun onTeamChange(newTeamId: String) {
         viewModelScope.launch {
             currentTeamFlow.update { newTeamId }
             dataStoreManager.saveCurrentTeam(newTeamId)
@@ -79,27 +79,26 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun onToggleObjectiveStatus(objectiveId: Int) {
+    fun onToggleObjectiveStatus(objectiveId: String, isCompleted: Boolean) {
         viewModelScope.launch {
-            toggleTeamObjectiveUseCase(objectiveId)
+            toggleTeamObjectiveUseCase(objectiveId, !isCompleted)
         }
     }
 
-    fun onUpdateObjective(objectiveId: Int, newDescription: String) {
+    fun onUpdateObjective(objectiveId: String, newDescription: String, isCompleted: Boolean) {
         viewModelScope.launch {
-            updateTeamObjectiveUseCase(objectiveId, description = newDescription)
-        }
-    }
-
-    fun onDeleteObjective(objectiveId: Int, description: String, isFinished: Boolean) {
-        viewModelScope.launch {
-            val teamId = currentTeamFlow.value ?: return@launch
-            deleteTeamObjectiveUseCase(
-                objectiveId,
-                description = description,
-                isFinish = isFinished,
-                teamId = teamId,
+            updateTeamObjectiveUseCase(
+                objectiveId = objectiveId,
+                newDescription = newDescription,
+                isCompleted = isCompleted,
+                teamId = currentTeamFlow.value ?: return@launch
             )
+        }
+    }
+
+    fun onDeleteObjective(objectiveId: String) {
+        viewModelScope.launch {
+            deleteTeamObjectiveUseCase(objectiveId)
         }
     }
 
@@ -264,7 +263,7 @@ sealed interface HomeUiState {
         val listOfPlayer: List<PlayerUiModel>,
         val currentTeam: TeamUiModel?,
         val listOfObjectives: List<TeamObjectivesUiModel>,
-        val lastTrainId: Long? = null
+        val lastTrainId: String? = null
     ) : HomeUiState
 
     data object Loading : HomeUiState

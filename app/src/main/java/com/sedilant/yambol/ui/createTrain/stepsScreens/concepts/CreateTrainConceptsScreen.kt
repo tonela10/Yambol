@@ -47,7 +47,7 @@ private fun CreateTrainConceptsScreenStateless(
     uiState: UiState,
     onBack: () -> Unit,
     onNext: () -> Unit,
-    onConceptSelected: (Long) -> Unit,
+    onConceptSelected: (String) -> Unit,
     onAddConcept: (String) -> Unit,
     onClose: () -> Unit
 ) {
@@ -235,11 +235,11 @@ fun ConceptItem(
 @Composable
 fun ConceptsScreenPreview() {
     val sampleConcepts = listOf(
-        Concept(id = 1L, conceptName = "Tiro en suspensión", isSelected = true),
-        Concept(id = 2L, conceptName = "Defensa individual", isSelected = false),
-        Concept(id = 3L, conceptName = "Pase de pecho", isSelected = true),
-        Concept(id = 4L, conceptName = "Rebote ofensivo", isSelected = false),
-        Concept(id = 5L, conceptName = "Transición defensa-ataque", isSelected = true)
+        Concept(id = "1", conceptName = "Tiro en suspensión", isSelected = true),
+        Concept(id = "2", conceptName = "Defensa individual", isSelected = false),
+        Concept(id = "3", conceptName = "Pase de pecho", isSelected = true),
+        Concept(id = "4", conceptName = "Rebote ofensivo", isSelected = false),
+        Concept(id = "5", conceptName = "Transición defensa-ataque", isSelected = true)
     )
 
     CreateTrainConceptsScreenStateless(

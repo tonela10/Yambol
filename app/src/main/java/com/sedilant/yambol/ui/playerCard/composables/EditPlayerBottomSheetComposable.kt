@@ -36,7 +36,6 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.sedilant.yambol.domain.Position
 import com.sedilant.yambol.ui.home.models.PlayerUiModel
 import com.sedilant.yambol.ui.theme.YambolTheme
 
@@ -86,14 +85,6 @@ fun EditPlayerBottomSheet(
             }
         }
     }
-
-    val positions = listOf(
-        Position.POINT_GUARD to "Point Guard",
-        Position.SHOOTING_GUARD to "Shooting Guard",
-        Position.SMALL_FORWARD to "Small Forward",
-        Position.POWER_FORWARD to "Power Forward",
-        Position.CENTER to "Center"
-    )
 
     fun validateAndSave() {
         val trimmedName = playerName.trim()
@@ -293,8 +284,8 @@ private fun EditPlayerBottomSheetPreview() {
             player = PlayerUiModel(
                 name = "Carlos Canut",
                 number = "23",
-                id = 1,
-                teamId = 1
+                id = "1",
+                teamId = "1"
             ),
             onSave = {},
             onDismiss = {},
@@ -311,8 +302,8 @@ private fun EditPlayerBottomSheetWithErrorPreview() {
             player = PlayerUiModel(
                 name = "Carlos Canut",
                 number = "23",
-                id = 1,
-                teamId = 1
+                id = "1",
+                teamId = "1"
             ),
             onSave = {},
             onDismiss = {},

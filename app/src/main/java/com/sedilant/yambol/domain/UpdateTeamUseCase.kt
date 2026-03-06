@@ -1,5 +1,5 @@
 package com.sedilant.yambol.domain
 
 interface UpdateTeamUseCase {
-    suspend operator fun invoke(teamId: Long, newName: String)
+    suspend operator fun invoke(teamId: String, newName: String)
 }

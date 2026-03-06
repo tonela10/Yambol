@@ -1,26 +1,12 @@
 package com.sedilant.yambol.domain
 
-import com.sedilant.yambol.data.team.TeamRepository
-import com.sedilant.yambol.data.team.TeamObjectivesEntity
+import com.sedilant.yambol.data.firestore.TeamObjectiveRepository
 import javax.inject.Inject
 
 class DeleteTeamObjectiveUseCaseImpl @Inject constructor(
-    private val teamRepository: TeamRepository
+    private val teamObjectiveRepository: TeamObjectiveRepository
 ) : DeleteTeamObjectiveUseCase {
-    override suspend fun invoke(
-        objectiveId: Int,
-        description: String,
-        isFinish: Boolean,
-        teamId: Long
-    ) {
-        teamRepository.deleteTeamObjective(
-            TeamObjectivesEntity(
-                id = objectiveId,
-                description = description,
-                isFinish = isFinish,
-                teamId = teamId,
-
-                )
-        )
+    override suspend fun invoke(teamObjectiveId: String) {
+        teamObjectiveRepository.delete(teamObjectiveId)
     }
 }

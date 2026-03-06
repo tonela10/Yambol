@@ -8,15 +8,15 @@ data class Training(
     val date: Date,
     val endTime: Float,
     val startTime: Float,
-    val concepts: List<Long>,
+    val conceptIds: List<String>,
     val tasks: List<Task>,
-    val teamId: Long
+    val teamId: String
 )
 
 data class Task(
     val id: String = UUID.randomUUID().toString(),
     val name: String,
-    val concepts: List<Long>,
+    val concepts: List<String>,
     val description: String,
     val variation: String
 )
@@ -28,7 +28,7 @@ fun TrainingDraftEntity.toDomain(tasks: List<TrainingTaskEntity>): Training {
         date = Date(this.date),
         endTime = this.endTime,
         startTime = this.startTime,
-        concepts = this.concepts,
+        conceptIds = this.concepts,
         tasks = tasks.map { it.toDomain() },
         teamId = teamId
     )
@@ -40,7 +40,7 @@ fun Training.toEntity(): TrainingDraftEntity {
         date = this.date.time,
         endTime = this.endTime,
         startTime = this.startTime,
-        concepts = this.concepts,
+        concepts = this.conceptIds,
         teamId = teamId
     )
 }
@@ -75,7 +75,7 @@ fun TrainingWithTasks.toDomain(): Training {
         date = java.util.Date(this.training.date), // Converting Long to Date
         endTime = this.training.endTime,
         startTime = this.training.startTime,
-        concepts = this.training.concepts,
+        conceptIds = this.training.concepts,
         tasks = this.tasks.map { taskEntity ->
             Task(
                 id = taskEntity.id,

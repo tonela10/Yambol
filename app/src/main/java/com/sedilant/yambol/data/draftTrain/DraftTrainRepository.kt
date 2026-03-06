@@ -12,8 +12,8 @@ interface TrainingDraftRepository {
         date: Date? = null,
         endTime: Float? = null,
         startTime: Float? = null,
-        concepts: List<Long>? = null,
-        teamId: Long? = null
+        concepts: List<String>? = null,
+        teamId: String? = null
     )
     suspend fun updateTasksList(trainingId: String, tasks: List<Task>)
     suspend fun addTask(trainingId: String, task: Task)

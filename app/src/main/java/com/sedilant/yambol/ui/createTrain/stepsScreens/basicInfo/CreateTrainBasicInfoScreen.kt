@@ -54,7 +54,7 @@ import java.util.Locale
 fun CreateTrainBasicInfoScreen(
     onClose: () -> Unit,
     onNext: () -> Unit,
-    teamId: Long,
+    teamId: String,
     viewModel: CreateTrainBasicInfoViewModel = hiltViewModel(
         creationCallback = { factory: CreateTrainBasicInfoViewModelFactory ->
             factory.create(teamId = teamId)
@@ -84,7 +84,7 @@ private fun CreateTrainBasicInfoScreenStateless(
     uiState: CreateTrainBasicInfoViewModel.UiStateNew,
     onClose: () -> Unit,
     onNext: () -> Unit,
-    onTeamSelected: (Long) -> Unit,
+    onTeamSelected: (String) -> Unit,
     onDateSelected: (Date) -> Unit,
     onStartTimeChanged: (Int, Int) -> Unit,
     onEndTimeChanged: (Int, Int) -> Unit
@@ -314,8 +314,8 @@ fun BasicInfoScreenPreview() {
                 onClose = {},
                 onNext = {},
                 uiState = CreateTrainBasicInfoViewModel.UiStateNew.Success(
-                    teamsList = listOf(TeamDomainModel(1, "Cachos"), TeamDomainModel(2, "Cachos2")),
-                    selectedTeamId = 1,
+                    teamsList = listOf(TeamDomainModel("1", "Cachos"), TeamDomainModel("2", "Cachos2")),
+                    selectedTeamId = "1",
                     selectedDate = Date(), // Current Date
                     startHour = 17.5f,    // 17:30
                     endHour = 19.0f       // 19:00

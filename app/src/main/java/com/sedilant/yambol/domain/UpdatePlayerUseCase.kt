@@ -2,9 +2,9 @@ package com.sedilant.yambol.domain
 
 interface UpdatePlayerUseCase {
     suspend operator fun invoke(
-        playerId: Long,
+        playerId: String,
         newName: String,
         newNumber: Int,
-        teamId: Long,
+        teamId: String,
     )
 }

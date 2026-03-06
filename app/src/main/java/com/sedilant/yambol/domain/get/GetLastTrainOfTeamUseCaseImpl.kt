@@ -1,14 +1,17 @@
 package com.sedilant.yambol.domain.get
 
-import com.sedilant.yambol.data.team.TeamRepository
+import com.sedilant.yambol.data.firebaseAuth.AuthRepository
+import com.sedilant.yambol.data.firestore.TrainRepository
 import javax.inject.Inject
 
 class GetLastTrainOfTeamUseCaseImpl @Inject constructor(
-    private val teamRepository: TeamRepository
+    private val trainRepository: TrainRepository,
+    private val authRepository: AuthRepository
 ) : GetLastTrainOfTeamUseCase {
-    override suspend fun invoke(teamId: Long?): Long? {
-        return if (teamId != null) {
-            teamRepository.getLastTrainWithTrainTaskByTeamId(teamId)
+    override suspend fun invoke(teamId: String?): String? {
+        val userId = authRepository.currentUser?.uid
+        return if (teamId != null && userId != null) {
+            trainRepository.getLastTrainId(userId, teamId)
         } else null
     }
 }

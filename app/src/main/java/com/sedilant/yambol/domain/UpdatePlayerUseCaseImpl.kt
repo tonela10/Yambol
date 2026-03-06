@@ -1,25 +1,20 @@
 package com.sedilant.yambol.domain
 
-import com.sedilant.yambol.data.team.player.PlayerEntity
-import com.sedilant.yambol.data.team.player.PlayerRepository
+import com.sedilant.yambol.data.firebaseAuth.AuthRepository
+import com.sedilant.yambol.data.firestore.PlayerRepository
 import javax.inject.Inject
 
 class UpdatePlayerUseCaseImpl @Inject constructor(
-    private val playerRepository: PlayerRepository
+    private val playerRepository: PlayerRepository,
+    private val authRepository: AuthRepository
 ) : UpdatePlayerUseCase {
     override suspend fun invoke(
-        playerId: Long,
+        playerId: String,
         newName: String,
         newNumber: Int,
-        teamId: Long,
+        teamId: String,
     ) {
-        playerRepository.updatePlayer(
-            player = PlayerEntity(
-                id = playerId,
-                name = newName,
-                number = newNumber,
-                teamId = teamId
-            )
-        )
+        authRepository.currentUser?.uid ?: return
+        playerRepository.update(playerId, newName, newNumber)
     }
 }

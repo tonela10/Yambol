@@ -1,14 +1,12 @@
 package com.sedilant.yambol.domain
 
-import com.sedilant.yambol.data.team.TeamRepository
+import com.sedilant.yambol.data.firestore.TeamObjectiveRepository
 import javax.inject.Inject
 
 class ToggleTeamObjectiveUseCaseImpl @Inject constructor(
-    private val repository: TeamRepository
+    private val repository: TeamObjectiveRepository
 ) : ToggleTeamObjectiveUseCase {
-    override suspend fun invoke(objectiveId: Int) {
-        val objective = repository.getTeamObjectiveById(objectiveId) ?: return
-        val updatedObjective = objective.copy(isFinish = !objective.isFinish)
-        repository.updateTeamObjective(updatedObjective)
+    override suspend fun invoke(objectiveId: String, isCompleted: Boolean) {
+        repository.toggleCompletion(objectiveId, isCompleted)
     }
 }

@@ -1,35 +1,41 @@
 package com.sedilant.yambol.domain.insert
 
-import com.sedilant.yambol.data.team.TeamRepository
-import com.sedilant.yambol.data.team.TrainCrossTrainTaskEntity
-import com.sedilant.yambol.data.team.TaskEntity
+import com.sedilant.yambol.data.firebaseAuth.AuthRepository
+import com.sedilant.yambol.data.firestore.TaskDto
+import com.sedilant.yambol.data.firestore.TaskRepository
+import com.sedilant.yambol.data.firestore.TrainRepository
 import javax.inject.Inject
 
 class CreateTrainTaskUseCaseImpl @Inject constructor(
-    private val teamRepository: TeamRepository
+    private val taskRepository: TaskRepository,
+    private val trainRepository: TrainRepository,
+    private val authRepository: AuthRepository
 ) : CreateTrainTaskUseCase {
     override suspend fun invoke(
-        trainId: Long,
+        taskId: String,
+        trainId: String?,
         name: String,
-        numberOfPlayer: Int,
-        concept: List<Long>,
+        concept: List<String>,
         description: String,
         variables: List<String>
     ) {
-        val taskId = teamRepository.insertTrainTask(
-            TaskEntity(
+        val userId = authRepository.currentUser?.uid ?: return
+
+        // create task
+        val finalTaskId = taskRepository.upsert(
+            TaskDto(
+                id = taskId,
                 name = name,
-                conceptsId = concept,
                 description = description,
                 variables = variables,
-                corrections = null
+                conceptIds = concept,
+                userId = userId
             )
         )
-        teamRepository.insertTrainCrossTrainTask(
-            TrainCrossTrainTaskEntity(
-                trainId = trainId,
-                taskId = taskId
-            )
-        )
+
+        // link to train
+        if (!trainId.isNullOrBlank()) {
+            trainRepository.addTaskToTrain(trainId, finalTaskId)
+        }
     }
 }

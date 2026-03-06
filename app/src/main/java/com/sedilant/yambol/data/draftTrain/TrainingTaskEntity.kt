@@ -23,7 +23,7 @@ data class TrainingTaskEntity(
     val id: String = UUID.randomUUID().toString(),
     val trainingId: String, // FK
     val name: String,
-    val conceptIds: List<Long>,
+    val conceptIds: List<String>,
     val description: String,
     val variation: String,
     val orderIndex: Int = 0

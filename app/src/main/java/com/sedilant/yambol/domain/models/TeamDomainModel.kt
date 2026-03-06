@@ -1,6 +1,6 @@
 package com.sedilant.yambol.domain.models
 
 data class TeamDomainModel(
-    val id: Long,
-    val name: String,
+    val id: String,
+    val name: String
 )

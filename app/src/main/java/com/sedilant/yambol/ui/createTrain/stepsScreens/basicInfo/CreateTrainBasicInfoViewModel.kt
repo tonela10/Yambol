@@ -24,14 +24,14 @@ import java.util.Date
 
 @HiltViewModel(assistedFactory = CreateTrainBasicInfoViewModelFactory::class)
 class CreateTrainBasicInfoViewModel @AssistedInject constructor(
-    @Assisted private val teamId: Long,
+    @Assisted private val teamId: String,
     private val repository: TrainingDraftRepository,
     private val getAllTeamsUseCase: GetTeamsUseCase,
     private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<UiStateNew>(UiStateNew.Loading)
-    public val uiState: StateFlow<UiStateNew> = _uiState.asStateFlow()
+    val uiState: StateFlow<UiStateNew> = _uiState.asStateFlow()
 
     private var draftId: String?
         get() = savedStateHandle.get<String>(KEY_DRAFT_ID)
@@ -108,7 +108,7 @@ class CreateTrainBasicInfoViewModel @AssistedInject constructor(
     /**
      * Actualiza el equipo seleccionado
      */
-    fun onTeamSelected(teamId: Long) {
+    fun onTeamSelected(teamId: String) {
         val currentState = _uiState.value
         if (currentState is UiStateNew.Success) {
             _uiState.value = currentState.copy(selectedTeamId = teamId)
@@ -192,18 +192,17 @@ class CreateTrainBasicInfoViewModel @AssistedInject constructor(
         return hour + (minute / 60f)
     }
 
-    sealed interface UiStateNew {
-        data object Loading : UiStateNew
-        data class Error(val message: String) : UiStateNew
+    sealed class UiStateNew {
+        data object Loading : UiStateNew()
         data class Success(
-            val teamsList: List<TeamDomainModel>,
-            val selectedTeamId: Long,
-            val selectedDate: Date = Date(),
+            val selectedDate: Date,
             val startHour: Float,
             val endHour: Float,
-        ) : UiStateNew
+            val teamsList: List<TeamDomainModel>,
+            val selectedTeamId: String
+        ) : UiStateNew()
+        data class Error(val message: String) : UiStateNew()
     }
-
 
     companion object {
         private const val KEY_DRAFT_ID = "draft_id"
@@ -212,5 +211,5 @@ class CreateTrainBasicInfoViewModel @AssistedInject constructor(
 
 @AssistedFactory
 interface CreateTrainBasicInfoViewModelFactory {
-    fun create(teamId: Long): CreateTrainBasicInfoViewModel
+    fun create(teamId: String): CreateTrainBasicInfoViewModel
 }

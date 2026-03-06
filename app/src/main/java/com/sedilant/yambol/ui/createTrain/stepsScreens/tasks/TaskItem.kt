@@ -106,7 +106,7 @@ fun TaskItemPreview() {
         task = TaskUI(
             id = "1",
             name = "Sentadillas",
-            concepts = listOf(Concept(1, "Sentadillas")),
+            concepts = listOf(Concept("1", "Sentadillas")),
             description = "3 series de 12 repeticiones",
             variation = "Con barra libre",
             duration = "20 minutos"

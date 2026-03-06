@@ -39,7 +39,7 @@ fun CreateTrainDetailsScreenV2(
     onBack: () -> Unit,
     onClose: () -> Unit,
     onTrainingSaved: () -> Unit, // Navigate after save
-    teamId: Long,
+    teamId: String,
     viewModel: CreateTrainDetailsViewModel = hiltViewModel(
         creationCallback = { factory: CreateTrainDetailsViewModelFactory ->
             factory.create(teamId)
@@ -302,7 +302,7 @@ private fun CreateTrainDetailsScreenPreview() {
                     name = "Sentadillas",
                     description = "3x12 con barra libre",
                     variation = "Con barra libre",
-                    concepts = listOf(Concept(1, "Sentadillas")),
+                    concepts = listOf(Concept("1", "Sentadillas")),
                 )
             ),
             listOfConcepts = listOf("Tiro en suspensión", "Defensa individual")

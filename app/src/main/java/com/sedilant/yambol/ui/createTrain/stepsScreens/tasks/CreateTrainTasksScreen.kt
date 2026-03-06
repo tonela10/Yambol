@@ -69,7 +69,7 @@ private fun CreateTrainTasksScreenStateless(
     onClose: () -> Unit,
     onClearError: () -> Unit,
     onMove: (from: Int, to: Int) -> Unit,
-    onAddTask: (name: String, description: String, variation: List<String>, concepts: List<Long>) -> Unit,
+    onAddTask: (name: String, description: String, variation: List<String>, concepts: List<String>) -> Unit,
     onTaskSelected: (TaskUI) -> Unit,
     onDeleteTask: (taskId: String) -> Unit
 ) {

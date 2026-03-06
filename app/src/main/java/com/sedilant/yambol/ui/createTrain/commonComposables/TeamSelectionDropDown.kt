@@ -37,8 +37,8 @@ import com.sedilant.yambol.ui.theme.YambolTheme
 @Composable
 fun TeamSelectionDropdown(
     teams: List<TeamDomainModel>,
-    selectedTeamId: Long,
-    onTeamSelected: (Long) -> Unit
+    selectedTeamId: String,
+    onTeamSelected: (String) -> Unit
 ) {
     if (teams.isNotEmpty()) {
         var expanded by remember { mutableStateOf(false) }
@@ -108,12 +108,12 @@ fun TeamSelectionDropdown(
 @Composable
 private fun TeamSelectionDropdownPreview() {
     val mockTeams = listOf(
-        TeamDomainModel(id = 1L, name = "Cachos F.C."),
-        TeamDomainModel(id = 2L, name = "Yambol Warriors"),
-        TeamDomainModel(id = 3L, name = "Junior Team")
+        TeamDomainModel(id = "1", name = "Cachos F.C."),
+        TeamDomainModel(id = "2", name = "Yambol Warriors"),
+        TeamDomainModel(id = "3", name = "Junior Team")
     )
 
-    var selectedId by remember { mutableStateOf(1L) }
+    var selectedId by remember { mutableStateOf("1") }
 
     YambolTheme() {
         Surface(

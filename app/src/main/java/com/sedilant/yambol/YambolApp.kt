@@ -4,7 +4,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -49,15 +51,25 @@ sealed interface YambolScreen {
     data class AddTeamStats(val teamId: Int, val statsIds: List<Int>) : YambolScreen
 
     @Serializable
-    data class TrainingDetails(val trainId: Long) : YambolScreen
+    data class TrainingDetails(val trainId: String) : YambolScreen
 
     @Serializable
-    data class CreateTrain(val currentTeam: Long) : YambolScreen
+    data class CreateTrain(val currentTeam: String) : YambolScreen
 }
 
 @Composable
-fun YambolApp() {
+fun YambolApp(
+    viewModel: YambolAppViewModel = hiltViewModel()
+) {
     val navController = rememberNavController()
+    val isAuthenticated = viewModel.isAuthenticated.collectAsState()
+
+    // Determine initial route based on auth state
+    val startDestination = if (isAuthenticated.value) {
+        YambolScreen.Home
+    } else {
+        YambolScreen.Profile
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -67,7 +79,7 @@ fun YambolApp() {
     ) { paddingValues ->
         NavHost(
             navController = navController,
-            startDestination = YambolScreen.Home,
+            startDestination = startDestination,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)

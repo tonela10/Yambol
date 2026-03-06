@@ -4,5 +4,5 @@ import com.sedilant.yambol.ui.home.models.PlayerUiModel
 import kotlinx.coroutines.flow.Flow
 
 interface GetPlayersByTeamIdUseCase {
-    suspend operator fun invoke(teamId: Long): Flow<List<PlayerUiModel>>
+    suspend operator fun invoke(teamId: String): Flow<List<PlayerUiModel>>
 }

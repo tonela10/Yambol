@@ -1,19 +1,29 @@
 package com.sedilant.yambol.domain
 
-import com.sedilant.yambol.data.team.TeamRepository
+import com.sedilant.yambol.data.firebaseAuth.AuthRepository
+import com.sedilant.yambol.data.firestore.TeamObjectiveDto
+import com.sedilant.yambol.data.firestore.TeamObjectiveRepository
 import javax.inject.Inject
 
 class UpdateTeamObjectiveUseCaseImpl @Inject constructor(
-    private val repository: TeamRepository
+    private val repository: TeamObjectiveRepository,
+    private val authRepository: AuthRepository
 ) : UpdateTeamObjectiveUseCase {
-    override suspend fun invoke(objectiveId: Int, description: String?, isFinish: Boolean?) {
-        val objective = repository.getTeamObjectiveById(objectiveId) ?: return // TODO return an error saying that the objective does not exists
-
-        val updatedObjective = objective.copy(
-            description = description ?: objective.description,
-            isFinish = isFinish ?: objective.isFinish
+    override suspend fun invoke(
+        objectiveId: String,
+        newDescription: String,
+        isCompleted: Boolean,
+        teamId: String
+    ) {
+        val userId = authRepository.currentUser?.uid ?: return
+        repository.upsert(
+            TeamObjectiveDto(
+                id = objectiveId,
+                title = newDescription,
+                userId = userId,
+                completed = isCompleted,
+                teamId = teamId
+            )
         )
-
-        repository.updateTeamObjective(updatedObjective)
     }
 }

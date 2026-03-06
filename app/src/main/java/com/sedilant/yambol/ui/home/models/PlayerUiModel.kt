@@ -1,8 +1,9 @@
 package com.sedilant.yambol.ui.home.models
 
+// Added position for compatibility with HomeViewModel constructor calls
 data class PlayerUiModel(
     val name: String,
     val number: String,
-    val id: Long = 0,
-    val teamId: Long // This should be only in the domainPlayerModel
+    val id: String = "",
+    val teamId: String, // This should be only in the domainPlayerModel
 )
