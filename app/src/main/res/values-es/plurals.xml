@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="teams_count">
+        <item quantity="one">%d equipo</item>
+        <item quantity="other">%d equipos</item>
+    </plurals>
+    <plurals name="players_count">
+        <item quantity="one">%d jugador</item>
+        <item quantity="other">%d jugadores</item>
+    </plurals>
+    <plurals name="tasks_count">
+        <item quantity="one">%d tarea</item>
+        <item quantity="other">%d tareas</item>
+    </plurals>
+    <plurals name="exercises_count">
+        <item quantity="one">%d ejercicio</item>
+        <item quantity="other">%d ejercicios</item>
+    </plurals>
+    <plurals name="concepts_count">
+        <item quantity="one">%d concepto</item>
+        <item quantity="other">%d conceptos</item>
+    </plurals>
+    <plurals name="sessions_count">
+        <item quantity="one">%d sesión</item>
+        <item quantity="other">%d sesiones</item>
+    </plurals>
+    <plurals name="objectives_count">
+        <item quantity="one">%d objetivo</item>
+        <item quantity="other">%d objetivos</item>
+    </plurals>
+    <plurals name="items_added">
+        <item quantity="one">%d elemento añadido</item>
+        <item quantity="other">%d elementos añadidos</item>
+    </plurals>
+    <plurals name="items_selected">
+        <item quantity="one">%d elemento seleccionado</item>
+        <item quantity="other">%d elementos seleccionados</item>
+    </plurals>
+    <plurals name="more_needed">
+        <item quantity="one">%d más necesario</item>
+        <item quantity="other">%d más necesarios</item>
+    </plurals>
+</resources>
+

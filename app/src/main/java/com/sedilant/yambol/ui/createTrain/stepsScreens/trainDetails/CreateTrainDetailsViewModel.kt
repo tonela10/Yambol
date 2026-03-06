@@ -2,8 +2,8 @@ package com.sedilant.yambol.ui.createTrain.stepsScreens.trainDetails
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sedilant.yambol.data.firebaseAuth.AuthRepository
 import com.sedilant.yambol.data.draftTrain.TrainingDraftRepository
+import com.sedilant.yambol.data.firebaseAuth.AuthRepository
 import com.sedilant.yambol.data.firestore.ConceptRepository
 import com.sedilant.yambol.domain.get.GetTeamsUseCase
 import com.sedilant.yambol.domain.insert.CreateTrainTaskUseCase
@@ -172,10 +172,8 @@ class CreateTrainDetailsViewModel @AssistedInject constructor(
         }
     }
 
-    // --- Métodos de formateo ---
-
     private fun formatDate(date: Date): String {
-        val format = SimpleDateFormat("d 'de' MMMM 'de' yyyy", Locale("es", "ES"))
+        val format = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
         return format.format(date)
     }
 
@@ -198,8 +196,6 @@ class CreateTrainDetailsViewModel @AssistedInject constructor(
         }
     }
 }
-
-// --- Estados de la UI ---
 
 sealed interface CreateTrainDetailsUiState {
     data object Loading : CreateTrainDetailsUiState

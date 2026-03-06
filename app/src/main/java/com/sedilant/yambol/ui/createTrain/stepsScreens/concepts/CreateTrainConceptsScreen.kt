@@ -2,23 +2,45 @@ package com.sedilant.yambol.ui.createTrain.stepsScreens.concepts
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LoadingIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.sedilant.yambol.R
 import com.sedilant.yambol.ui.createTrain.commonComposables.CreateTrainScaffold
 import com.sedilant.yambol.ui.createTrain.stepsScreens.concepts.CreateTrainConceptsViewModel.UiState
 
@@ -56,10 +78,10 @@ private fun CreateTrainConceptsScreenStateless(
     val sheetState = rememberModalBottomSheetState()
 
     CreateTrainScaffold(
-        title = "Crear entrenamiento",
+        title = stringResource(R.string.create_training),
         onCloseClick = onClose,
         onBottomButtonClick = onNext,
-        bottomButtonText = "Siguiente",
+        bottomButtonText = stringResource(R.string.next),
         showBackButton = true,
         onBackClick = onBack,
     ) { paddingValues ->
@@ -83,7 +105,7 @@ private fun CreateTrainConceptsScreenStateless(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(text = uiState.message, color = MaterialTheme.colorScheme.error)
-                        Button(onClick = onBack) { Text("Volver") }
+                        Button(onClick = onBack) { Text(stringResource(R.string.back)) }
                     }
                 }
 
@@ -113,7 +135,7 @@ private fun CreateTrainConceptsScreenStateless(
                     }
 
                     Text(
-                        text = "¿Qué conceptos quieres trabajar?",
+                        text = stringResource(R.string.concepts_question),
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold
                     )
@@ -123,8 +145,13 @@ private fun CreateTrainConceptsScreenStateless(
                         value = searchQuery,
                         onValueChange = { searchQuery = it },
                         modifier = Modifier.fillMaxWidth(),
-                        placeholder = { Text("Buscar conceptos") },
-                        leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                        placeholder = { Text(stringResource(R.string.search_concepts)) },
+                        leadingIcon = {
+                            Icon(
+                                Icons.Default.Search,
+                                contentDescription = stringResource(R.string.cd_search)
+                            )
+                        },
                         shape = RoundedCornerShape(8.dp)
                     )
 
@@ -136,12 +163,12 @@ private fun CreateTrainConceptsScreenStateless(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Conceptos",
+                            text = stringResource(R.string.concepts),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = "Añadir concepto",
+                            text = stringResource(R.string.add_concept),
                             color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.clickable { showBottomSheet = true }
@@ -153,7 +180,7 @@ private fun CreateTrainConceptsScreenStateless(
                     val selectedCount = uiState.concepts.count { it.isSelected }
                     if (selectedCount > 0) {
                         Text(
-                            text = "$selectedCount concepto(s) seleccionado(s)",
+                            text = stringResource(R.string.concepts_selected, selectedCount),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(bottom = 8.dp)
@@ -172,8 +199,10 @@ private fun CreateTrainConceptsScreenStateless(
                         if (filteredConcepts.isEmpty() && searchQuery.isNotBlank()) {
                             item {
                                 Text(
-                                    text = "No se encontraron conceptos",
-                                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                                    text = stringResource(R.string.no_concepts_found),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
                                     style = MaterialTheme.typography.bodyMedium
                                 )
                             }
@@ -188,13 +217,19 @@ private fun CreateTrainConceptsScreenStateless(
 @Composable
 private fun AddConceptBottomSheet(onAddConcept: (String) -> Unit) {
     var conceptName by remember { mutableStateOf("") }
-    Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
-        Text("Añadir concepto", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .padding(16.dp)) {
+        Text(
+            stringResource(R.string.add_concept),
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold
+        )
         Spacer(modifier = Modifier.height(16.dp))
         OutlinedTextField(
             value = conceptName,
             onValueChange = { conceptName = it },
-            label = { Text("Nombre del concepto") },
+            label = { Text(stringResource(R.string.concept_name)) },
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(16.dp))
@@ -203,7 +238,7 @@ private fun AddConceptBottomSheet(onAddConcept: (String) -> Unit) {
             modifier = Modifier.fillMaxWidth(),
             enabled = conceptName.isNotBlank()
         ) {
-            Text("Guardar")
+            Text(stringResource(R.string.save))
         }
     }
 }

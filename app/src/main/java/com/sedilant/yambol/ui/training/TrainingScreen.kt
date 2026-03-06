@@ -82,7 +82,7 @@ private fun TrainingScreenStateless(
                         .fillMaxSize()
                 ) {
                     SectionHeader(
-                        title = "Teams",
+                        title = stringResource(R.string.teams),
                         modifier = Modifier.padding(horizontal = 0.dp)
                     )
                     TeamTabs(
@@ -95,7 +95,7 @@ private fun TrainingScreenStateless(
                     )
 
                     SectionHeader(
-                        title = "Filter by Date",
+                        title = stringResource(R.string.filter_by_date),
                         modifier = Modifier.padding(horizontal = 0.dp)
                     )
                     DateFilterSection(

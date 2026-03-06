@@ -34,8 +34,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.sedilant.yambol.R
 import com.sedilant.yambol.ui.createTrain.commonComposables.CreateTrainScaffold
 
 @Composable
@@ -78,10 +80,10 @@ private fun CreateTrainTasksScreenStateless(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     CreateTrainScaffold(
-        title = "Nuevo Entrenamiento",
+        title = stringResource(R.string.new_training_session),
         onCloseClick = onClose,
         onBottomButtonClick = onNext,
-        bottomButtonText = "Siguiente",
+        bottomButtonText = stringResource(R.string.next),
         showBackButton = true,
         onBackClick = onBack,
     ) { innerPadding ->
@@ -104,7 +106,7 @@ private fun CreateTrainTasksScreenStateless(
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text(text = uiState.message, color = MaterialTheme.colorScheme.error)
-                            Button(onClick = onClearError) { Text("Reintentar") }
+                            Button(onClick = onClearError) { Text(stringResource(R.string.retry)) }
                         }
                     }
                 }
@@ -112,7 +114,7 @@ private fun CreateTrainTasksScreenStateless(
                 is CreateTrainTasksViewModel.UiStateNew.Success -> {
                     Text(
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                        text = "¿QUÉ EJERCICIOS HARÁS?",
+                        text = stringResource(R.string.exercises_question),
                         color = MaterialTheme.colorScheme.primary,
                         style = MaterialTheme.typography.titleLarge
                     )
@@ -128,12 +130,15 @@ private fun CreateTrainTasksScreenStateless(
                     ) {
                         Icon(imageVector = Icons.Default.Add, contentDescription = null)
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = "Añadir Ejercicio existente")
+                        Text(text = stringResource(R.string.add_existing_exercise))
                     }
 
                     if (uiState.draftTasks.isNotEmpty()) {
                         Text(
-                            text = "${uiState.draftTasks.size} ejercicio(s) añadido(s)",
+                            text = stringResource(
+                                R.string.exercises_added,
+                                uiState.draftTasks.size
+                            ),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
@@ -211,12 +216,12 @@ private fun AddTaskButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
         ) {
             Text(
                 modifier = Modifier.padding(8.dp),
-                text = "Añadir nuevo ejercicio",
+                text = stringResource(R.string.add_new_exercise),
                 style = MaterialTheme.typography.bodyLarge
             )
             Icon(
                 imageVector = Icons.Default.Add,
-                contentDescription = "Add",
+                contentDescription = stringResource(R.string.cd_add),
                 modifier = Modifier
                     .padding(8.dp)
                     .clip(RoundedCornerShape(size = 8.dp))

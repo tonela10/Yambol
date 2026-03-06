@@ -38,10 +38,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.sedilant.yambol.R
 import com.sedilant.yambol.domain.models.TeamDomainModel
 import com.sedilant.yambol.ui.createTrain.commonComposables.CreateTrainScaffold
 import com.sedilant.yambol.ui.createTrain.commonComposables.TeamSelectionDropdown
@@ -90,10 +92,10 @@ private fun CreateTrainBasicInfoScreenStateless(
     onEndTimeChanged: (Int, Int) -> Unit
 ) {
     CreateTrainScaffold(
-        title = "Nuevo entrenamiento",
+        title = stringResource(R.string.new_training_session),
         onCloseClick = onClose,
         onBottomButtonClick = onNext,
-        bottomButtonText = "Siguiente",
+        bottomButtonText = stringResource(R.string.next),
         showBackButton = false
     ) { paddingValues ->
         Column(
@@ -314,7 +316,10 @@ fun BasicInfoScreenPreview() {
                 onClose = {},
                 onNext = {},
                 uiState = CreateTrainBasicInfoViewModel.UiStateNew.Success(
-                    teamsList = listOf(TeamDomainModel("1", "Cachos"), TeamDomainModel("2", "Cachos2")),
+                    teamsList = listOf(
+                        TeamDomainModel("1", "Cachos"),
+                        TeamDomainModel("2", "Cachos2")
+                    ),
                     selectedTeamId = "1",
                     selectedDate = Date(), // Current Date
                     startHour = 17.5f,    // 17:30

@@ -112,9 +112,8 @@ Yambol uses Room database with the following main entities:
 
 - [ ] Cloud sync and backup functionality
 - [ ] Advanced analytics and machine learning insights
-- [ ] Multi-language support
+- [x] Multi-language support (English and Spanish) - See [CONTRIBUTING.md](CONTRIBUTING.md) for adding more languages
 - [ ] Export functionality (PDF reports, CSV data)
-- [ ] Video analysis integration
 - [ ] Team communication features
 
 ## License

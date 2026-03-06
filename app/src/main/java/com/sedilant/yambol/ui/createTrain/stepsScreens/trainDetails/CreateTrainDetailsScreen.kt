@@ -25,11 +25,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.sedilant.yambol.R
 import com.sedilant.yambol.ui.createTrain.commonComposables.CreateTrainScaffold
 import com.sedilant.yambol.ui.createTrain.stepsScreens.concepts.Concept
 import com.sedilant.yambol.ui.createTrain.stepsScreens.tasks.TaskUI
@@ -86,12 +88,12 @@ fun CreateTrainDetailsScreenStateless(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     Text(
-                        text = "Error al cargar el entrenamiento",
+                        text = stringResource(R.string.error_loading_training),
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.error
                     )
                     Text(
-                        text = uiState.throwable.message ?: "Error desconocido",
+                        text = uiState.throwable.message ?: stringResource(R.string.error_unknown),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -102,14 +104,16 @@ fun CreateTrainDetailsScreenStateless(
         is CreateTrainDetailsUiState.Success -> {
             CreateTrainScaffold(
                 onBackClick = onBack,
-                title = "Detalles del entrenamiento",
+                title = stringResource(R.string.training_details),
                 onCloseClick = onClose,
                 onBottomButtonClick = {
                     if (!uiState.isSaving) {
                         onSave()
                     }
                 },
-                bottomButtonText = if (uiState.isSaving) "Guardando..." else "Guardar entrenamiento",
+                bottomButtonText = if (uiState.isSaving) stringResource(R.string.saving) else stringResource(
+                    R.string.save_training
+                ),
                 showBackButton = true
             ) { paddingValues ->
                 Column(
@@ -156,7 +160,7 @@ fun CreateTrainDetailsScreenStateless(
 private fun TasksInfo(tasks: List<TaskUI>) {
     Column {
         Text(
-            text = "Ejercicios (${tasks.size})",
+            text = stringResource(R.string.exercises_label, tasks.size),
             style = MaterialTheme.typography.titleLarge,
         )
         Spacer(modifier = Modifier.height(8.dp))
@@ -195,7 +199,7 @@ private fun TaskItemDetail(task: TaskUI) {
             if (task.variation.isNotBlank()) {
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Variación: ${task.variation}",
+                    text = stringResource(R.string.variation_label, task.variation),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -218,7 +222,7 @@ private fun TaskItemDetail(task: TaskUI) {
 private fun ConceptsInfo(concepts: List<String>, modifier: Modifier = Modifier) {
     Column(modifier = modifier) {
         Text(
-            text = "Conceptos trabajados (${concepts.size})",
+            text = stringResource(R.string.concepts_worked, concepts.size),
             style = MaterialTheme.typography.titleLarge,
         )
         Spacer(modifier = Modifier.height(8.dp))
@@ -240,7 +244,7 @@ private fun ConceptsInfo(concepts: List<String>, modifier: Modifier = Modifier) 
 private fun GeneralInfo(trainInfo: TrainInfo, modifier: Modifier = Modifier) {
     Column(modifier = modifier) {
         Text(
-            text = "Información general",
+            text = stringResource(R.string.general_information),
             style = MaterialTheme.typography.titleLarge,
         )
         Spacer(modifier = Modifier.height(8.dp))
