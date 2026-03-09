@@ -33,6 +33,7 @@ fun CreateTrainScaffold(
     bottomButtonText: String,
     showBackButton: Boolean = false,
     onBackClick: () -> Unit = {},
+    bottomButtonEnabled: Boolean = true,
     content: @Composable (PaddingValues) -> Unit
 ) {
     Scaffold(
@@ -76,6 +77,7 @@ fun CreateTrainScaffold(
         bottomBar = {
             Button(
                 onClick = onBottomButtonClick,
+                enabled = bottomButtonEnabled,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),

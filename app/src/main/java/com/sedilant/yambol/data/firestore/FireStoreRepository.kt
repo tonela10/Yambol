@@ -503,13 +503,26 @@ class FirestoreConceptRepository(
 
     override suspend fun getConceptsByIds(userId: String, ids: List<String>): List<ConceptDto> {
         if (ids.isEmpty()) return emptyList()
+
+        val orderedIds = ids.distinct().filter { it.isNotBlank() }
+        if (orderedIds.isEmpty()) return emptyList()
+
         return try {
-            val snapshot = db.collection(FirestoreCollections.CONCEPTS)
-                .whereEqualTo(ConceptDto::userId.name, userId)
-                .whereIn(FieldPath.documentId(), ids)
-                .get()
-                .await()
-            mapDocs(snapshot, ConceptDto::class.java)
+            val conceptsById = mutableMapOf<String, ConceptDto>()
+
+            orderedIds.chunked(10).forEach { chunkIds ->
+                val snapshot = db.collection(FirestoreCollections.CONCEPTS)
+                    .whereEqualTo(ConceptDto::userId.name, userId)
+                    .whereIn(FieldPath.documentId(), chunkIds)
+                    .get()
+                    .await()
+
+                mapDocs(snapshot, ConceptDto::class.java).forEach { concept ->
+                    conceptsById[concept.id] = concept
+                }
+            }
+
+            orderedIds.mapNotNull { requestedId -> conceptsById[requestedId] }
         } catch (e: Exception) {
             emptyList()
         }

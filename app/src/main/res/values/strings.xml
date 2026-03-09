@@ -94,6 +94,10 @@
     <string name="variation_label">Variation: %s</string>
     <string name="variables_help_text">Variables help you track and modify the task during training</string>
 
+    <!-- Training - Validation -->
+    <string name="error_concepts_required_to_continue">Select at least one concept to continue.</string>
+    <string name="error_task_concept_required">Select at least one concept for the task.</string>
+
     <!-- Training - Details & Review -->
     <string name="add_specific_tasks_and_drills_for_this_training_optional">Add specific tasks and drills for this training (optional)</string>
     <string name="no_tasks_added">No tasks added</string>

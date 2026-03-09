@@ -55,10 +55,11 @@ fun CreateTrainTasksScreen(
         onAddTask = viewModel::onAddTask,
         onDeleteTask = viewModel::onDeleteTask,
         onBack = onBack,
-        onNext = onNext, // saveStepData removed as it's now reactive
+        onNext = onNext,
         onClose = onClose,
         onClearError = viewModel::clearError,
-        onTaskSelected = viewModel::onTaskSelected
+        onTaskSelected = viewModel::onTaskSelected,
+        onClearTaskConceptError = viewModel::clearTaskConceptError
     )
 }
 
@@ -73,7 +74,8 @@ private fun CreateTrainTasksScreenStateless(
     onMove: (from: Int, to: Int) -> Unit,
     onAddTask: (name: String, description: String, variation: List<String>, concepts: List<String>) -> Unit,
     onTaskSelected: (TaskUI) -> Unit,
-    onDeleteTask: (taskId: String) -> Unit
+    onDeleteTask: (taskId: String) -> Unit,
+    onClearTaskConceptError: () -> Unit
 ) {
     var showCreateTaskBottomSheet by remember { mutableStateOf(false) }
     var showExistingTasksBottomSheet by remember { mutableStateOf(false) }
@@ -121,16 +123,18 @@ private fun CreateTrainTasksScreenStateless(
 
                     AddTaskButton(onClick = { showCreateTaskBottomSheet = true })
 
-                    OutlinedButton(
-                        onClick = { showExistingTasksBottomSheet = true },
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp, vertical = 8.dp)
-                            .fillMaxWidth()
-                            .height(40.dp)
-                    ) {
-                        Icon(imageVector = Icons.Default.Add, contentDescription = null)
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = stringResource(R.string.add_existing_exercise))
+                    if (uiState.existingTasks.isNotEmpty()) {
+                        OutlinedButton(
+                            onClick = { showExistingTasksBottomSheet = true },
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp, vertical = 8.dp)
+                                .fillMaxWidth()
+                                .height(40.dp)
+                        ) {
+                            Icon(imageVector = Icons.Default.Add, contentDescription = null)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(text = stringResource(R.string.add_existing_exercise))
+                        }
                     }
 
                     if (uiState.draftTasks.isNotEmpty()) {
@@ -156,16 +160,29 @@ private fun CreateTrainTasksScreenStateless(
                     // Bottom Sheet Logic
                     if (showCreateTaskBottomSheet) {
                         ModalBottomSheet(
-                            onDismissRequest = { showCreateTaskBottomSheet = false },
+                            onDismissRequest = {
+                                showCreateTaskBottomSheet = false
+                                onClearTaskConceptError()
+                            },
                             sheetState = sheetState
                         ) {
                             AddTaskBottomSheet(
                                 onAddTask = { name, description, concepts, variation ->
                                     onAddTask(name, description, variation, concepts)
-                                    showCreateTaskBottomSheet = false
+                                    if (concepts.isNotEmpty()) {
+                                        showCreateTaskBottomSheet = false
+                                    }
                                 },
-                                onDismiss = { showCreateTaskBottomSheet = false },
+                                onDismiss = {
+                                    showCreateTaskBottomSheet = false
+                                    onClearTaskConceptError()
+                                },
                                 concepts = uiState.listOfConcept,
+                                conceptsError = if (uiState.taskConceptError == "TASK_CONCEPT_REQUIRED") {
+                                    stringResource(R.string.error_task_concept_required)
+                                } else {
+                                    null
+                                }
                             )
                         }
                     }
@@ -195,7 +212,7 @@ private fun CreateTrainTasksScreenStateless(
 private fun AddTaskButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
     Button(
         onClick = onClick,
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .height(64.dp)
             .padding(horizontal = 16.dp),
