@@ -49,7 +49,8 @@ import com.sedilant.yambol.ui.createTrain.stepsScreens.concepts.Concept
 internal fun AddTaskBottomSheet(
     onAddTask: (name: String, description: String, concepts: List<String>, variants: List<String>) -> Unit,
     onDismiss: () -> Unit,
-    concepts: List<Concept> // These are all available concepts in the database
+    concepts: List<Concept>,
+    conceptsError: String? = null
 ) {
     var taskName by remember { mutableStateOf("") }
     var taskDescription by remember { mutableStateOf("") }
@@ -139,6 +140,15 @@ internal fun AddTaskBottomSheet(
             }
         }
 
+        conceptsError?.let {
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = it,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
+
         Spacer(modifier = Modifier.height(16.dp))
 
         // Variants Section
@@ -187,10 +197,9 @@ internal fun AddTaskBottomSheet(
                         selectedConceptIds.toList(),
                         taskVariants.filter { it.isNotBlank() }.toList()
                     )
-                    onDismiss()
                 },
                 modifier = Modifier.weight(1f),
-                enabled = taskName.isNotBlank()
+                enabled = taskName.isNotBlank() && selectedConceptIds.isNotEmpty()
             ) {
                 Text("Guardar")
             }
@@ -213,11 +222,12 @@ private fun AddTaskBottomSheetPreview() {
     MaterialTheme {
         Surface {
             AddTaskBottomSheet(
-                onAddTask = { name, desc, conceptIds, variants ->
+                onAddTask = { _, _, _, _ ->
                     // No action needed for preview
                 },
                 onDismiss = {},
-                concepts = mockConcepts
+                concepts = mockConcepts,
+                conceptsError = null
             )
         }
     }

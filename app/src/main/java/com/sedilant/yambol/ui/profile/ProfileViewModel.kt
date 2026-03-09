@@ -2,6 +2,7 @@ package com.sedilant.yambol.ui.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.sedilant.yambol.data.DataStoreManager
 import com.sedilant.yambol.data.firebaseAuth.AuthRepository
 import com.sedilant.yambol.data.firebaseAuth.AuthResult
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -34,7 +35,8 @@ sealed class ProfileUiState {
  */
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val dataStoreManager: DataStoreManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<ProfileUiState>(ProfileUiState.Loading)
@@ -74,6 +76,7 @@ class ProfileViewModel @Inject constructor(
     fun signOut() {
         viewModelScope.launch {
             _uiState.update { ProfileUiState.Loading }
+            dataStoreManager.saveCurrentTeam(null)
             authRepository.signOut()
         }
     }
@@ -94,6 +97,7 @@ class ProfileViewModel @Inject constructor(
 
             when (val result = authRepository.deleteAccount()) {
                 is AuthResult.Success -> {
+                    dataStoreManager.saveCurrentTeam(null)
                     // observeAuthState will handle the transition
                 }
                 is AuthResult.Error -> {

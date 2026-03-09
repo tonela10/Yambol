@@ -5,8 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.sedilant.yambol.data.draftTrain.Task
 import com.sedilant.yambol.data.draftTrain.TrainingDraftRepository
 import com.sedilant.yambol.data.firebaseAuth.AuthRepository
+import com.sedilant.yambol.data.firestore.ConceptDto
 import com.sedilant.yambol.data.firestore.ConceptRepository
 import com.sedilant.yambol.domain.get.GetAllTaskUseCase
+import com.sedilant.yambol.domain.models.TaskDomain
 import com.sedilant.yambol.ui.createTrain.stepsScreens.concepts.Concept
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -38,6 +40,7 @@ class CreateTrainTasksViewModel @Inject constructor(
 
     // Internal flow for transient errors (like failed network/db operations)
     private val _manualError = MutableStateFlow<String?>(null)
+    private val _taskConceptError = MutableStateFlow<String?>(null)
 
     val uiState: StateFlow<UiStateNew> = _draftId
         .filterNotNull()
@@ -50,69 +53,21 @@ class CreateTrainTasksViewModel @Inject constructor(
                     combine(
                         draftRepository.observeDraft(id),
                         _manualError,
+                        _taskConceptError,
                         getAllTaskUseCase()
-                    ) { draft, manualError, existingTasksList ->
+                    ) { draft, manualError, conceptError, existingTasksList ->
                         when {
                             manualError != null -> UiStateNew.Error(manualError)
-                            draft != null -> {
-                        // Async fetch for concepts
-                val conceptIds =
-                    (draft.tasks.flatMap { it.concepts } + draft.conceptIds + existingTasksList.flatMap { it.concepts })
-                        .distinct()
-                        .filter { it.isNotBlank() }
-                        val conceptsMap =
-                            conceptsRepository.getConceptsByIds(userId = userId, ids = conceptIds)
-                        UiStateNew.Success(
-                            draftTasks = draft.tasks.map { task ->
-                                TaskUI(
-                                    id = task.id,
-                                    name = task.name,
-                                    concepts = conceptsMap.filter { task.concepts.contains(it.id) }
-                                        .map {
-                                            Concept(
-                                                id = it.id,
-                                                conceptName = it.name,
-                                            )
-                                        },
-                                    description = task.description,
-                                    variation = task.variation,
-                                    duration = "0"
-                                )
-                            },
-                            listOfConcept = conceptsMap
-                                .map {
-                                    Concept(
-                                        id = it.id,
-                                        conceptName = it.name,
-                                    )
-                                },
-                            existingTasks = existingTasksList.map { existingTask ->
-                                TaskUI(
-                                    id = existingTask.trainingTaskId,
-                                    name = existingTask.name,
-                                    concepts = conceptsMap.filter {
-                                        existingTask.concepts.contains(
-                                            it.id
-                                        )
-                                    }
-                                        .map {
-                                            Concept(
-                                                id = it.id,
-                                                conceptName = it.name,
-                                            )
-                                        },
-                                    description = existingTask.description,
-                                    variation = existingTask.variables.sorted()
-                                        .joinToString(","),
-                                    duration = "0"
-                                )
-                            }
-                        )
+                            draft == null -> UiStateNew.Error("No se pudo encontrar el borrador")
+                            else -> buildSuccessState(
+                                userId = userId,
+                                draftTasks = draft.tasks,
+                                selectedDraftConceptIds = draft.conceptIds,
+                                existingTasksList = existingTasksList,
+                                conceptError = conceptError
+                            )
+                        }
                     }
-
-                    else -> UiStateNew.Error("No se pudo encontrar el borrador")
-                }
-            }
                 }
             }
         }
@@ -124,6 +79,57 @@ class CreateTrainTasksViewModel @Inject constructor(
 
     init {
         loadInitialData()
+    }
+
+    private suspend fun buildSuccessState(
+        userId: String,
+        draftTasks: List<Task>,
+        selectedDraftConceptIds: List<String>,
+        existingTasksList: List<TaskDomain>,
+        conceptError: String?
+    ): UiStateNew.Success {
+        val selectedConceptIds = selectedDraftConceptIds.distinct().filter { it.isNotBlank() }
+        val selectedConceptSet = selectedConceptIds.toSet()
+
+        val selectedConceptDtos = conceptsRepository.getConceptsByIds(userId = userId, ids = selectedConceptIds)
+        val selectedConceptById = selectedConceptDtos.associateBy { it.id }
+        val selectedConcepts = selectedConceptIds.mapNotNull { conceptId ->
+            selectedConceptById[conceptId]?.toUiConcept()
+        }
+
+        val filteredExistingTasks = if (selectedConceptSet.isEmpty()) {
+            emptyList()
+        } else {
+            existingTasksList.filter { existingTask ->
+                existingTask.concepts.any(selectedConceptSet::contains)
+            }
+        }
+
+        val taskConceptIds = (draftTasks.flatMap { it.concepts } + filteredExistingTasks.flatMap { it.concepts })
+            .distinct()
+            .filter { it.isNotBlank() }
+        val taskConceptById = conceptsRepository.getConceptsByIds(userId = userId, ids = taskConceptIds)
+            .associateBy { it.id }
+
+        val conceptById = taskConceptById + selectedConceptById
+
+        return UiStateNew.Success(
+            draftTasks = draftTasks.map { task -> task.toTaskUi(conceptById) },
+            listOfConcept = selectedConcepts,
+            existingTasks = filteredExistingTasks.map { existingTask ->
+                TaskUI(
+                    id = existingTask.trainingTaskId,
+                    name = existingTask.name,
+                    concepts = existingTask.concepts.mapNotNull { conceptId ->
+                        conceptById[conceptId]?.toUiConcept()
+                    },
+                    description = existingTask.description,
+                    variation = existingTask.variables.sorted().joinToString(","),
+                    duration = "0"
+                )
+            },
+            taskConceptError = conceptError
+        )
     }
 
     private fun loadInitialData() {
@@ -150,11 +156,18 @@ class CreateTrainTasksViewModel @Inject constructor(
         val id = _draftId.value ?: return
         if (name.isBlank()) return
 
+        val sanitizedConcepts = concepts.distinct().filter { it.isNotBlank() }
+        if (sanitizedConcepts.isEmpty()) {
+            _taskConceptError.value = "TASK_CONCEPT_REQUIRED"
+            return
+        }
+
         viewModelScope.launch {
             try {
+                _taskConceptError.value = null
                 val newTask = Task(
                     name = name.trim(),
-                    concepts = concepts,
+                    concepts = sanitizedConcepts,
                     description = description.trim(),
                     variation = variation.toCommaSeparatedString().trim(),
                 )
@@ -169,12 +182,19 @@ class CreateTrainTasksViewModel @Inject constructor(
         val id = _draftId.value ?: return
         if (task.name.isBlank()) return
 
+        val selectedConcepts = task.concepts.map { it.id }.distinct().filter { it.isNotBlank() }
+        if (selectedConcepts.isEmpty()) {
+            _taskConceptError.value = "TASK_CONCEPT_REQUIRED"
+            return
+        }
+
         viewModelScope.launch {
             try {
+                _taskConceptError.value = null
                 val newTask = Task(
                     id = task.id,
                     name = task.name.trim(),
-                    concepts = task.concepts.map { it.id },
+                    concepts = selectedConcepts,
                     description = task.description.trim(),
                     variation = task.variation,
                 )
@@ -209,13 +229,11 @@ class CreateTrainTasksViewModel @Inject constructor(
     private fun saveTasksOrder(id: String, tasks: List<TaskUI>) {
         viewModelScope.launch {
             try {
-                // Re-mapping UI tasks back to Domain Tasks for the repository
                 val domainTasks = tasks.map { taskUI ->
                     Task(
                         id = taskUI.id,
                         name = taskUI.name,
-                        // Note: You might need to preserve concept IDs here
-                        concepts = emptyList(), // TODO preserve the concepts here
+                        concepts = taskUI.concepts.map { it.id },
                         description = taskUI.description,
                         variation = taskUI.variation
                     )
@@ -245,11 +263,16 @@ class CreateTrainTasksViewModel @Inject constructor(
         _manualError.value = null
     }
 
+    fun clearTaskConceptError() {
+        _taskConceptError.value = null
+    }
+
     sealed interface UiStateNew {
         data class Success(
             val draftTasks: List<TaskUI>,
             val listOfConcept: List<Concept>,
-            val existingTasks: List<TaskUI>
+            val existingTasks: List<TaskUI>,
+            val taskConceptError: String? = null
         ) : UiStateNew
 
         data class Error(val message: String) : UiStateNew
@@ -258,3 +281,19 @@ class CreateTrainTasksViewModel @Inject constructor(
 }
 
 private fun List<String>.toCommaSeparatedString(): String = joinToString(",")
+
+private fun ConceptDto.toUiConcept(): Concept = Concept(
+    id = id,
+    conceptName = name
+)
+
+private fun Task.toTaskUi(conceptById: Map<String, ConceptDto>): TaskUI = TaskUI(
+    id = id,
+    name = name,
+    concepts = concepts.mapNotNull { conceptId ->
+        conceptById[conceptId]?.toUiConcept()
+    },
+    description = description,
+    variation = variation,
+    duration = "0"
+)

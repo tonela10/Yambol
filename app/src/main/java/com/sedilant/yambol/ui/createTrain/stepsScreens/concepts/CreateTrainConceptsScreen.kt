@@ -76,6 +76,7 @@ private fun CreateTrainConceptsScreenStateless(
     var searchQuery by remember { mutableStateOf("") }
     var showBottomSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
+    val selectedCount = (uiState as? UiState.Success)?.concepts?.count { it.isSelected } ?: 0
 
     CreateTrainScaffold(
         title = stringResource(R.string.create_training),
@@ -84,6 +85,7 @@ private fun CreateTrainConceptsScreenStateless(
         bottomButtonText = stringResource(R.string.next),
         showBackButton = true,
         onBackClick = onBack,
+        bottomButtonEnabled = selectedCount > 0,
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -177,12 +179,18 @@ private fun CreateTrainConceptsScreenStateless(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    val selectedCount = uiState.concepts.count { it.isSelected }
                     if (selectedCount > 0) {
                         Text(
                             text = stringResource(R.string.concepts_selected, selectedCount),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                    } else {
+                        Text(
+                            text = stringResource(R.string.error_concepts_required_to_continue),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.error,
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
                     }

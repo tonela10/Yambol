@@ -25,6 +25,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.Locale
@@ -69,6 +71,7 @@ class HomeViewModel @Inject constructor(
             currentTeamFlow.update { newTeamId }
             dataStoreManager.saveCurrentTeam(newTeamId)
             lastTrainId = getLastTrainOfTeamUseCase(newTeamId)
+            refreshData()
         }
     }
 
@@ -151,30 +154,15 @@ class HomeViewModel @Inject constructor(
 
     private fun setupUiStateFlow() {
         viewModelScope.launch {
-            trigger.flatMapLatest { _ ->
-                val teamsFlow = getTeamsUseCase()
+            trigger.flatMapLatest {
                 combine(
-                    teamsFlow,
-                    currentTeamFlow.flatMapLatest { teamId ->
-                        if (teamId != null) {
-                            getPlayersByTeamIdUseCase(teamId)
-                        } else {
-                            MutableStateFlow(emptyList())
-                        }
-                    },
-                    currentTeamFlow.flatMapLatest { teamId ->
-                        if (teamId != null) {
-                            getTeamObjectivesUseCase(teamId)
-                        } else {
-                            MutableStateFlow(emptyList())
-                        }
-                    },
-                    currentTeamFlow,
-                ) { teams, teamPlayerList, teamObjectivesList, currentTeamId ->
-
-                    // If there are no teams, navigate to CreateTeamScreen
+                    getTeamsUseCase(),
+                    currentTeamFlow
+                ) { teams, requestedTeamId ->
+                    teams to requestedTeamId
+                }.flatMapLatest { (teams, requestedTeamId) ->
                     if (teams.isEmpty()) {
-                        return@combine HomeUiState.CreateTeam
+                        return@flatMapLatest flowOf(HomeUiState.CreateTeam)
                     }
 
                     val listOfTeams = teams.map { team ->
@@ -186,35 +174,37 @@ class HomeViewModel @Inject constructor(
                         )
                     }
 
-                    // TODO remove this part because we already do it in the loadSavedTeam
-                    // If currentTeamId is null but there are teams, use the first one
-                    val safeCurrentTeamId = currentTeamId ?: if (listOfTeams.isNotEmpty()) {
-                        val firstTeamId = listOfTeams.first().id
-                        // Update the new actual team
-                        viewModelScope.launch {
-                            currentTeamFlow.update { firstTeamId }
-                            dataStoreManager.saveCurrentTeam(firstTeamId)
+                    val resolvedTeamId = teams.firstOrNull { it.id == requestedTeamId }?.id
+                        ?: teams.first().id
+
+                    flow {
+                        // Keep in-memory and persisted selection aligned to a valid team.
+                        if (requestedTeamId != resolvedTeamId) {
+                            currentTeamFlow.update { resolvedTeamId }
+                            dataStoreManager.saveCurrentTeam(resolvedTeamId)
                         }
-                        firstTeamId
-                    } else null
-
-                    if (safeCurrentTeamId == null) {
-                        return@combine HomeUiState.Loading
-                    }
-
-                    HomeUiState.Success(
-                        listOfTeams = listOfTeams,
-                        currentTeam = listOfTeams.find { it.id == safeCurrentTeamId },
-                        listOfPlayer = teamPlayerList,
-                        listOfObjectives = teamObjectivesList.map {
-                            TeamObjectivesUiModel(
-                                description = it.description,
-                                isFinish = it.isFinish,
-                                id = it.id,
+                        lastTrainId = getLastTrainOfTeamUseCase(resolvedTeamId)
+                        emit(resolvedTeamId to listOfTeams)
+                    }.flatMapLatest { (teamId, uiTeams) ->
+                        combine(
+                            getPlayersByTeamIdUseCase(teamId),
+                            getTeamObjectivesUseCase(teamId)
+                        ) { teamPlayerList, teamObjectivesList ->
+                            HomeUiState.Success(
+                                listOfTeams = uiTeams,
+                                currentTeam = uiTeams.first { it.id == teamId },
+                                listOfPlayer = teamPlayerList,
+                                listOfObjectives = teamObjectivesList.map {
+                                    TeamObjectivesUiModel(
+                                        description = it.description,
+                                        isFinish = it.isFinish,
+                                        id = it.id,
+                                    )
+                                },
+                                lastTrainId = lastTrainId
                             )
-                        },
-                        lastTrainId = lastTrainId
-                    )
+                        }
+                    }
                 }
             }.collect { state ->
                 _uiState.value = state
@@ -227,23 +217,22 @@ class HomeViewModel @Inject constructor(
             try {
                 _uiState.value = HomeUiState.Loading
 
-                val savedTeamId = dataStoreManager.currentTeam.first()
-                if (savedTeamId != null) {
-                    currentTeamFlow.update { savedTeamId }
-                    lastTrainId = getLastTrainOfTeamUseCase(savedTeamId)
-                } else {
-                    val teams = getTeamsUseCase().first()
-
-                    if (teams.isEmpty()) {
-                        _uiState.value = HomeUiState.CreateTeam
-                        return@launch
-                    } else {
-                        val firstTeamId = teams.first().id
-                        currentTeamFlow.update { firstTeamId }
-                        lastTrainId = getLastTrainOfTeamUseCase(savedTeamId)
-                        dataStoreManager.saveCurrentTeam(firstTeamId)
-                    }
+                val teams = getTeamsUseCase().first()
+                if (teams.isEmpty()) {
+                    currentTeamFlow.update { null }
+                    dataStoreManager.saveCurrentTeam(null)
+                    _uiState.value = HomeUiState.CreateTeam
+                    return@launch
                 }
+
+                val savedTeamId = dataStoreManager.currentTeam.first()
+                val resolvedTeamId = teams.firstOrNull { it.id == savedTeamId }?.id ?: teams.first().id
+
+                currentTeamFlow.update { resolvedTeamId }
+                if (savedTeamId != resolvedTeamId) {
+                    dataStoreManager.saveCurrentTeam(resolvedTeamId)
+                }
+                lastTrainId = getLastTrainOfTeamUseCase(resolvedTeamId)
             } finally {
                 refreshData()
             }
