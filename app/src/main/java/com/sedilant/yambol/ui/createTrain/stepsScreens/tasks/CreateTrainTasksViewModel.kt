@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -41,18 +42,19 @@ class CreateTrainTasksViewModel @Inject constructor(
     val uiState: StateFlow<UiStateNew> = _draftId
         .filterNotNull()
         .flatMapLatest { id ->
-            val userId = authRepository.currentUser?.uid ?: return@flatMapLatest MutableStateFlow(
-                UiStateNew.Error("User not logged in")
-            )
-
-            combine(
-                draftRepository.observeDraft(id),
-                _manualError,
-                getAllTaskUseCase()
-            ) { draft, manualError, existingTasksList ->
-                when {
-                    manualError != null -> UiStateNew.Error(manualError)
-                    draft != null -> {
+            authRepository.getAuthStateFlow().flatMapLatest { user ->
+                val userId = user?.uid
+                if (userId == null) {
+                    flowOf(UiStateNew.Error("User not logged in"))
+                } else {
+                    combine(
+                        draftRepository.observeDraft(id),
+                        _manualError,
+                        getAllTaskUseCase()
+                    ) { draft, manualError, existingTasksList ->
+                        when {
+                            manualError != null -> UiStateNew.Error(manualError)
+                            draft != null -> {
                         // Async fetch for concepts
                 val conceptIds =
                     (draft.tasks.flatMap { it.concepts } + draft.conceptIds + existingTasksList.flatMap { it.concepts })
@@ -109,6 +111,8 @@ class CreateTrainTasksViewModel @Inject constructor(
                     }
 
                     else -> UiStateNew.Error("No se pudo encontrar el borrador")
+                }
+            }
                 }
             }
         }

@@ -33,24 +33,28 @@ class CreateTrainConceptsViewModel @Inject constructor(
     val uiState: StateFlow<UiState> = _draftId
         .filterNotNull()
         .flatMapLatest { id ->
-            val userId = authRepository.currentUser?.uid
-                ?: return@flatMapLatest flowOf(UiState.Error("User not logged in"))
-
-            combine(
-                draftRepository.observeDraft(id),
-                conceptRepository.listByUserFlow(userId = userId)
-            ) { draft, concepts ->
-                if (draft != null) {
-                    val listOfConcepts = concepts.map { concept ->
-                        Concept(
-                            id = concept.id,
-                            conceptName = concept.name,
-                            isSelected = draft.conceptIds.contains(concept.id),
-                        )
-                    }
-                    UiState.Success(concepts = listOfConcepts)
+            authRepository.getAuthStateFlow().flatMapLatest { user ->
+                val userId = user?.uid
+                if (userId == null) {
+                    flowOf(UiState.Error("User not logged in"))
                 } else {
-                    UiState.Error("No se pudo encontrar el borrador")
+                    combine(
+                        draftRepository.observeDraft(id),
+                        conceptRepository.listByUserFlow(userId = userId)
+                    ) { draft, concepts ->
+                        if (draft != null) {
+                            val listOfConcepts = concepts.map { concept ->
+                                Concept(
+                                    id = concept.id,
+                                    conceptName = concept.name,
+                                    isSelected = draft.conceptIds.contains(concept.id),
+                                )
+                            }
+                            UiState.Success(concepts = listOfConcepts)
+                        } else {
+                            UiState.Error("No se pudo encontrar el borrador")
+                        }
+                    }
                 }
             }
         }

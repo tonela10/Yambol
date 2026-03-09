@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -16,6 +17,7 @@ import com.sedilant.yambol.ui.NavigationBottomBar
 import com.sedilant.yambol.ui.createTeam.CreateTeamScreen
 import com.sedilant.yambol.ui.createTrain.CreateTrainScreenV2
 import com.sedilant.yambol.ui.home.HomeScreen
+import com.sedilant.yambol.ui.login.LoginScreen
 import com.sedilant.yambol.ui.profile.ProfileScreen
 import com.sedilant.yambol.ui.training.TrainingScreen
 import com.sedilant.yambol.ui.trainingDetails.TrainingDetailsScreen
@@ -39,6 +41,9 @@ sealed interface YambolScreen {
 
     @Serializable
     data object Profile : YambolScreen
+
+    @Serializable
+    data object Login : YambolScreen
 
     @Serializable
     data object CreateTeam : YambolScreen
@@ -68,7 +73,33 @@ fun YambolApp(
     val startDestination = if (isAuthenticated.value) {
         YambolScreen.Home
     } else {
-        YambolScreen.Profile
+        YambolScreen.Login
+    }
+
+    val loginRoute = YambolScreen.Login::class.qualifiedName.orEmpty()
+    val homeRoute = YambolScreen.Home::class.qualifiedName.orEmpty()
+
+    LaunchedEffect(isAuthenticated.value) {
+        val currentRoute = navController.currentBackStackEntry?.destination?.route.orEmpty()
+        if (isAuthenticated.value) {
+            if (!currentRoute.contains(homeRoute)) {
+                navController.navigate(YambolScreen.Home) {
+                    popUpTo(navController.graph.findStartDestination().id) {
+                        inclusive = true
+                    }
+                    launchSingleTop = true
+                }
+            }
+        } else {
+            if (!currentRoute.contains(loginRoute)) {
+                navController.navigate(YambolScreen.Login) {
+                    popUpTo(navController.graph.findStartDestination().id) {
+                        inclusive = true
+                    }
+                    launchSingleTop = true
+                }
+            }
+        }
     }
 
     Scaffold(
@@ -84,6 +115,10 @@ fun YambolApp(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
+            composable<YambolScreen.Login> {
+                LoginScreen()
+            }
+
             composable<YambolScreen.Home> {
                 HomeScreen(
                     onCreateTeam = {
