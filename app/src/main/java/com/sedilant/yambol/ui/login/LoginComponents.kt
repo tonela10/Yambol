@@ -1,4 +1,4 @@
-package com.sedilant.yambol.ui.profile
+package com.sedilant.yambol.ui.login
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -559,3 +559,4 @@ fun GoogleSignInButton(
         }
     }
 }
+
