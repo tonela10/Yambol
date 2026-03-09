@@ -46,7 +46,7 @@ sealed interface YambolScreen {
     data object Login : YambolScreen
 
     @Serializable
-    data object CreateTeam : YambolScreen
+    data class CreateTeam(val isCancellable: Boolean) : YambolScreen
 
     @Serializable
     data class PlayerCardDetails(val id: Int?) : YambolScreen
@@ -121,8 +121,12 @@ fun YambolApp(
 
             composable<YambolScreen.Home> {
                 HomeScreen(
-                    onCreateTeam = {
-                        navController.navigate(YambolScreen.CreateTeam)
+                    onCreateTeam = { isCancellable ->
+                        navController.navigate(
+                            YambolScreen.CreateTeam(
+                                isCancellable = isCancellable
+                            )
+                        )
                     },
                     onLastTrainClick = { trainId ->
                         navController.navigate(
@@ -157,8 +161,11 @@ fun YambolApp(
                 ProfileScreen()
             }
 
-            composable<YambolScreen.CreateTeam> {
-                CreateTeamScreen {
+            composable<YambolScreen.CreateTeam> { navBackStackEntry ->
+                val args = navBackStackEntry.toRoute<YambolScreen.CreateTeam>()
+                CreateTeamScreen(
+                    isCancellable = args.isCancellable
+                ) {
                     navController.navigate(YambolScreen.Home) {
                         popUpTo(navController.graph.findStartDestination().id) {
                             inclusive = true

@@ -49,7 +49,7 @@ import com.sedilant.yambol.ui.theme.YambolTheme
 fun HomeScreen(
     modifier: Modifier = Modifier,
     homeViewModel: HomeViewModel = hiltViewModel(),
-    onCreateTeam: () -> Unit,
+    onCreateTeam: (Boolean) -> Unit,
     onLastTrainClick: (String) -> Unit
 ) {
     val homeUiState = homeViewModel.uiState.collectAsState(
@@ -82,7 +82,7 @@ private fun HomeScreenStateless(
     homeUiState: HomeUiState,
     editTeamState: EditTeamState,
     onTeamChange: (String) -> Unit,
-    onCreateTeam: () -> Unit,
+    onCreateTeam: (Boolean) -> Unit,
     onSaveNewObjective: (String) -> Unit,
     onToggleObjectiveStatus: (String, Boolean) -> Unit,
     onUpdateObjective: (String, String, Boolean) -> Unit,
@@ -98,7 +98,7 @@ private fun HomeScreenStateless(
             // to add thing to load in future
         }
 
-        HomeUiState.CreateTeam -> onCreateTeam()
+        HomeUiState.CreateTeam -> onCreateTeam(false)
 
         is HomeUiState.Success -> {
             Column(
@@ -130,7 +130,7 @@ private fun HomeScreenStateless(
                         currentTeamId = it.id,
                         listOfTeams = homeUiState.listOfTeams,
                         onTeamChange = onTeamChange,
-                        onCreateTeam = onCreateTeam,
+                        onCreateTeam = { onCreateTeam(true) },
                         modifier = Modifier.padding(bottom = 16.dp),
                     )
                 }
@@ -440,7 +440,7 @@ private fun HomeScreenPreview() {
     YambolTheme {
         HomeScreenStateless(
             modifier = Modifier,
-            onCreateTeam = {},
+            onCreateTeam = { _ -> },
             homeUiState = HomeUiState.Success(
                 listOfTeams = listOf(TeamUiModel("Utebo", "1"), TeamUiModel("Olivar", "2")),
                 listOfPlayer = listOf(

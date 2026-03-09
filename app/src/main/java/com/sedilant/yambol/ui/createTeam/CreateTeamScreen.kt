@@ -1,5 +1,6 @@
 package com.sedilant.yambol.ui.createTeam
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -54,6 +55,7 @@ import com.sedilant.yambol.ui.theme.YambolTheme
 @Composable
 fun CreateTeamScreen(
     createTeamViewModel: CreateTeamViewModel = hiltViewModel(),
+    isCancellable: Boolean = true,
     onNavigateHome: () -> Unit
 ) {
 
@@ -73,7 +75,8 @@ fun CreateTeamScreen(
         },
         updatePlayerName = createTeamViewModel::updatePlayerName,
         updatePlayerNumber = createTeamViewModel::updatePlayerNumber,
-        playersCount = createTeamViewModel.getPlayersCount()
+        playersCount = createTeamViewModel.getPlayersCount(),
+        isCancellable = isCancellable
     )
 }
 
@@ -87,8 +90,12 @@ private fun CreateTeamScreenStateless(
     updateTeam: (String) -> Unit,
     updatePlayerName: (String) -> Unit,
     updatePlayerNumber: (String) -> Unit,
-    playersCount: Int = 0
+    playersCount: Int = 0,
+    isCancellable: Boolean = true
 ) {
+
+    // Prevent leaving setup when team creation is mandatory.
+    BackHandler(enabled = !isCancellable) { }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -113,6 +120,7 @@ private fun CreateTeamScreenStateless(
                             teamName = uiState.teamName,
                             updateTeam = updateTeam,
                             isErrorShow = uiState.isErrorMessageShow,
+                            isCancellable = isCancellable
                         )
                     }
 
@@ -127,7 +135,8 @@ private fun CreateTeamScreenStateless(
                             updatePlayerNumber = updatePlayerNumber,
                             nextButtonEnabled = uiState.isNextButtonEnabled,
                             finishButtonEnabled = uiState.isFinishButtonEnabled,
-                            playersCount = playersCount
+                            playersCount = playersCount,
+                            isCancellable = isCancellable
                         )
                     }
 
@@ -150,7 +159,8 @@ private fun AddPlayer(
     updatePlayerNumber: (String) -> Unit,
     nextButtonEnabled: Boolean,
     finishButtonEnabled: Boolean,
-    playersCount: Int
+    playersCount: Int,
+    isCancellable: Boolean
 ) {
 
     val focusRequester = remember { FocusRequester() }
@@ -269,6 +279,7 @@ private fun AddPlayer(
             onFinish = onFinish,
             onNextEnabled = nextButtonEnabled,
             onFinishEnabled = finishButtonEnabled,
+            showCancel = isCancellable
         )
     }
 }
@@ -347,7 +358,8 @@ private fun FormButtons(
     onCancel: () -> Unit,
     onFinish: () -> Unit = {},
     onNextEnabled: Boolean = true,
-    onFinishEnabled: Boolean = false
+    onFinishEnabled: Boolean = false,
+    showCancel: Boolean = true
 ) {
     Column(
         modifier = Modifier.imePadding(),
@@ -374,37 +386,47 @@ private fun FormButtons(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = if (onFinishEnabled) Arrangement.spacedBy(16.dp) else Arrangement.Center
-        ) {
-            OutlinedButton(
-                onClick = onCancel,
-                modifier = Modifier
-                    .then(if (onFinishEnabled) Modifier.weight(1f) else Modifier.fillMaxWidth())
-                    .height(56.dp),
-                shape = RoundedCornerShape(16.dp)
+        if (showCancel || onFinishEnabled) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = if (showCancel && onFinishEnabled) Arrangement.spacedBy(16.dp) else Arrangement.Center
             ) {
-                Text("Cancel")
-                Spacer(modifier = Modifier.width(8.dp))
-                Icon(
-                    imageVector = Icons.Filled.Close,
-                    contentDescription = "Cancel"
-                )
-            }
+                if (showCancel) {
+                    OutlinedButton(
+                        onClick = onCancel,
+                        modifier = Modifier
+                            .then(if (onFinishEnabled) Modifier.weight(1f) else Modifier.fillMaxWidth())
+                            .height(56.dp),
+                        shape = RoundedCornerShape(16.dp)
+                    ) {
+                        Text(stringResource(R.string.cancel))
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Icon(
+                            imageVector = Icons.Filled.Close,
+                            contentDescription = stringResource(R.string.cancel)
+                        )
+                    }
+                }
 
-            if (onFinishEnabled) {
-                Button(
-                    onClick = onFinish,
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(56.dp),
-                    shape = RoundedCornerShape(16.dp)
-                ) {
-                    Text(
-                        text = stringResource(R.string.create_team),
-                        style = MaterialTheme.typography.titleMedium
-                    )
+                if (onFinishEnabled) {
+                    Button(
+                        onClick = onFinish,
+                        modifier = if (showCancel) {
+                            Modifier
+                                .weight(1f)
+                                .height(56.dp)
+                        } else {
+                            Modifier
+                                .fillMaxWidth()
+                                .height(56.dp)
+                        },
+                        shape = RoundedCornerShape(16.dp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.create_team),
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                    }
                 }
             }
         }
@@ -418,6 +440,7 @@ private fun AddTeamName(
     updateTeam: (String) -> Unit,
     teamName: String,
     isErrorShow: Boolean,
+    isCancellable: Boolean
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
@@ -491,6 +514,7 @@ private fun AddTeamName(
             onNext = { onNext() },
             onCancel = onCancel,
             onNextEnabled = true,
+            showCancel = isCancellable
         )
     }
 }
@@ -508,7 +532,8 @@ private fun CreateTeamScreenAddTeamNamePreview() {
             updateTeam = {},
             updatePlayerName = {},
             updatePlayerNumber = {},
-            playersCount = 0
+            playersCount = 0,
+            isCancellable = true
         )
     }
 }
@@ -526,7 +551,8 @@ private fun CreateTeamScreenAddPlayerNamePreview() {
             updateTeam = {},
             updatePlayerName = {},
             updatePlayerNumber = {},
-            playersCount = 3
+            playersCount = 3,
+            isCancellable = true
         )
     }
 }
