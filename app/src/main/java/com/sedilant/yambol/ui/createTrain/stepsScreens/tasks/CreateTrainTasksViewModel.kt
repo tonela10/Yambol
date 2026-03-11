@@ -54,16 +54,17 @@ class CreateTrainTasksViewModel @Inject constructor(
                         draftRepository.observeDraft(id),
                         _manualError,
                         _taskConceptError,
-                        getAllTaskUseCase()
-                    ) { draft, manualError, conceptError, existingTasksList ->
+                        getAllTaskUseCase(),
+                        conceptsRepository.listByUserFlow(userId)
+                    ) { draft, manualError, conceptError, existingTasksList, allConceptDtos ->
                         when {
                             manualError != null -> UiStateNew.Error(manualError)
                             draft == null -> UiStateNew.Error("No se pudo encontrar el borrador")
                             else -> buildSuccessState(
-                                userId = userId,
                                 draftTasks = draft.tasks,
                                 selectedDraftConceptIds = draft.conceptIds,
                                 existingTasksList = existingTasksList,
+                                allConceptDtos = allConceptDtos,
                                 conceptError = conceptError
                             )
                         }
@@ -81,20 +82,19 @@ class CreateTrainTasksViewModel @Inject constructor(
         loadInitialData()
     }
 
-    private suspend fun buildSuccessState(
-        userId: String,
+    private fun buildSuccessState(
         draftTasks: List<Task>,
         selectedDraftConceptIds: List<String>,
         existingTasksList: List<TaskDomain>,
+        allConceptDtos: List<ConceptDto>,
         conceptError: String?
     ): UiStateNew.Success {
         val selectedConceptIds = selectedDraftConceptIds.distinct().filter { it.isNotBlank() }
         val selectedConceptSet = selectedConceptIds.toSet()
 
-        val selectedConceptDtos = conceptsRepository.getConceptsByIds(userId = userId, ids = selectedConceptIds)
-        val selectedConceptById = selectedConceptDtos.associateBy { it.id }
+        val allConceptById = allConceptDtos.associateBy { it.id }
         val selectedConcepts = selectedConceptIds.mapNotNull { conceptId ->
-            selectedConceptById[conceptId]?.toUiConcept()
+            allConceptById[conceptId]?.toUiConcept()
         }
 
         val filteredExistingTasks = if (selectedConceptSet.isEmpty()) {
@@ -105,23 +105,15 @@ class CreateTrainTasksViewModel @Inject constructor(
             }
         }
 
-        val taskConceptIds = (draftTasks.flatMap { it.concepts } + filteredExistingTasks.flatMap { it.concepts })
-            .distinct()
-            .filter { it.isNotBlank() }
-        val taskConceptById = conceptsRepository.getConceptsByIds(userId = userId, ids = taskConceptIds)
-            .associateBy { it.id }
-
-        val conceptById = taskConceptById + selectedConceptById
-
         return UiStateNew.Success(
-            draftTasks = draftTasks.map { task -> task.toTaskUi(conceptById) },
+            draftTasks = draftTasks.map { task -> task.toTaskUi(allConceptById) },
             listOfConcept = selectedConcepts,
             existingTasks = filteredExistingTasks.map { existingTask ->
                 TaskUI(
                     id = existingTask.trainingTaskId,
                     name = existingTask.name,
                     concepts = existingTask.concepts.mapNotNull { conceptId ->
-                        conceptById[conceptId]?.toUiConcept()
+                        allConceptById[conceptId]?.toUiConcept()
                     },
                     description = existingTask.description,
                     variation = existingTask.variables.sorted().joinToString(","),
@@ -172,7 +164,7 @@ class CreateTrainTasksViewModel @Inject constructor(
                     variation = variation.toCommaSeparatedString().trim(),
                 )
                 draftRepository.addTask(id, newTask)
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 _manualError.value = "Error al añadir tarea"
             }
         }
@@ -199,7 +191,7 @@ class CreateTrainTasksViewModel @Inject constructor(
                     variation = task.variation,
                 )
                 draftRepository.addTask(id, newTask)
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 _manualError.value = "Error al añadir tarea"
             }
         }
@@ -239,7 +231,7 @@ class CreateTrainTasksViewModel @Inject constructor(
                     )
                 }
                 draftRepository.updateTasksList(id, domainTasks)
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 _manualError.value = "Error al guardar orden"
             }
         }
@@ -253,7 +245,7 @@ class CreateTrainTasksViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 draftRepository.removeTask(id, taskId)
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 _manualError.value = "Error al eliminar tarea"
             }
         }
