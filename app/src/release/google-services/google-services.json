@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "69633607293",
+    "project_id": "yambol-prod",
+    "storage_bucket": "yambol-prod.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:69633607293:android:6e1d518033c3eca46d1314",
+        "android_client_info": {
+          "package_name": "com.sedilant.yambol"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "69633607293-lh8ra79i3atm0q4oev1r9g1pk1ilk5ob.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDk-CcrgDJVRNFHczICRyVT-HxxlL6ExR0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "69633607293-lh8ra79i3atm0q4oev1r9g1pk1ilk5ob.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

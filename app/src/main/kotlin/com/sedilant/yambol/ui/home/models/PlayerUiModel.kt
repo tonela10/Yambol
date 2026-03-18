@@ -1,4 +1,4 @@
-package com.sedilant.yambol.ui.home.models
+package yambol.ui.home.models
 
 // Added position for compatibility with HomeViewModel constructor calls
 data class PlayerUiModel(
