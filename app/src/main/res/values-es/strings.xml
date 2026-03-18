@@ -110,11 +110,37 @@
     <string name="tasks">Tareas</string>
     <string name="filters">Filtros</string>
     <string name="no_tasks_tab_title">Aun no hay tareas creadas</string>
-    <string name="no_tasks_tab_message">Crea tareas mientras preparas entrenamientos y apareceran aqui para reutilizarlas.</string>
+    <string name="no_tasks_tab_message">Crea tareas mientras preparas entrenamientos y apareceran aquí para reutilizarlas.</string>
 
     <!-- Training List & Details -->
     <string name="filter_by_date">Filtrar por fecha</string>
     <string name="no_tasks_session">Esta sesión de entrenamiento no tiene tareas todavía.</string>
+    <string name="task_details_title">Detalles de la tarea</string>
+    <string name="edit_task">Editar tarea</string>
+    <string name="task_name">Nombre de la tarea</string>
+    <string name="task_description">Descripcion</string>
+    <string name="task_variables_hint">Variables (separadas por comas)</string>
+    <string name="task_variables_value">Variables: %1$s</string>
+    <string name="task_concepts">Conceptos</string>
+    <string name="task_not_found">No se encontro la tarea</string>
+    <string name="task_name_empty">El nombre de la tarea no puede estar vacio</string>
+    <string name="task_updated">Tarea actualizada</string>
+    <string name="delete_task">Eliminar tarea</string>
+    <string name="delete_task_confirmation_title">Eliminar tarea?</string>
+    <string name="delete_task_confirmation_message">Esta tarea se eliminara permanentemente.</string>
+    <string name="delete_task_used_warning">Esta tarea se usa en uno o mas entrenamientos. Si la eliminas, también se quitara de esos entrenamientos.</string>
+    <string name="new_concept_name">Nombre del nuevo concepto</string>
+    <string name="create_concept">Crear concepto</string>
+    <string name="new_concept_name_empty">El nombre del concepto no puede estar vacio</string>
+    <string name="task_deleted">Tarea eliminada</string>
+    <string name="task_coach_notes">Notas del entrenador</string>
+    <string name="task_variants">Variantes de la tarea</string>
+    <string name="task_no_notes">Todavia no hay notas del entrenador.</string>
+    <string name="task_no_variants">Todavia no hay variantes.</string>
+    <string name="task_variant_title">Variacion %1$02d</string>
+    <string name="task_skills_targeted">Habilidades trabajadas</string>
+    <string name="task_no_concepts">No hay conceptos seleccionados.</string>
+    <string name="task_variant_supporting_text">Ajusta esta variacion del ejercicio durante la practica.</string>
 
     <!-- Step Progress -->
     <string name="step_progress">Paso %1$d de %2$d</string>

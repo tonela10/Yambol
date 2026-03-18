@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -35,6 +36,7 @@ import com.sedilant.yambol.ui.theme.YambolTheme
 @Composable
 fun TrainingTaskList(
     tasks: List<TaskDomain>,
+    onTaskClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -50,15 +52,23 @@ fun TrainingTaskList(
         }
 
         items(tasks, key = { it.trainingTaskId }) { task ->
-            TaskItemCard(task = task)
+            TaskItemCard(
+                task = task,
+                onClick = { onTaskClick(task.trainingTaskId) },
+            )
         }
     }
 }
 
 @Composable
-private fun TaskItemCard(task: TaskDomain) {
+private fun TaskItemCard(
+    task: TaskDomain,
+    onClick: () -> Unit,
+) {
     ElevatedCard(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
         shape = RoundedCornerShape(14.dp),
         elevation = CardDefaults.elevatedCardElevation(defaultElevation = 3.dp)
     ) {
@@ -160,6 +170,7 @@ private fun EmptyTasksListCard() {
 private fun TrainingTaskListPreview() {
     YambolTheme {
         TrainingTaskList(
+            onTaskClick = {},
             tasks = listOf(
                 TaskDomain(
                     trainingTaskId = "1",

@@ -52,6 +52,7 @@ import java.util.Date
 fun TrainingScreen(
     modifier: Modifier = Modifier,
     onTrainClicked: (String) -> Unit,
+    onTaskClicked: (String) -> Unit,
     onNavigateToCreateTraining: (String) -> Unit,
     trainingViewModel: TrainingViewModel = hiltViewModel()
 ) {
@@ -63,6 +64,7 @@ fun TrainingScreen(
         uiState = uiState,
         onTeamChange = { trainingViewModel.onTeamChange(it) },
         onTrainClicked = onTrainClicked,
+        onTaskClicked = onTaskClicked,
         onNavigateToCreateTraining = onNavigateToCreateTraining,
     )
 }
@@ -73,6 +75,7 @@ private fun TrainingScreenStateless(
     uiState: TrainingUiState,
     onTeamChange: (String) -> Unit,
     onTrainClicked: (String) -> Unit,
+    onTaskClicked: (String) -> Unit,
     onNavigateToCreateTraining: (String) -> Unit,
 ) {
     var selectedDateFilter by remember { mutableStateOf(DateFilter.ALL) }
@@ -170,6 +173,7 @@ private fun TrainingScreenStateless(
                                     )
                                     TrainingTaskList(
                                         tasks = uiState.taskList,
+                                        onTaskClick = onTaskClicked,
                                         modifier = Modifier.fillMaxSize()
                                     )
                                 }
@@ -277,6 +281,7 @@ private fun TrainingScreenPreview() {
             modifier = Modifier,
             onTeamChange = {},
             onTrainClicked = {},
+            onTaskClicked = {},
             onNavigateToCreateTraining = {},
         )
     }

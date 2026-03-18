@@ -19,6 +19,7 @@ import com.sedilant.yambol.ui.createTrain.CreateTrainScreenV2
 import com.sedilant.yambol.ui.home.HomeScreen
 import com.sedilant.yambol.ui.login.LoginScreen
 import com.sedilant.yambol.ui.profile.ProfileScreen
+import com.sedilant.yambol.ui.task.TaskScreen
 import com.sedilant.yambol.ui.training.TrainingScreen
 import com.sedilant.yambol.ui.trainingDetails.TrainingDetailsScreen
 import kotlinx.serialization.Serializable
@@ -60,6 +61,9 @@ sealed interface YambolScreen {
 
     @Serializable
     data class CreateTrain(val currentTeam: String) : YambolScreen
+
+    @Serializable
+    data class TaskDetails(val taskId: String) : YambolScreen
 }
 
 @Composable
@@ -147,6 +151,13 @@ fun YambolApp(
                             )
                         )
                     },
+                    onTaskClicked = { taskId ->
+                        navController.navigate(
+                            YambolScreen.TaskDetails(
+                                taskId = taskId,
+                            )
+                        )
+                    },
                     onNavigateToCreateTraining = { currentTeamId ->
                         navController.navigate(
                             YambolScreen.CreateTrain(
@@ -188,6 +199,14 @@ fun YambolApp(
                 CreateTrainScreenV2(
                     onCancel = { navController.popBackStack() },
                     teamId = args.currentTeam
+                )
+            }
+
+            composable<YambolScreen.TaskDetails> { navBackStackEntry ->
+                val args = navBackStackEntry.toRoute<YambolScreen.TaskDetails>()
+                TaskScreen(
+                    taskId = args.taskId,
+                    onNavigateBack = { navController.popBackStack() },
                 )
             }
         }

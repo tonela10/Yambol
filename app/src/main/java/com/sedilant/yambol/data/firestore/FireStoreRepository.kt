@@ -62,6 +62,7 @@ interface TaskRepository {
     )
 
     suspend fun getTasksByIds(userId: String, ids: List<String>): List<TaskDto>
+    suspend fun delete(taskId: String)
 }
 
 interface TrainRepository {
@@ -77,6 +78,8 @@ interface TrainRepository {
     fun listByTeamFlow(userId: String, teamId: String): Flow<List<TrainDto>>
     suspend fun getLastTrainId(userId: String, teamId: String): String?
     suspend fun getTrainById(trainId: String): TrainDto?
+    suspend fun isTaskUsedByAnyTrain(userId: String, taskId: String): Boolean
+    suspend fun removeTaskFromAllTrains(userId: String, taskId: String)
 }
 
 interface ConceptRepository {
@@ -355,6 +358,11 @@ class FirestoreTaskRepository(
             emptyList()
         }
     }
+
+    override suspend fun delete(taskId: String) {
+        if (taskId.isBlank()) return
+        db.collection(FirestoreCollections.TASKS).document(taskId).delete().await()
+    }
 }
 
 class FirestoreTrainRepository(
@@ -421,6 +429,47 @@ class FirestoreTrainRepository(
         if (trainId.isBlank()) return null
         val snapshot = db.collection(FirestoreCollections.TRAINS).document(trainId).get().await()
         return snapshot.toObject(TrainDto::class.java)?.copy(id = snapshot.id)
+    }
+
+    override suspend fun isTaskUsedByAnyTrain(userId: String, taskId: String): Boolean {
+        if (userId.isBlank() || taskId.isBlank()) return false
+
+        return try {
+            val snapshot = db.collection(FirestoreCollections.TRAINS)
+                .whereEqualTo(TrainDto::userId.name, userId)
+                .whereArrayContains(TrainDto::taskIds.name, taskId)
+                .limit(1)
+                .get()
+                .await()
+
+            !snapshot.isEmpty
+        } catch (_: Exception) {
+            false
+        }
+    }
+
+    override suspend fun removeTaskFromAllTrains(userId: String, taskId: String) {
+        if (userId.isBlank() || taskId.isBlank()) return
+
+        val snapshot = db.collection(FirestoreCollections.TRAINS)
+            .whereEqualTo(TrainDto::userId.name, userId)
+            .whereArrayContains(TrainDto::taskIds.name, taskId)
+            .get()
+            .await()
+
+        if (snapshot.isEmpty) return
+
+        val batch = db.batch()
+        snapshot.documents.forEach { document ->
+            batch.update(
+                document.reference,
+                mapOf(
+                    TrainDto::taskIds.name to FieldValue.arrayRemove(taskId),
+                    TrainDto::updatedAt.name to Timestamp.now(),
+                )
+            )
+        }
+        batch.commit().await()
     }
 }
 

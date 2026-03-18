@@ -115,6 +115,32 @@
     <!-- Training List & Details -->
     <string name="filter_by_date">Filter by Date</string>
     <string name="no_tasks_session">This training session doesn\'t have any tasks yet.</string>
+    <string name="task_details_title">Task Details</string>
+    <string name="edit_task">Edit Task</string>
+    <string name="task_name">Task name</string>
+    <string name="task_description">Description</string>
+    <string name="task_variables_hint">Variables (comma separated)</string>
+    <string name="task_variables_value">Variables: %1$s</string>
+    <string name="task_concepts">Concepts</string>
+    <string name="task_not_found">Task not found</string>
+    <string name="task_name_empty">Task name cannot be empty</string>
+    <string name="task_updated">Task updated</string>
+    <string name="delete_task">Delete task</string>
+    <string name="delete_task_confirmation_title">Delete task?</string>
+    <string name="delete_task_confirmation_message">This task will be permanently deleted.</string>
+    <string name="delete_task_used_warning">This task is used in one or more trainings. If you delete it, it will be removed from those trainings as well.</string>
+    <string name="new_concept_name">New concept name</string>
+    <string name="create_concept">Create concept</string>
+    <string name="new_concept_name_empty">Concept name cannot be empty</string>
+    <string name="task_deleted">Task deleted</string>
+    <string name="task_coach_notes">Coach notes</string>
+    <string name="task_variants">Task variants</string>
+    <string name="task_no_notes">No coach notes added yet.</string>
+    <string name="task_no_variants">No variants added yet.</string>
+    <string name="task_variant_title">Variation %1$02d</string>
+    <string name="task_skills_targeted">Skills targeted</string>
+    <string name="task_no_concepts">No concepts selected.</string>
+    <string name="task_variant_supporting_text">Adjust this drill variation during practice.</string>
 
     <!-- Step Progress -->
     <string name="step_progress">Step %1$d of %2$d</string>
