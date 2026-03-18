@@ -107,6 +107,10 @@
     <string name="saving">Saving…</string>
     <string name="save_training">Save training</string>
     <string name="sessions">Sessions</string>
+    <string name="tasks">Tasks</string>
+    <string name="filters">Filters</string>
+    <string name="no_tasks_tab_title">No tasks created yet</string>
+    <string name="no_tasks_tab_message">Create tasks while building trainings and they will appear here for reuse.</string>
 
     <!-- Training List & Details -->
     <string name="filter_by_date">Filter by Date</string>

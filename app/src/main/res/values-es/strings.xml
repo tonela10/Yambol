@@ -107,6 +107,10 @@
     <string name="saving">Guardando…</string>
     <string name="save_training">Guardar entrenamiento</string>
     <string name="sessions">Sesiones</string>
+    <string name="tasks">Tareas</string>
+    <string name="filters">Filtros</string>
+    <string name="no_tasks_tab_title">Aun no hay tareas creadas</string>
+    <string name="no_tasks_tab_message">Crea tareas mientras preparas entrenamientos y apareceran aqui para reutilizarlas.</string>
 
     <!-- Training List & Details -->
     <string name="filter_by_date">Filtrar por fecha</string>
