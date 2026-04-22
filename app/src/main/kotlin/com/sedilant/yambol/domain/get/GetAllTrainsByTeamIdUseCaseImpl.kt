@@ -4,8 +4,8 @@ import com.sedilant.yambol.data.firebaseAuth.AuthRepository
 import com.sedilant.yambol.data.firestore.TrainRepository
 import com.sedilant.yambol.domain.models.TrainDomainModel
 import kotlinx.coroutines.flow.first
-import java.util.Date
 import javax.inject.Inject
+import kotlinx.datetime.Instant
 
 class GetAllTrainsByTeamIdUseCaseImpl @Inject constructor(
     private val trainRepository: TrainRepository,
@@ -26,7 +26,7 @@ class GetAllTrainsByTeamIdUseCaseImpl @Inject constructor(
             }
             TrainDomainModel(
                 id = it.id,
-                date = Date(it.dateMillis ?: 0),
+                date = Instant.fromEpochMilliseconds(it.dateMillis ?: 0),
                 time = duration,
                 concepts = it.conceptIds,
                 teamId = it.teamId

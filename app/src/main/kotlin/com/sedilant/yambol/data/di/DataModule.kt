@@ -5,14 +5,13 @@ import android.content.Context
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
 import com.sedilant.yambol.data.DataStoreManager
-import com.sedilant.yambol.data.draftTrain.TrainingDatabase
+import com.sedilant.yambol.data.YambolDatabase
 import com.sedilant.yambol.data.draftTrain.TrainingDraftDao
 import com.sedilant.yambol.data.draftTrain.TrainingDraftRepository
 import com.sedilant.yambol.data.draftTrain.TrainingDraftRepositoryImpl
 import com.sedilant.yambol.data.firebaseAuth.AuthRepository
 import com.sedilant.yambol.data.firebaseAuth.AuthRepositoryImpl
 import com.sedilant.yambol.data.team.TeamDao
-import com.sedilant.yambol.data.team.TeamDatabase
 import com.sedilant.yambol.data.team.TeamObjectivesDao
 import com.sedilant.yambol.data.team.TeamRepository
 import com.sedilant.yambol.data.team.TeamRepositoryImpl
@@ -56,32 +55,32 @@ abstract class DataModule {
 
         @Provides
         fun provideConceptDao(context: Context): ConceptDao {
-            return TeamDatabase.getDatabase(context).conceptDao()
+            return YambolDatabase.getDatabase(context).conceptDao()
         }
 
         @Provides
         fun providePlayerDao(context: Context): PlayerDao {
-            return TeamDatabase.getDatabase(context).playerDao()
+            return YambolDatabase.getDatabase(context).playerDao()
         }
 
         @Provides
         fun provideTeamDao(context: Context): TeamDao {
-            return TeamDatabase.getDatabase(context).teamDao()
+            return YambolDatabase.getDatabase(context).teamDao()
         }
 
         @Provides
         fun provideTeamObjectivesDao(context: Context): TeamObjectivesDao {
-            return TeamDatabase.getDatabase(context).teamObjectivesDao()
+            return YambolDatabase.getDatabase(context).teamObjectivesDao()
         }
 
         @Provides
         fun provideTrainingDao(context: Context): TrainingDao {
-            return TeamDatabase.getDatabase(context).trainingDao()
+            return YambolDatabase.getDatabase(context).trainingDao()
         }
 
         @Provides
         fun providesTrainingDraftDao(context: Context): TrainingDraftDao {
-            return TrainingDatabase.getDatabase(context).trainingDraftDao()
+            return YambolDatabase.getDatabase(context).trainingDraftDao()
         }
 
         @Provides

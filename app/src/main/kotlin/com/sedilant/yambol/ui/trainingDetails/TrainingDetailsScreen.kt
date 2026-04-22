@@ -39,9 +39,10 @@ import com.sedilant.yambol.R
 import com.sedilant.yambol.domain.models.TaskDomain
 import com.sedilant.yambol.domain.models.TrainDomainModel
 import com.sedilant.yambol.ui.theme.YambolTheme
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 @Composable
 fun TrainingDetailsScreen(
@@ -339,9 +340,10 @@ fun EmptyTasksCard() {
     }
 }
 
-private fun formatDate(date: Date): String {
-    val formatter = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
-    return formatter.format(date)
+private fun formatDate(instant: Instant): String {
+    val dt = instant.toLocalDateTime(TimeZone.currentSystemDefault())
+    val monthAbbr = dt.month.name.take(3).lowercase().replaceFirstChar { it.uppercase() }
+    return "$monthAbbr ${dt.dayOfMonth.toString().padStart(2, '0')}, ${dt.year}"
 }
 
 private fun formatDuration(hours: Float): String {
@@ -360,7 +362,7 @@ private fun TrainingDetailsScreenPreview() {
             uiState = TrainingDetailsUiState.Success(
                 train = TrainDomainModel(
                     id = "1",
-                    date = Date(),
+                    date = Clock.System.now(),
                     time = 1.5f,
                     concepts = emptyList(),
                     teamId = "1"
@@ -395,7 +397,7 @@ private fun TrainingDetailsScreenEmptyPreview() {
             uiState = TrainingDetailsUiState.Success(
                 train = TrainDomainModel(
                     id = "1",
-                    date = Date(),
+                    date = Clock.System.now(),
                     time = 1f,
                     concepts = emptyList(),
                     teamId = "1"

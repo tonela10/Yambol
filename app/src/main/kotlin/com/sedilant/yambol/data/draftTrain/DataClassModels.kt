@@ -1,11 +1,11 @@
 package com.sedilant.yambol.data.draftTrain
 
-import java.util.Date
 import java.util.UUID
+import kotlinx.datetime.Instant
 
 data class Training(
     val id: String = UUID.randomUUID().toString(),
-    val date: Date,
+    val date: Instant,
     val endTime: Float,
     val startTime: Float,
     val conceptIds: List<String>,
@@ -25,7 +25,7 @@ data class Task(
 fun TrainingDraftEntity.toDomain(tasks: List<TrainingTaskEntity>): Training {
     return Training(
         id = this.id,
-        date = Date(this.date),
+        date = Instant.fromEpochMilliseconds(this.date),
         endTime = this.endTime,
         startTime = this.startTime,
         conceptIds = this.concepts,
@@ -37,7 +37,7 @@ fun TrainingDraftEntity.toDomain(tasks: List<TrainingTaskEntity>): Training {
 fun Training.toEntity(): TrainingDraftEntity {
     return TrainingDraftEntity(
         id = this.id,
-        date = this.date.time,
+        date = this.date.toEpochMilliseconds(),
         endTime = this.endTime,
         startTime = this.startTime,
         concepts = this.conceptIds,
@@ -72,7 +72,7 @@ fun Task.toEntity(trainingId: String, orderIndex: Int): TrainingTaskEntity {
 fun TrainingWithTasks.toDomain(): Training {
     return Training(
         id = this.training.id,
-        date = java.util.Date(this.training.date), // Converting Long to Date
+        date = Instant.fromEpochMilliseconds(this.training.date),
         endTime = this.training.endTime,
         startTime = this.training.startTime,
         conceptIds = this.training.concepts,

@@ -15,8 +15,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import java.util.Calendar
-import java.util.Date
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 /*
     TODO it is not recovering well the endTime
@@ -66,7 +68,7 @@ class CreateTrainBasicInfoViewModel @AssistedInject constructor(
                     )
                 } else {
                     _uiState.value = UiStateNew.Success(
-                        selectedDate = Date(),
+                        selectedDate = Clock.System.now(),
                         teamsList = teamList,
                         selectedTeamId = teamId,
                         startHour = getCurrentHourAsFloat(),
@@ -79,7 +81,7 @@ class CreateTrainBasicInfoViewModel @AssistedInject constructor(
         }
     }
 
-    fun onDateSelected(date: Date) {
+    fun onDateSelected(date: Instant) {
         val currentState = _uiState.value
         if (currentState is UiStateNew.Success) {
             _uiState.value = currentState.copy(selectedDate = date)
@@ -140,7 +142,7 @@ class CreateTrainBasicInfoViewModel @AssistedInject constructor(
 
     // Private methods
 
-    private fun saveDateToRepository(date: Date) {
+    private fun saveDateToRepository(date: Instant) {
         val id = draftId ?: return
 
         viewModelScope.launch {
@@ -186,16 +188,14 @@ class CreateTrainBasicInfoViewModel @AssistedInject constructor(
     }
 
     private fun getCurrentHourAsFloat(): Float {
-        val calendar = Calendar.getInstance()
-        val hour = calendar.get(Calendar.HOUR_OF_DAY)
-        val minute = calendar.get(Calendar.MINUTE)
-        return hour + (minute / 60f)
+        val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+        return now.hour + (now.minute / 60f)
     }
 
     sealed class UiStateNew {
         data object Loading : UiStateNew()
         data class Success(
-            val selectedDate: Date,
+            val selectedDate: Instant,
             val startHour: Float,
             val endHour: Float,
             val teamsList: List<TeamDomainModel>,

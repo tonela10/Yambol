@@ -3,8 +3,10 @@ package com.sedilant.yambol.data.draftTrain
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import java.util.Calendar
-import java.util.Date
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import javax.inject.Inject
 
 // TODO Change to English
@@ -33,7 +35,7 @@ class TrainingDraftRepositoryImpl @Inject constructor(
             } else {
                 // Create a new draft
                 val newTraining = Training(
-                    date = Date(),
+                    date = Clock.System.now(),
                     endTime = 90f,
                     startTime = getCurrentHourAsFloat(),
                     conceptIds = emptyList(),
@@ -44,7 +46,7 @@ class TrainingDraftRepositoryImpl @Inject constructor(
             }
         } catch (e: Exception) {
             val newTraining = Training(
-                date = Date(),
+                date = Clock.System.now(),
                 endTime = 90f,
                 startTime = getCurrentHourAsFloat(),
                 conceptIds = emptyList(),
@@ -56,15 +58,13 @@ class TrainingDraftRepositoryImpl @Inject constructor(
     }
 
     private fun getCurrentHourAsFloat(): Float {
-        val calendar = Calendar.getInstance()
-        val hour = calendar.get(Calendar.HOUR_OF_DAY)
-        val minute = calendar.get(Calendar.MINUTE)
-        return hour + (minute / 60f)
+        val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+        return now.hour + (now.minute / 60f)
     }
 
     override suspend fun updateTrainingData(
         id: String,
-        date: Date?,
+        date: Instant?,
         endTime: Float?,
         startTime: Float?,
         concepts: List<String>?,
@@ -74,7 +74,7 @@ class TrainingDraftRepositoryImpl @Inject constructor(
             ?: return // TODO ADD EXCEPTION OIE CARALHO ESTO NO EXISTE POS POR ALGUNA RAZÓN QUE NO COMMPRENDO
 
         val updated = current.copy(
-            date = date?.time ?: current.date,
+            date = date?.toEpochMilliseconds() ?: current.date,
             endTime = endTime ?: current.endTime,
             startTime = startTime ?: current.startTime,
             concepts = concepts ?: current.concepts,

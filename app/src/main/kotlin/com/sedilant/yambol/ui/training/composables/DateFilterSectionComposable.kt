@@ -18,9 +18,11 @@ import androidx.compose.ui.unit.dp
 import com.sedilant.yambol.R
 import com.sedilant.yambol.domain.models.TrainDomainModel
 import com.sedilant.yambol.ui.theme.YambolTheme
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
+import kotlinx.datetime.Clock
+import kotlinx.datetime.DatePeriod
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.minus
+import kotlinx.datetime.toLocalDateTime
 
 @Composable
 fun DateFilterSection(
@@ -63,36 +65,25 @@ fun filterTrainingsByDate(
     trainings: List<TrainDomainModel>,
     filter: DateFilter
 ): List<TrainDomainModel> {
-    val calendar = Calendar.getInstance()
-    val today = calendar.time
+    val tz = TimeZone.currentSystemDefault()
+    val today = Clock.System.now().toLocalDateTime(tz).date
 
     return when (filter) {
         DateFilter.ALL -> trainings
         DateFilter.TODAY -> {
-            val todayFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-            trainings.filter {
-                todayFormat.format(it.date) == todayFormat.format(today)
-            }
+            trainings.filter { it.date.toLocalDateTime(tz).date == today }
         }
-
         DateFilter.THIS_WEEK -> {
-            calendar.add(Calendar.DAY_OF_YEAR, -7)
-            val weekAgo = calendar.time
-            trainings.filter { it.date.after(weekAgo) }
+            val weekAgo = today.minus(DatePeriod(days = 7))
+            trainings.filter { it.date.toLocalDateTime(tz).date >= weekAgo }
         }
-
         DateFilter.THIS_MONTH -> {
-            calendar.time = today
-            calendar.add(Calendar.MONTH, -1)
-            val monthAgo = calendar.time
-            trainings.filter { it.date.after(monthAgo) }
+            val monthAgo = today.minus(DatePeriod(months = 1))
+            trainings.filter { it.date.toLocalDateTime(tz).date >= monthAgo }
         }
-
         DateFilter.LAST_3_MONTHS -> {
-            calendar.time = today
-            calendar.add(Calendar.MONTH, -3)
-            val threeMonthsAgo = calendar.time
-            trainings.filter { it.date.after(threeMonthsAgo) }
+            val threeMonthsAgo = today.minus(DatePeriod(months = 3))
+            trainings.filter { it.date.toLocalDateTime(tz).date >= threeMonthsAgo }
         }
     }
 }
