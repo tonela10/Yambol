@@ -1,10 +1,10 @@
 package com.sedilant.yambol.domain.models
 
-import java.util.Date
+import kotlinx.datetime.Instant
 
 data class TrainWithTaskDomainModel(
     val trainId: String,
-    val date: Date,
+    val date: Instant,
     val time: Float,
     val conceptIds: List<String>,
     val teamId: String,

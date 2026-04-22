@@ -31,7 +31,8 @@ import com.sedilant.yambol.ui.training.composables.DateFilter
 import com.sedilant.yambol.ui.training.composables.DateFilterSection
 import com.sedilant.yambol.ui.training.composables.TrainingList
 import com.sedilant.yambol.ui.training.composables.filterTrainingsByDate
-import java.util.Date
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 
 @Composable
 fun TrainingScreen(
@@ -142,21 +143,21 @@ private fun TrainingScreenPreview() {
                 trainList = listOf(
                     TrainDomainModel(
                         id = "1",
-                        date = Date(),
+                        date = Clock.System.now(),
                         time = 1.5f,
                         concepts = listOf(),
                         teamId = "1"
                     ),
                     TrainDomainModel(
                         id = "2",
-                        date = Date(System.currentTimeMillis() + 86400000),
+                        date = Instant.fromEpochMilliseconds(System.currentTimeMillis() + 86400000),
                         time = 2f,
                         concepts = listOf(),
                         teamId = "1"
                     ),
                     TrainDomainModel(
                         id = "3",
-                        date = Date(System.currentTimeMillis() + 172800000),
+                        date = Instant.fromEpochMilliseconds(System.currentTimeMillis() + 172800000),
                         time = 1f,
                         concepts = listOf(),
                         teamId = "1"

@@ -27,9 +27,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.sedilant.yambol.R
 import com.sedilant.yambol.domain.models.TrainDomainModel
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 @Composable
 fun TrainingList(
@@ -171,9 +172,10 @@ private fun ConceptsRow(
     }
 }
 
-private fun formatDate(date: Date): String {
-    val formatter = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
-    return formatter.format(date)
+private fun formatDate(instant: Instant): String {
+    val dt = instant.toLocalDateTime(TimeZone.currentSystemDefault())
+    val monthAbbr = dt.month.name.take(3).lowercase().replaceFirstChar { it.uppercase() }
+    return "$monthAbbr ${dt.dayOfMonth.toString().padStart(2, '0')}, ${dt.year}"
 }
 
 private fun formatDuration(hours: Float): String {
@@ -191,21 +193,21 @@ private fun TrainingListPreview() {
         val sampleTrainings = listOf(
             TrainDomainModel(
                 id = "1",
-                date = Date(),
+                date = Clock.System.now(),
                 time = 1.5f,
                 concepts = emptyList(),
                 teamId = "1"
             ),
             TrainDomainModel(
                 id = "2",
-                date = Date(System.currentTimeMillis() + 86400000), // Tomorrow
+                date = Instant.fromEpochMilliseconds(System.currentTimeMillis() + 86400000),
                 time = 2f,
                 concepts = emptyList(),
                 teamId = "1"
             ),
             TrainDomainModel(
                 id = "3",
-                date = Date(System.currentTimeMillis() + 172800000), // Day after tomorrow
+                date = Instant.fromEpochMilliseconds(System.currentTimeMillis() + 172800000),
                 time = 1f,
                 concepts = emptyList(),
                 teamId = "1"

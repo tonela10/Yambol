@@ -21,3 +21,16 @@ dependencyResolutionManagement {
 
 rootProject.name = "Yambol"
 include(":app")
+
+// Phase 0 skeleton modules — code will be migrated here in Phase 1+
+include(":core:domain")
+include(":core:data")
+include(":core:designsystem")
+include(":feature:home")
+include(":feature:training")
+include(":feature:trainingDetails")
+include(":feature:createTrain")
+include(":feature:createTeam")
+include(":feature:playerCard")
+include(":feature:statistics")
+include(":feature:profile")

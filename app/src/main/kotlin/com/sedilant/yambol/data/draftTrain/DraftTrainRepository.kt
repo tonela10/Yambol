@@ -1,7 +1,7 @@
 package com.sedilant.yambol.data.draftTrain
 
 import kotlinx.coroutines.flow.Flow
-import java.util.Date
+import kotlinx.datetime.Instant
 
 interface TrainingDraftRepository {
 
@@ -9,7 +9,7 @@ interface TrainingDraftRepository {
     suspend fun getOrCreateActiveDraft(): String
     suspend fun updateTrainingData(
         id: String,
-        date: Date? = null,
+        date: Instant? = null,
         endTime: Float? = null,
         startTime: Float? = null,
         concepts: List<String>? = null,

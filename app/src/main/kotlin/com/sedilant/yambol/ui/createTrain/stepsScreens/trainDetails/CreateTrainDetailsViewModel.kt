@@ -20,9 +20,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 @HiltViewModel(assistedFactory = CreateTrainDetailsViewModelFactory::class)
 class CreateTrainDetailsViewModel @AssistedInject constructor(
@@ -139,7 +140,7 @@ class CreateTrainDetailsViewModel @AssistedInject constructor(
 
                 // 1. Crear el entrenamiento principal
                 val trainId = createTrainUseCase(
-                    date = draft?.date ?: Date(),
+                    date = draft?.date ?: Clock.System.now(),
                     startTime = draft?.startTime ?: 0f,
                     endTime = draft?.endTime ?: 0f,
                     concepts = draft?.conceptIds ?: emptyList(),
@@ -172,9 +173,10 @@ class CreateTrainDetailsViewModel @AssistedInject constructor(
         }
     }
 
-    private fun formatDate(date: Date): String {
-        val format = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
-        return format.format(date)
+    private fun formatDate(instant: Instant): String {
+        val dt = instant.toLocalDateTime(TimeZone.currentSystemDefault())
+        val monthAbbr = dt.month.name.take(3).lowercase().replaceFirstChar { it.uppercase() }
+        return "$monthAbbr ${dt.dayOfMonth.toString().padStart(2, '0')}, ${dt.year}"
     }
 
     private fun formatHour(hour: Float): String {

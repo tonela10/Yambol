@@ -48,9 +48,10 @@ import com.sedilant.yambol.domain.models.TeamDomainModel
 import com.sedilant.yambol.ui.createTrain.commonComposables.CreateTrainScaffold
 import com.sedilant.yambol.ui.createTrain.commonComposables.TeamSelectionDropdown
 import com.sedilant.yambol.ui.theme.YambolTheme
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 @Composable
 fun CreateTrainBasicInfoScreen(
@@ -87,7 +88,7 @@ private fun CreateTrainBasicInfoScreenStateless(
     onClose: () -> Unit,
     onNext: () -> Unit,
     onTeamSelected: (String) -> Unit,
-    onDateSelected: (Date) -> Unit,
+    onDateSelected: (Instant) -> Unit,
     onStartTimeChanged: (Int, Int) -> Unit,
     onEndTimeChanged: (Int, Int) -> Unit
 ) {
@@ -152,10 +153,10 @@ private fun CreateTrainBasicInfoScreenStateless(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SuccessState(
-    selectedDate: Date,
+    selectedDate: Instant,
     startHourFloat: Float,
     endHourFloat: Float,
-    onDateSelected: (Date) -> Unit,
+    onDateSelected: (Instant) -> Unit,
     onStartTimeChanged: (Int, Int) -> Unit,
     onEndTimeChanged: (Int, Int) -> Unit
 ) {
@@ -164,7 +165,10 @@ private fun SuccessState(
     var showEndTimePicker by remember { mutableStateOf(false) }
 
     // Converters for Display
-    val dateFormatter = remember { SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()) }
+    fun formatInstant(instant: Instant): String {
+        val dt = instant.toLocalDateTime(TimeZone.currentSystemDefault())
+        return "${dt.dayOfMonth.toString().padStart(2, '0')}/${dt.monthNumber.toString().padStart(2, '0')}/${dt.year}"
+    }
 
     fun floatToTimeString(value: Float): String {
         val h = value.toInt()
@@ -173,7 +177,7 @@ private fun SuccessState(
     }
 
     // Picker States
-    val datePickerState = rememberDatePickerState(initialSelectedDateMillis = selectedDate.time)
+    val datePickerState = rememberDatePickerState(initialSelectedDateMillis = selectedDate.toEpochMilliseconds())
 
     val startH = startHourFloat.toInt()
     val startM = ((startHourFloat - startH) * 60).toInt()
@@ -195,7 +199,7 @@ private fun SuccessState(
 
         // Date Field
         OutlinedTextField(
-            value = dateFormatter.format(selectedDate),
+            value = formatInstant(selectedDate),
             onValueChange = {},
             label = { Text("Fecha") },
             readOnly = true,
@@ -259,7 +263,7 @@ private fun SuccessState(
             onDismissRequest = { showDatePicker = false },
             confirmButton = {
                 TextButton(onClick = {
-                    datePickerState.selectedDateMillis?.let { onDateSelected(Date(it)) }
+                    datePickerState.selectedDateMillis?.let { onDateSelected(Instant.fromEpochMilliseconds(it)) }
                     showDatePicker = false
                 }) { Text("OK") }
             }
@@ -321,7 +325,7 @@ fun BasicInfoScreenPreview() {
                         TeamDomainModel("2", "Cachos2")
                     ),
                     selectedTeamId = "1",
-                    selectedDate = Date(), // Current Date
+                    selectedDate = Clock.System.now(),
                     startHour = 17.5f,    // 17:30
                     endHour = 19.0f       // 19:00
                 ),
@@ -343,7 +347,7 @@ private fun SuccessStatePreview() {
             color = MaterialTheme.colorScheme.background
         ) {
             SuccessState(
-                selectedDate = Date(),
+                selectedDate = Clock.System.now(),
                 startHourFloat = 17.5f,
                 endHourFloat = 18.5f,
                 onDateSelected = {},
