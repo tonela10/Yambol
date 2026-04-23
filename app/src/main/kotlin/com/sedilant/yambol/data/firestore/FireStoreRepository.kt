@@ -71,7 +71,7 @@ abstract class BaseFirestoreRepository<T : FirestoreEntityMeta>(
     protected val collection: CollectionReference
 ) {
     protected fun docRef(id: String): DocumentReference =
-        if (id.isBlank()) collection.document() else collection.document(id)
+        if (id.isBlank()) collection.document else collection.document(id)
 }
 
 class FirestoreTeamRepository(
