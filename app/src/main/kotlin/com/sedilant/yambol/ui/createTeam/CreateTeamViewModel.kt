@@ -6,7 +6,6 @@ import com.sedilant.yambol.domain.get.GetTeamsUseCase
 import com.sedilant.yambol.domain.insert.InsertPlayersUseCase
 import com.sedilant.yambol.domain.insert.InsertTeamUseCase
 import com.sedilant.yambol.ui.home.models.PlayerUiModel
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
@@ -17,7 +16,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 /*   TODO remove the commment
     Pedir nombre del equipo y guardarlo -> tengo el id del equipo.
@@ -27,9 +25,8 @@ import javax.inject.Inject
     Sin cancelo la operación elimino el equipo y en consecuencia se borran todos los jugadores
  */
 // TODO create an onCancel method to remove the team created in case the user cancel the process
-@HiltViewModel
 @OptIn(ExperimentalCoroutinesApi::class)
-class CreateTeamViewModel @Inject constructor(
+class CreateTeamViewModel(
     private val insertPlayersUseCase: InsertPlayersUseCase,
     private val insertTeamUseCase: InsertTeamUseCase,
     private val getTeamsUseCase: GetTeamsUseCase,

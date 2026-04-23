@@ -6,10 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.sedilant.yambol.data.draftTrain.TrainingDraftRepository
 import com.sedilant.yambol.domain.get.GetTeamsUseCase
 import com.sedilant.yambol.domain.models.TeamDomainModel
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,9 +20,8 @@ import kotlinx.datetime.toLocalDateTime
     TODO it is not recovering well the endTime
  */
 
-@HiltViewModel(assistedFactory = CreateTrainBasicInfoViewModelFactory::class)
-class CreateTrainBasicInfoViewModel @AssistedInject constructor(
-    @Assisted private val teamId: String,
+class CreateTrainBasicInfoViewModel(
+    private val teamId: String,
     private val repository: TrainingDraftRepository,
     private val getAllTeamsUseCase: GetTeamsUseCase,
     private val savedStateHandle: SavedStateHandle,
@@ -207,9 +202,4 @@ class CreateTrainBasicInfoViewModel @AssistedInject constructor(
     companion object {
         private const val KEY_DRAFT_ID = "draft_id"
     }
-}
-
-@AssistedFactory
-interface CreateTrainBasicInfoViewModelFactory {
-    fun create(teamId: String): CreateTrainBasicInfoViewModel
 }

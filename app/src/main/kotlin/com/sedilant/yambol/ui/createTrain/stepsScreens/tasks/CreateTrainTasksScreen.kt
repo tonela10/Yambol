@@ -36,7 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import com.sedilant.yambol.R
 import com.sedilant.yambol.ui.createTrain.commonComposables.CreateTrainScaffold
 
@@ -45,7 +45,7 @@ fun CreateTrainTasksScreen(
     onBack: () -> Unit,
     onNext: () -> Unit,
     onClose: () -> Unit,
-    viewModel: CreateTrainTasksViewModel = hiltViewModel()
+    viewModel: CreateTrainTasksViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
 

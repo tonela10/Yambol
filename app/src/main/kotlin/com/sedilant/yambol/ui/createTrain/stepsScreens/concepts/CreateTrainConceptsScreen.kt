@@ -38,7 +38,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sedilant.yambol.R
 import com.sedilant.yambol.ui.createTrain.commonComposables.CreateTrainScaffold
@@ -49,7 +49,7 @@ fun CreateTrainConceptsScreen(
     onBack: () -> Unit,
     onNext: () -> Unit,
     onClose: () -> Unit,
-    viewModel: CreateTrainConceptsViewModel = hiltViewModel()
+    viewModel: CreateTrainConceptsViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 

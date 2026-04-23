@@ -10,7 +10,6 @@ import com.sedilant.yambol.data.firestore.ConceptRepository
 import com.sedilant.yambol.domain.get.GetAllTaskUseCase
 import com.sedilant.yambol.domain.models.TaskDomain
 import com.sedilant.yambol.ui.createTrain.stepsScreens.concepts.Concept
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -21,15 +20,13 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 /**
  * This ViewModel is expose an ui state that have all existing tasks ( todo with the current concepts)
  * create new tasks in and expose the draft task to the ui
  */
-@HiltViewModel
 @OptIn(ExperimentalCoroutinesApi::class)
-class CreateTrainTasksViewModel @Inject constructor(
+class CreateTrainTasksViewModel(
     private val draftRepository: TrainingDraftRepository,
     private val conceptsRepository: ConceptRepository,
     private val getAllTaskUseCase: GetAllTaskUseCase,

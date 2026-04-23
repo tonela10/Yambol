@@ -15,7 +15,6 @@ import com.sedilant.yambol.domain.insert.InsertTeamObjectiveUseCase
 import com.sedilant.yambol.ui.home.models.PlayerUiModel
 import com.sedilant.yambol.ui.home.models.TeamObjectivesUiModel
 import com.sedilant.yambol.ui.home.models.TeamUiModel
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -30,11 +29,9 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.Locale
-import javax.inject.Inject
 
-@HiltViewModel
 @OptIn(ExperimentalCoroutinesApi::class)
-class HomeViewModel @Inject constructor(
+class HomeViewModel(
     private val getTeamsUseCase: GetTeamsUseCase,
     private val getPlayersByTeamIdUseCase: GetPlayersByTeamIdUseCase,
     private val getTeamObjectivesUseCase: GetTeamObjectivesUseCase,

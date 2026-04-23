@@ -4,9 +4,8 @@ import com.sedilant.yambol.data.firebaseAuth.AuthRepository
 import com.sedilant.yambol.data.firestore.TaskDto
 import com.sedilant.yambol.data.firestore.TaskRepository
 import com.sedilant.yambol.data.firestore.TrainRepository
-import javax.inject.Inject
 
-class CreateTrainTaskUseCaseImpl @Inject constructor(
+class CreateTrainTaskUseCaseImpl(
     private val taskRepository: TaskRepository,
     private val trainRepository: TrainRepository,
     private val authRepository: AuthRepository

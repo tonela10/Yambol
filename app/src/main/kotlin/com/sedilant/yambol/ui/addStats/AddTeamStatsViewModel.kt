@@ -6,20 +6,15 @@ import androidx.lifecycle.viewModelScope
 import com.sedilant.yambol.domain.get.GetPlayersByTeamIdUseCase
 import com.sedilant.yambol.ui.home.models.PlayerUiModel
 import com.sedilant.yambol.ui.playerCard.StatUiModel
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 
-@HiltViewModel(assistedFactory = AddTeamStatsViewModelFactory::class)
-class AddTeamStatsViewModel @AssistedInject constructor(
-    @Assisted private val teamId: Int,
-    @Assisted private val statIds: List<Int>,
+class AddTeamStatsViewModel(
+    private val teamId: Int,
+    private val statIds: List<Int>,
     private val getPlayersByTeamIdUseCase: GetPlayersByTeamIdUseCase,
 ) : ViewModel() {
 
@@ -197,10 +192,5 @@ sealed interface AddTeamStatsUiState {
 
     data object Completed : AddTeamStatsUiState
     data class Error(val message: String) : AddTeamStatsUiState
-}
-
-@AssistedFactory
-interface AddTeamStatsViewModelFactory {
-    fun create(teamId: Int, statIds: List<Int>): AddTeamStatsViewModel
 }
 */

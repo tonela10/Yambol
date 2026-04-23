@@ -8,10 +8,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class GetTeamObjectivesUseCaseImpl @Inject constructor(
+class GetTeamObjectivesUseCaseImpl(
     private val teamObjectiveRepository: TeamObjectiveRepository,
     private val authRepository: AuthRepository
 ) : GetTeamObjectivesUseCase {

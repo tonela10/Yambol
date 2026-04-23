@@ -41,7 +41,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sedilant.yambol.R
 import com.sedilant.yambol.domain.models.TeamDomainModel
@@ -58,10 +59,8 @@ fun CreateTrainBasicInfoScreen(
     onClose: () -> Unit,
     onNext: () -> Unit,
     teamId: String,
-    viewModel: CreateTrainBasicInfoViewModel = hiltViewModel(
-        creationCallback = { factory: CreateTrainBasicInfoViewModelFactory ->
-            factory.create(teamId = teamId)
-        }
+    viewModel: CreateTrainBasicInfoViewModel = koinViewModel(
+        parameters = { parametersOf(teamId) }
     )
 ) {
 

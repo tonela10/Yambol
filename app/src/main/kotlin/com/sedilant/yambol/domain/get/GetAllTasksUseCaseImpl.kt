@@ -8,10 +8,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class GetAllTasksUseCaseImpl @Inject constructor(
+class GetAllTasksUseCaseImpl(
     private val taskRepository: TaskRepository,
     private val authRepository: AuthRepository
 ) : GetAllTaskUseCase {

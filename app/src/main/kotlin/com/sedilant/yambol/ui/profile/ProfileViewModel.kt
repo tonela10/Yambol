@@ -5,13 +5,11 @@ import androidx.lifecycle.viewModelScope
 import com.sedilant.yambol.data.DataStoreManager
 import com.sedilant.yambol.data.firebaseAuth.AuthRepository
 import com.sedilant.yambol.data.firebaseAuth.AuthResult
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 /**
  * UI State for the Profile Screen
@@ -33,8 +31,7 @@ sealed class ProfileUiState {
 /**
  * ViewModel for Profile Screen
  */
-@HiltViewModel
-class ProfileViewModel @Inject constructor(
+class ProfileViewModel(
     private val authRepository: AuthRepository,
     private val dataStoreManager: DataStoreManager
 ) : ViewModel() {
@@ -58,7 +55,7 @@ class ProfileViewModel @Inject constructor(
                             userName = user.displayName ?: "User",
                             userEmail = user.email ?: "No Email",
                             isEmailVerified = user.isEmailVerified,
-                            photoUrl = user.photoUrl?.toString(),
+                            photoUrl = user.photoURL,
                             showDeleteConfirmation = false
                         )
                     }
@@ -122,7 +119,7 @@ class ProfileViewModel @Inject constructor(
                     userName = user.displayName ?: "User",
                     userEmail = user.email ?: "",
                     isEmailVerified = user.isEmailVerified,
-                    photoUrl = user.photoUrl?.toString(),
+                    photoUrl = user.photoURL,
                     showDeleteConfirmation = false
                 )
             }

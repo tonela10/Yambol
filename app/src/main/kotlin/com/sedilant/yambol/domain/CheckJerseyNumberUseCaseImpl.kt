@@ -2,9 +2,8 @@ package com.sedilant.yambol.domain
 
 import com.sedilant.yambol.data.firebaseAuth.AuthRepository
 import com.sedilant.yambol.data.firestore.PlayerRepository
-import javax.inject.Inject
 
-class CheckJerseyNumberUseCaseImpl @Inject constructor(
+class CheckJerseyNumberUseCaseImpl(
     private val playerRepository: PlayerRepository,
     private val authRepository: AuthRepository
 ) : CheckJerseyNumberUseCase {

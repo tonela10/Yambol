@@ -7,7 +7,6 @@ import com.sedilant.yambol.domain.get.GetAllTrainsByTeamIdUseCase
 import com.sedilant.yambol.domain.get.GetTeamsUseCase
 import com.sedilant.yambol.domain.models.TrainDomainModel
 import com.sedilant.yambol.ui.home.models.TeamUiModel
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -19,11 +18,9 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.util.Locale
-import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@HiltViewModel
-class TrainingViewModel @Inject constructor(
+class TrainingViewModel(
     private val getAllTrainsByTeamIdUseCase: GetAllTrainsByTeamIdUseCase,
     private val dataStoreManager: DataStoreManager,
     private val getTeamsUseCase: GetTeamsUseCase,

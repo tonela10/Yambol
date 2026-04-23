@@ -10,10 +10,6 @@ import com.sedilant.yambol.domain.insert.CreateTrainTaskUseCase
 import com.sedilant.yambol.domain.insert.CreateTrainUseCase
 import com.sedilant.yambol.ui.createTrain.stepsScreens.concepts.Concept
 import com.sedilant.yambol.ui.createTrain.stepsScreens.tasks.TaskUI
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,9 +21,8 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
-@HiltViewModel(assistedFactory = CreateTrainDetailsViewModelFactory::class)
-class CreateTrainDetailsViewModel @AssistedInject constructor(
-    @Assisted private val teamId: String,
+class CreateTrainDetailsViewModel(
+    private val teamId: String,
     private val draftRepository: TrainingDraftRepository,
     private val conceptRepository: ConceptRepository,
     private val createTrainUseCase: CreateTrainUseCase,
@@ -217,8 +212,3 @@ data class TrainInfo(
     val duration: String = "",
     val team: String = ""
 )
-
-@AssistedFactory
-interface CreateTrainDetailsViewModelFactory {
-    fun create(teamId: String): CreateTrainDetailsViewModel
-}

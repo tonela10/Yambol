@@ -48,13 +48,13 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import com.sedilant.yambol.R
 import com.sedilant.yambol.ui.theme.YambolTheme
 
 @Composable
 fun CreateTeamScreen(
-    createTeamViewModel: CreateTeamViewModel = hiltViewModel(),
+    createTeamViewModel: CreateTeamViewModel = koinViewModel(),
     isCancellable: Boolean = true,
     onNavigateHome: () -> Unit
 ) {
