@@ -136,8 +136,10 @@ class FirestorePlayerRepository(
     override fun listByTeamFlow(userId: String, teamId: String): Flow<List<PlayerDto>> =
         db.collection(FirestoreCollections.PLAYERS)
             .where {
-                PlayerDto::userId.name equalTo userId
-                PlayerDto::teamId.name equalTo teamId
+                all(
+                    PlayerDto::userId.name equalTo userId,
+                    PlayerDto::teamId.name equalTo teamId
+                )
             }
             .snapshots()
             .map { snapshot ->
@@ -160,9 +162,11 @@ class FirestorePlayerRepository(
         return try {
             val snapshot = db.collection(FirestoreCollections.PLAYERS)
                 .where {
-                    PlayerDto::userId.name equalTo userId
-                    PlayerDto::teamId.name equalTo teamId
-                    PlayerDto::number.name equalTo jerseyNumber
+                    all(
+                        PlayerDto::userId.name equalTo userId,
+                        PlayerDto::teamId.name equalTo teamId,
+                        PlayerDto::number.name equalTo jerseyNumber
+                    )
                 }
                 .get()
             if (snapshot.documents.isEmpty()) return false
@@ -203,8 +207,10 @@ class FirestoreTaskRepository(
             ids.distinct().filter { it.isNotBlank() }.chunked(10).forEach { chunkIds ->
                 val snapshot = db.collection(FirestoreCollections.TASKS)
                     .where {
-                        TaskDto::userId.name equalTo userId
-                        FieldPath.documentId inArray chunkIds
+                        all(
+                            TaskDto::userId.name equalTo userId,
+                            FieldPath.documentId inArray chunkIds
+                        )
                     }
                     .get()
                 snapshot.documents.mapNotNullTo(result) { doc ->
@@ -240,8 +246,10 @@ class FirestoreTrainRepository(
     override fun listByTeamFlow(userId: String, teamId: String): Flow<List<TrainDto>> =
         db.collection(FirestoreCollections.TRAINS)
             .where {
-                TrainDto::userId.name equalTo userId
-                TrainDto::teamId.name equalTo teamId
+                all(
+                    TrainDto::userId.name equalTo userId,
+                    TrainDto::teamId.name equalTo teamId
+                )
             }
             .snapshots()
             .map { snapshot ->
@@ -254,8 +262,10 @@ class FirestoreTrainRepository(
         return try {
             val snapshot = db.collection(FirestoreCollections.TRAINS)
                 .where {
-                    TrainDto::userId.name equalTo userId
-                    TrainDto::teamId.name equalTo teamId
+                    all(
+                        TrainDto::userId.name equalTo userId,
+                        TrainDto::teamId.name equalTo teamId
+                    )
                 }
                 .get()
             snapshot.documents
@@ -303,8 +313,10 @@ class FirestoreConceptRepository(
         if (ids.isEmpty()) return flowOf(emptyList())
         return db.collection(FirestoreCollections.CONCEPTS)
             .where {
-                ConceptDto::userId.name equalTo userId
-                FieldPath.documentId inArray ids.take(10)
+                all(
+                    ConceptDto::userId.name equalTo userId,
+                    FieldPath.documentId inArray ids.take(10)
+                )
             }
             .snapshots()
             .map { snapshot ->
@@ -323,8 +335,10 @@ class FirestoreConceptRepository(
             orderedIds.chunked(10).forEach { chunkIds ->
                 val snapshot = db.collection(FirestoreCollections.CONCEPTS)
                     .where {
-                        ConceptDto::userId.name equalTo userId
-                        FieldPath.documentId inArray chunkIds
+                        all(
+                            ConceptDto::userId.name equalTo userId,
+                            FieldPath.documentId inArray chunkIds
+                        )
                     }
                     .get()
                 snapshot.documents.mapNotNull { doc ->
@@ -360,8 +374,10 @@ class FirestoreTeamObjectiveRepository(
     override fun listByTeamFlow(userId: String, teamId: String): Flow<List<TeamObjectiveDto>> =
         db.collection(FirestoreCollections.TEAM_OBJECTIVES)
             .where {
-                TeamObjectiveDto::userId.name equalTo userId
-                TeamObjectiveDto::teamId.name equalTo teamId
+                all(
+                    TeamObjectiveDto::userId.name equalTo userId,
+                    TeamObjectiveDto::teamId.name equalTo teamId
+                )
             }
             .snapshots()
             .map { snapshot ->
