@@ -15,6 +15,8 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.update
+import com.sedilant.yambol.feature.createTeam.CreateTeamUiState
+import com.sedilant.yambol.feature.createTeam.ValueAndValidation
 import kotlinx.coroutines.launch
 
 /*   TODO remove the commment
@@ -222,20 +224,4 @@ class CreateTeamViewModel(
         ADD_TEAM,
         ADD_PLAYER,
     }
-}
-
-sealed interface CreateTeamUiState {
-    data class AddTeamName(
-        val teamName: String,
-        val isErrorMessageShow: Boolean = false
-    ) : CreateTeamUiState
-
-    data class AddPlayer(
-        val playerName: String,
-        val playerNumber: String,
-        val isNextButtonEnabled: Boolean = false,
-        val isFinishButtonEnabled: Boolean = false
-    ) : CreateTeamUiState
-
-    data object Loading : CreateTeamUiState
 }
