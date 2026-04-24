@@ -1,4 +1,4 @@
-package com.sedilant.yambol.ui.createTrain.stepsScreens.tasks
+package com.sedilant.yambol.feature.createTrain.stepsScreens.tasks
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -28,7 +28,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -40,9 +39,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.sedilant.yambol.ui.createTrain.stepsScreens.concepts.Concept
+import com.sedilant.yambol.feature.createTrain.stepsScreens.concepts.Concept
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -203,32 +201,6 @@ internal fun AddTaskBottomSheet(
             ) {
                 Text("Guardar")
             }
-        }
-    }
-}
-
-@Preview(showBackground = true, name = "1. Preview: Bottom Sheet Añadir Tarea")
-@Composable
-private fun AddTaskBottomSheetPreview() {
-    // Mock data for the preview
-    val mockConcepts = listOf(
-        Concept(id = "1", conceptName = "Tiro", isSelected = false),
-        Concept(id = "2", conceptName = "Defensa", isSelected = false),
-        Concept(id = "3", conceptName = "Pase", isSelected = false),
-        Concept(id = "4", conceptName = "Rebote", isSelected = false),
-        Concept(id = "5", conceptName = "Táctica", isSelected = false)
-    )
-
-    MaterialTheme {
-        Surface {
-            AddTaskBottomSheet(
-                onAddTask = { _, _, _, _ ->
-                    // No action needed for preview
-                },
-                onDismiss = {},
-                concepts = mockConcepts,
-                conceptsError = null
-            )
         }
     }
 }

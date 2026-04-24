@@ -1,4 +1,4 @@
-package com.sedilant.yambol.ui.createTrain
+package com.sedilant.yambol.feature.createTrain
 
 import kotlinx.serialization.Serializable
 
@@ -10,4 +10,3 @@ data class TaskData(
     val description: String,
     val variables: List<String>
 )
-

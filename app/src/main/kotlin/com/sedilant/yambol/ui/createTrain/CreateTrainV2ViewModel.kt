@@ -1,6 +1,8 @@
 package com.sedilant.yambol.ui.createTrain
 
 import androidx.lifecycle.ViewModel
+import com.sedilant.yambol.feature.createTrain.CreateTrainUiStateV2
+import com.sedilant.yambol.feature.createTrain.Step
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -33,16 +35,4 @@ class CreateTrainV2ViewModel(
     fun onSave() {
 
     }
-}
-
-data class CreateTrainUiStateV2(
-    val currentStep: Step = Step.BASIC_INFO,
-    val teamId: String,
-)
-
-enum class Step {
-    BASIC_INFO,
-    CONCEPTS,
-    TASKS,
-    TRAIN_DETAIL
 }

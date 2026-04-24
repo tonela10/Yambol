@@ -1,4 +1,4 @@
-package com.sedilant.yambol.ui.createTrain.composables
+package com.sedilant.yambol.feature.createTrain.commonComposables
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -27,7 +26,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlin.math.abs
@@ -49,7 +47,6 @@ fun TimeWheelPicker(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Hour picker
             WheelPicker(
                 items = (0..23).toList(),
                 selectedIndex = selectedHour,
@@ -59,7 +56,6 @@ fun TimeWheelPicker(
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            // Minute picker
             WheelPicker(
                 items = (0..59).toList(),
                 selectedIndex = selectedMinute,
@@ -68,11 +64,9 @@ fun TimeWheelPicker(
             )
         }
 
-        // Selection indicator overlay
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                //.width(128.dp) // 60dp + 8dp + 60dp = 128dp
                 .height(40.dp)
                 .align(Alignment.Center)
                 .background(
@@ -95,7 +89,6 @@ fun DurationWheelPicker(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Value picker (1-120)
         WheelPicker(
             items = (1..120).toList(),
             selectedIndex = selectedValue - 1,
@@ -105,7 +98,6 @@ fun DurationWheelPicker(
 
         Spacer(modifier = Modifier.width(8.dp))
 
-        // Unit picker (Minutos/Horas)
         WheelPicker(
             items = listOf("Minutos", "Horas"),
             selectedIndex = if (selectedUnit == "Minutos") 0 else 1,
@@ -138,7 +130,6 @@ fun <T> WheelPicker(
         modifier = modifier
             .height(120.dp)
             .clip(RoundedCornerShape(12.dp))
-            //   .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
             .pointerInput(Unit) {
                 detectDragGestures(
                     onDrag = { change, offset ->
@@ -167,12 +158,10 @@ fun <T> WheelPicker(
             }
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize(),
+            modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Show 1 item before (if exists)
             val prevIndex = currentIndex - 1
             if (prevIndex in items.indices) {
                 WheelPickerItem(
@@ -184,7 +173,6 @@ fun <T> WheelPicker(
                 Spacer(modifier = Modifier.height(40.dp))
             }
 
-            // Selected item (center)
             if (currentIndex in items.indices) {
                 WheelPickerItem(
                     text = displayText(items[currentIndex]),
@@ -193,7 +181,6 @@ fun <T> WheelPicker(
                 )
             }
 
-            // Show 1 item after (if exists)
             val nextIndex = currentIndex + 1
             if (nextIndex in items.indices) {
                 WheelPickerItem(
@@ -229,33 +216,4 @@ fun WheelPickerItem(
             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
         )
     }
-}
-
-// Preview Components
-@Preview(showBackground = true)
-@Composable
-fun TimeWheelPickerPreview() {
-    Box(modifier = Modifier.fillMaxSize()) {
-        TimeWheelPicker(
-            modifier = Modifier
-                .padding(16.dp)
-                .align(Alignment.Center),
-            selectedHour = 10,
-            selectedMinute = 11,
-            onTimeChange = { h, m ->
-            }
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DurationWheelPickerPreview() {
-    DurationWheelPicker(
-        selectedValue = 1,
-        selectedUnit = "Minutos",
-        onDurationChange = { v, u ->
-        }
-    )
-
 }

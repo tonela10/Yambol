@@ -1,6 +1,6 @@
-package com.sedilant.yambol.ui.createTrain.stepsScreens.tasks
+package com.sedilant.yambol.feature.createTrain.stepsScreens.tasks
 
-import com.sedilant.yambol.ui.createTrain.stepsScreens.concepts.Concept
+import com.sedilant.yambol.feature.createTrain.stepsScreens.concepts.Concept
 
 data class TaskUI(
     val id: String,

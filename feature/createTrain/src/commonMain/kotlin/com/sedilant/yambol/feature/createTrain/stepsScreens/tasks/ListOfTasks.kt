@@ -1,4 +1,4 @@
-package com.sedilant.yambol.ui.createTrain.stepsScreens.tasks
+package com.sedilant.yambol.feature.createTrain.stepsScreens.tasks
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,9 +18,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.sedilant.yambol.R
+import com.sedilant.yambol.core.designsystem.Res
+import com.sedilant.yambol.core.designsystem.add_first_exercise
+import com.sedilant.yambol.core.designsystem.no_exercises_yet
+import org.jetbrains.compose.resources.stringResource
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 
@@ -43,13 +45,13 @@ internal fun ListOfTasks(
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = stringResource(R.string.no_exercises_yet),
+                    text = stringResource(Res.string.no_exercises_yet),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = stringResource(R.string.add_first_exercise),
+                    text = stringResource(Res.string.add_first_exercise),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -60,7 +62,7 @@ internal fun ListOfTasks(
             val reorderableLazyListState =
                 rememberReorderableLazyListState(lazyListState) { from, to ->
                     onMove(from.index, to.index)
-                    hapticFeedback.performHapticFeedback(HapticFeedbackType.SegmentFrequentTick)
+                    hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                 }
 
             LazyColumn(

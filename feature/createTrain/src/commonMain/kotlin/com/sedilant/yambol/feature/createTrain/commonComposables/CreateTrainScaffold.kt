@@ -1,4 +1,4 @@
-package com.sedilant.yambol.ui.createTrain.commonComposables
+package com.sedilant.yambol.feature.createTrain.commonComposables
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -54,7 +54,7 @@ fun CreateTrainScaffold(
                         )
                     }
                 } else {
-                    Spacer(modifier = Modifier.size(48.dp)) // Corresponds to IconButton width
+                    Spacer(modifier = Modifier.size(48.dp))
                 }
 
                 Text(

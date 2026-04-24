@@ -1,4 +1,4 @@
-package com.sedilant.yambol.ui.createTrain.commonComposables
+package com.sedilant.yambol.feature.createTrain.commonComposables
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -18,7 +18,6 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -28,13 +27,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.sedilant.yambol.R
+import com.sedilant.yambol.core.designsystem.Res
+import com.sedilant.yambol.core.designsystem.*
 import com.sedilant.yambol.domain.models.TeamDomainModel
-import com.sedilant.yambol.ui.theme.YambolTheme
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun TeamSelectionDropdown(
@@ -52,7 +50,7 @@ fun TeamSelectionDropdown(
                 .padding(horizontal = 16.dp, vertical = 16.dp)
         ) {
             Text(
-                text = stringResource(R.string.team_label),
+                text = stringResource(Res.string.team_label),
                 color = MaterialTheme.colorScheme.primary,
                 fontSize = 16.sp
             )
@@ -73,7 +71,7 @@ fun TeamSelectionDropdown(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = selectedTeam?.name ?: stringResource(R.string.select_team),
+                            text = selectedTeam?.name ?: stringResource(Res.string.select_team),
                             color = MaterialTheme.colorScheme.primary,
                             fontSize = 14.sp
                         )
@@ -102,31 +100,6 @@ fun TeamSelectionDropdown(
                     }
                 }
             }
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun TeamSelectionDropdownPreview() {
-    val mockTeams = listOf(
-        TeamDomainModel(id = "1", name = "Cachos F.C."),
-        TeamDomainModel(id = "2", name = "Yambol Warriors"),
-        TeamDomainModel(id = "3", name = "Junior Team")
-    )
-
-    var selectedId by remember { mutableStateOf("1") }
-
-    YambolTheme() {
-        Surface(
-            modifier = Modifier.fillMaxWidth(),
-            color = MaterialTheme.colorScheme.background
-        ) {
-            TeamSelectionDropdown(
-                teams = mockTeams,
-                selectedTeamId = selectedId,
-                onTeamSelected = { newId -> selectedId = newId }
-            )
         }
     }
 }

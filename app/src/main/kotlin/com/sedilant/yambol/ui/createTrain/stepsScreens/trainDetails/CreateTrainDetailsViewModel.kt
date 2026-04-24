@@ -8,8 +8,10 @@ import com.sedilant.yambol.data.firestore.ConceptRepository
 import com.sedilant.yambol.domain.get.GetTeamsUseCase
 import com.sedilant.yambol.domain.insert.CreateTrainTaskUseCase
 import com.sedilant.yambol.domain.insert.CreateTrainUseCase
-import com.sedilant.yambol.ui.createTrain.stepsScreens.concepts.Concept
-import com.sedilant.yambol.ui.createTrain.stepsScreens.tasks.TaskUI
+import com.sedilant.yambol.feature.createTrain.stepsScreens.concepts.Concept
+import com.sedilant.yambol.feature.createTrain.stepsScreens.tasks.TaskUI
+import com.sedilant.yambol.feature.createTrain.stepsScreens.trainDetails.CreateTrainDetailsUiState
+import com.sedilant.yambol.feature.createTrain.stepsScreens.trainDetails.TrainInfo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -47,11 +49,6 @@ class CreateTrainDetailsViewModel(
     private fun loadTrainingDetails() {
         viewModelScope.launch {
             try {
-                // Get userId
-                // Ideally injected AuthRepository or maybe userId is provided in some UseCase or Manager.
-                // Assuming we can get userId somehow or I need to inject AuthRepository.
-                // CreateTrainDetailsViewModel does NOT inject AuthRepository yet.
-                // I will add it to the constructor.
                 val userId = authRepository.currentUser?.uid
                     ?: throw IllegalStateException("User not logged in")
 
@@ -61,7 +58,6 @@ class CreateTrainDetailsViewModel(
                 draftId?.let { currentId ->
                     draftRepository.observeDraft(currentId).collect { draft ->
                         if (draft != null) {
-                            // Calculate duration: (End - Start) * 60 to get minutes
                             val durationInMinutes = (draft.endTime - draft.startTime) * 60
 
                             val trainInfo = TrainInfo(
@@ -71,9 +67,7 @@ class CreateTrainDetailsViewModel(
                                 team = teamName
                             )
 
-                            // Convertir tareas del dominio a TaskUI para la vista
                             val tasksUI = draft.tasks.map { task ->
-                                // Get concept names from concept IDs
                                 val conceptNames = conceptRepository.getConceptsByIds(
                                     userId,
                                     task.concepts
@@ -84,7 +78,7 @@ class CreateTrainDetailsViewModel(
                                     name = task.name,
                                     concepts = conceptNames.map { conceptName ->
                                         Concept(
-                                            id = conceptName, // Assuming concept ID is the same as conceptName here or we just want to display it
+                                            id = conceptName,
                                             conceptName = conceptName
                                         )
                                     },
@@ -94,7 +88,6 @@ class CreateTrainDetailsViewModel(
                                 )
                             }
 
-                            // Extraer lista única de nombres de conceptos para los chips de resumen
                             val listOfConcepts = tasksUI
                                 .flatMap { task -> task.concepts.map { it.conceptName } }
                                 .distinct()
@@ -117,9 +110,6 @@ class CreateTrainDetailsViewModel(
         }
     }
 
-    /**
-     * Finaliza y guarda el entrenamiento en la base de datos definitiva.
-     */
     fun saveTraining() {
         val id = draftId ?: return
 
@@ -133,7 +123,6 @@ class CreateTrainDetailsViewModel(
 
                 val draft = draftRepository.getDraft(id)
 
-                // 1. Crear el entrenamiento principal
                 val trainId = createTrainUseCase(
                     date = draft?.date ?: Clock.System.now(),
                     startTime = draft?.startTime ?: 0f,
@@ -142,7 +131,6 @@ class CreateTrainDetailsViewModel(
                     teamId = teamId,
                 )
 
-                // 2. Guardar cada tarea asociada al entrenamiento creado
                 draft?.tasks?.forEach { task ->
                     createTrainTaskUseCase(
                         taskId = task.id,
@@ -154,7 +142,6 @@ class CreateTrainDetailsViewModel(
                     )
                 }
 
-                // 3. Marcar el borrador como finalizado
                 draftRepository.finalizeDraft(id)
 
                 _uiState.update { state ->
@@ -193,22 +180,3 @@ class CreateTrainDetailsViewModel(
         }
     }
 }
-
-sealed interface CreateTrainDetailsUiState {
-    data object Loading : CreateTrainDetailsUiState
-    data class Error(val throwable: Throwable) : CreateTrainDetailsUiState
-    data class Success(
-        val trainInfo: TrainInfo,
-        val listOfTasks: List<TaskUI>,
-        val listOfConcepts: List<String>,
-        val isSaving: Boolean = false,
-        val trainingSaved: Boolean = false
-    ) : CreateTrainDetailsUiState
-}
-
-data class TrainInfo(
-    val date: String = "",
-    val hour: String = "",
-    val duration: String = "",
-    val team: String = ""
-)

@@ -9,7 +9,9 @@ import com.sedilant.yambol.data.firestore.ConceptDto
 import com.sedilant.yambol.data.firestore.ConceptRepository
 import com.sedilant.yambol.domain.get.GetAllTaskUseCase
 import com.sedilant.yambol.domain.models.TaskDomain
-import com.sedilant.yambol.ui.createTrain.stepsScreens.concepts.Concept
+import com.sedilant.yambol.feature.createTrain.stepsScreens.concepts.Concept
+import com.sedilant.yambol.feature.createTrain.stepsScreens.tasks.TaskUI
+import com.sedilant.yambol.feature.createTrain.stepsScreens.tasks.TasksUiState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -39,13 +41,13 @@ class CreateTrainTasksViewModel(
     private val _manualError = MutableStateFlow<String?>(null)
     private val _taskConceptError = MutableStateFlow<String?>(null)
 
-    val uiState: StateFlow<UiStateNew> = _draftId
+    val uiState: StateFlow<TasksUiState> = _draftId
         .filterNotNull()
         .flatMapLatest { id ->
             authRepository.getAuthStateFlow().flatMapLatest { user ->
                 val userId = user?.uid
                 if (userId == null) {
-                    flowOf(UiStateNew.Error("User not logged in"))
+                    flowOf(TasksUiState.Error("User not logged in"))
                 } else {
                     combine(
                         draftRepository.observeDraft(id),
@@ -55,8 +57,8 @@ class CreateTrainTasksViewModel(
                         conceptsRepository.listByUserFlow(userId)
                     ) { draft, manualError, conceptError, existingTasksList, allConceptDtos ->
                         when {
-                            manualError != null -> UiStateNew.Error(manualError)
-                            draft == null -> UiStateNew.Error("No se pudo encontrar el borrador")
+                            manualError != null -> TasksUiState.Error(manualError)
+                            draft == null -> TasksUiState.Error("No se pudo encontrar el borrador")
                             else -> buildSuccessState(
                                 draftTasks = draft.tasks,
                                 selectedDraftConceptIds = draft.conceptIds,
@@ -72,7 +74,7 @@ class CreateTrainTasksViewModel(
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
-            initialValue = UiStateNew.Loading
+            initialValue = TasksUiState.Loading
         )
 
     init {
@@ -85,7 +87,7 @@ class CreateTrainTasksViewModel(
         existingTasksList: List<TaskDomain>,
         allConceptDtos: List<ConceptDto>,
         conceptError: String?
-    ): UiStateNew.Success {
+    ): TasksUiState.Success {
         val selectedConceptIds = selectedDraftConceptIds.distinct().filter { it.isNotBlank() }
         val selectedConceptSet = selectedConceptIds.toSet()
 
@@ -102,7 +104,7 @@ class CreateTrainTasksViewModel(
             }
         }
 
-        return UiStateNew.Success(
+        return TasksUiState.Success(
             draftTasks = draftTasks.map { task -> task.toTaskUi(allConceptById) },
             listOfConcept = selectedConcepts,
             existingTasks = filteredExistingTasks.map { existingTask ->
@@ -203,7 +205,7 @@ class CreateTrainTasksViewModel(
         val currentState = uiState.value
         val id = _draftId.value ?: return
 
-        if (currentState is UiStateNew.Success) {
+        if (currentState is TasksUiState.Success) {
             val currentTasks = currentState.draftTasks.toMutableList()
             if (from !in currentTasks.indices || to !in currentTasks.indices) return
 
@@ -254,18 +256,6 @@ class CreateTrainTasksViewModel(
 
     fun clearTaskConceptError() {
         _taskConceptError.value = null
-    }
-
-    sealed interface UiStateNew {
-        data class Success(
-            val draftTasks: List<TaskUI>,
-            val listOfConcept: List<Concept>,
-            val existingTasks: List<TaskUI>,
-            val taskConceptError: String? = null
-        ) : UiStateNew
-
-        data class Error(val message: String) : UiStateNew
-        data object Loading : UiStateNew
     }
 }
 

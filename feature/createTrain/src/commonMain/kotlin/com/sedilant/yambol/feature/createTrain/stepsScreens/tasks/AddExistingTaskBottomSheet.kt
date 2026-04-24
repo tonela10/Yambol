@@ -1,4 +1,4 @@
-package com.sedilant.yambol.ui.createTrain.stepsScreens.tasks
+package com.sedilant.yambol.feature.createTrain.stepsScreens.tasks
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -34,14 +34,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.sedilant.yambol.ui.createTrain.stepsScreens.concepts.Concept
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun AddExistingTaskBottomSheet(
-    existingTasks: List<TaskUI>, // Passed from ViewModel
+    existingTasks: List<TaskUI>,
     onTaskSelected: (TaskUI) -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -63,7 +61,7 @@ fun AddExistingTaskBottomSheet(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .heightIn(min = 400.dp, max = 700.dp) // Control height for search usability
+            .heightIn(min = 400.dp, max = 700.dp)
             .background(MaterialTheme.colorScheme.surface)
             .padding(16.dp)
     ) {
@@ -165,47 +163,6 @@ private fun ExistingTaskItem(
                 imageVector = Icons.Default.Add,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary
-            )
-        }
-    }
-}
-
-@Preview(showBackground = true, name = "Buscador de Tareas Existentes")
-@Composable
-private fun AddExistingTaskPreview() {
-    val mockExistingTasks = listOf(
-        TaskUI(
-            id = "1",
-            name = "Rueda de entradas",
-            concepts = listOf(Concept("1", "Finalizaciones"), Concept("2", "Táctica")),
-            description = "Entradas por derecha e izquierda",
-            variation = "Sin defensa",
-            duration = "0"
-        ),
-        TaskUI(
-            id = "2",
-            name = "3x3 Continuo",
-            concepts = listOf(Concept("1", "Finalizaciones"), Concept("2", "Táctica")),
-            description = "Juego real a media pista",
-            variation = "Con comodín",
-            duration = "0"
-        ),
-        TaskUI(
-            id = "3",
-            name = "Tiros libres",
-            concepts = listOf(Concept("1", "Finalizaciones"), Concept("2", "Táctica")),
-            description = "Series de 10 tiros",
-            variation = "Bajo presión",
-            duration = "0"
-        )
-    )
-
-    MaterialTheme {
-        Surface {
-            AddExistingTaskBottomSheet(
-                existingTasks = mockExistingTasks,
-                onTaskSelected = { /* No-op */ },
-                onDismiss = { /* No-op */ }
             )
         }
     }

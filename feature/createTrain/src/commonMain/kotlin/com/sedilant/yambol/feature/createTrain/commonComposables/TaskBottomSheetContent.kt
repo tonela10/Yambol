@@ -1,4 +1,4 @@
-package com.sedilant.yambol.ui.createTrain.commonComposables
+package com.sedilant.yambol.feature.createTrain.commonComposables
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -36,16 +36,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.sedilant.yambol.R
-import com.sedilant.yambol.ui.createTrain.TaskData
-import com.sedilant.yambol.ui.theme.YambolTheme
+import com.sedilant.yambol.core.designsystem.Res
+import com.sedilant.yambol.core.designsystem.*
+import com.sedilant.yambol.feature.createTrain.TaskData
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -74,17 +73,13 @@ fun TaskBottomSheetContent(
     }
     var showConceptDropdown by remember { mutableStateOf(false) }
 
-
-    // Header
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
             .systemBarsPadding()
             .verticalScroll(rememberScrollState())
-
     ) {
-
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -106,7 +101,6 @@ fun TaskBottomSheetContent(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Form content in scrollable column
         LazyColumn(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -117,8 +111,7 @@ fun TaskBottomSheetContent(
                     onValueChange = { name = it },
                     label = { Text("Task Name") },
                     placeholder = { Text("e.g., Ball Control Drill") },
-                    modifier = Modifier
-                        .fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(
                         capitalization = KeyboardCapitalization.Words,
@@ -138,8 +131,7 @@ fun TaskBottomSheetContent(
                         keyboardType = KeyboardType.Number,
                         imeAction = ImeAction.Next
                     ),
-                    modifier = Modifier
-                        .fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth(),
                     singleLine = true
                 )
             }
@@ -185,8 +177,7 @@ fun TaskBottomSheetContent(
                     onValueChange = { description = it },
                     label = { Text("Description") },
                     placeholder = { Text("Describe the task in detail...") },
-                    modifier = Modifier
-                        .fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth(),
                     minLines = 3,
                     maxLines = 5,
                     keyboardOptions = KeyboardOptions(
@@ -203,8 +194,7 @@ fun TaskBottomSheetContent(
                     onValueChange = { variablesText = it },
                     label = { Text("Variables (comma separated)") },
                     placeholder = { Text("Speed, Distance, Time, Difficulty") },
-                    modifier = Modifier
-                        .fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth(),
                     minLines = 2,
                     maxLines = 3,
                     keyboardOptions = KeyboardOptions(
@@ -230,14 +220,13 @@ fun TaskBottomSheetContent(
 
             item {
                 Text(
-                    text = stringResource(R.string.variables_help_text),
+                    text = stringResource(Res.string.variables_help_text),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
 
-        // Action buttons
         Spacer(modifier = Modifier.height(16.dp))
 
         Row(
@@ -277,17 +266,5 @@ fun TaskBottomSheetContent(
                 Text("Save Task")
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun TaskBottomSheetContentPreview() {
-    YambolTheme {
-        TaskBottomSheetContent(
-            concepts = listOf("Pivot foot", "finishing with contact"),
-            onDismiss = {},
-            onSave = {},
-        )
     }
 }

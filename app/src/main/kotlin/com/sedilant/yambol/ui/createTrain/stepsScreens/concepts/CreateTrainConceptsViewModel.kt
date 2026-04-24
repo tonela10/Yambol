@@ -6,6 +6,8 @@ import com.sedilant.yambol.data.draftTrain.TrainingDraftRepository
 import com.sedilant.yambol.data.firebaseAuth.AuthRepository
 import com.sedilant.yambol.data.firestore.ConceptDto
 import com.sedilant.yambol.data.firestore.ConceptRepository
+import com.sedilant.yambol.feature.createTrain.stepsScreens.concepts.Concept
+import com.sedilant.yambol.feature.createTrain.stepsScreens.concepts.ConceptsUiState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -27,13 +29,13 @@ class CreateTrainConceptsViewModel(
     private val _draftId = MutableStateFlow<String?>(null)
 
 
-    val uiState: StateFlow<UiState> = _draftId
+    val uiState: StateFlow<ConceptsUiState> = _draftId
         .filterNotNull()
         .flatMapLatest { id ->
             authRepository.getAuthStateFlow().flatMapLatest { user ->
                 val userId = user?.uid
                 if (userId == null) {
-                    flowOf(UiState.Error("User not logged in"))
+                    flowOf(ConceptsUiState.Error("User not logged in"))
                 } else {
                     combine(
                         draftRepository.observeDraft(id),
@@ -47,9 +49,9 @@ class CreateTrainConceptsViewModel(
                                     isSelected = draft.conceptIds.contains(concept.id),
                                 )
                             }
-                            UiState.Success(concepts = listOfConcepts)
+                            ConceptsUiState.Success(concepts = listOfConcepts)
                         } else {
-                            UiState.Error("No se pudo encontrar el borrador")
+                            ConceptsUiState.Error("No se pudo encontrar el borrador")
                         }
                     }
                 }
@@ -58,7 +60,7 @@ class CreateTrainConceptsViewModel(
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
-            initialValue = UiState.Loading
+            initialValue = ConceptsUiState.Loading
         )
 
     init {
@@ -111,16 +113,4 @@ class CreateTrainConceptsViewModel(
             onConceptSelected(conceptId)
         }
     }
-
-    sealed interface UiState {
-        data class Success(val concepts: List<Concept>) : UiState
-        data class Error(val message: String) : UiState
-        data object Loading : UiState
-    }
 }
-
-data class Concept(
-    val id: String,
-    val conceptName: String,
-    val isSelected: Boolean = false
-)

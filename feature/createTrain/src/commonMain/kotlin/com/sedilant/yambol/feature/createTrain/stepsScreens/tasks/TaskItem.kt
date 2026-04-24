@@ -1,4 +1,4 @@
-package com.sedilant.yambol.ui.createTrain.stepsScreens.tasks
+package com.sedilant.yambol.feature.createTrain.stepsScreens.tasks
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -22,9 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.sedilant.yambol.ui.createTrain.stepsScreens.concepts.Concept
 import sh.calvin.reorderable.ReorderableCollectionItemScope
 
 @Composable
@@ -97,22 +95,4 @@ internal fun TaskItem(
         )
 
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun TaskItemPreview() {
-    TaskItem(
-        task = TaskUI(
-            id = "1",
-            name = "Sentadillas",
-            concepts = listOf(Concept("1", "Sentadillas")),
-            description = "3 series de 12 repeticiones",
-            variation = "Con barra libre",
-            duration = "20 minutos"
-        ),
-        onDelete = {},
-        scope = TODO(),
-        modifier = Modifier,
-    )
 }
