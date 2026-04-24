@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 kotlin {
@@ -23,21 +24,22 @@ kotlin {
             implementation(compose.material3)
             implementation(compose.materialIconsExtended)
             implementation(compose.components.resources)
+            implementation(libs.kotlinx.serialization.json)
+            implementation(libs.kotlinx.datetime)
+            implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.koin.core)
+            implementation(project(":core:domain"))
+            implementation(project(":core:data"))
+            implementation(project(":core:designsystem"))
         }
         androidMain.dependencies {
-            // Android-specific theme utilities (dynamic color, etc.)
+            implementation(libs.androidx.activity.compose)
         }
     }
 }
 
-compose.resources {
-    publicResClass = true
-    packageOfResClass = "com.sedilant.yambol.core.designsystem"
-    generateResClass = always
-}
-
 android {
-    namespace = "com.sedilant.yambol.core.designsystem"
+    namespace = "com.sedilant.yambol.composeapp"
     compileSdk = 36
 
     defaultConfig {
