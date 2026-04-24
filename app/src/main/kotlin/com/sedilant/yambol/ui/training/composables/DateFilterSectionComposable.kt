@@ -12,10 +12,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.sedilant.yambol.R
+import com.sedilant.yambol.core.designsystem.Res
+import com.sedilant.yambol.core.designsystem.*
 import com.sedilant.yambol.domain.models.TrainDomainModel
 import com.sedilant.yambol.ui.theme.YambolTheme
 import kotlinx.datetime.Clock
@@ -48,7 +49,7 @@ fun DateFilterSection(
                 leadingIcon = if (selectedFilter == filter) {
                     {
                         Icon(
-                            painter = painterResource(R.drawable.calendar_month_24dp),
+                            painter = painterResource(Res.drawable.calendar_month_24dp),
                             contentDescription = null,
                             modifier = Modifier.size(16.dp)
                         )

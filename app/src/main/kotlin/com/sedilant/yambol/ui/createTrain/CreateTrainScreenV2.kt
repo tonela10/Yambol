@@ -1,15 +1,11 @@
 package com.sedilant.yambol.ui.createTrain
 
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
+import com.sedilant.yambol.feature.createTrain.CreateTrainScreenV2Stateless
 import com.sedilant.yambol.ui.createTrain.stepsScreens.basicInfo.CreateTrainBasicInfoScreen
 import com.sedilant.yambol.ui.createTrain.stepsScreens.concepts.CreateTrainConceptsScreen
 import com.sedilant.yambol.ui.createTrain.stepsScreens.tasks.CreateTrainTasksScreen
@@ -36,54 +32,34 @@ fun CreateTrainScreenV2(
         onNextStep = viewModel::onNextStep,
         onBack = viewModel::onBack,
         onCancel = onCancel,
-    )
-}
-
-@Composable
-private fun CreateTrainScreenV2Stateless(
-    uiState: CreateTrainUiStateV2,
-    onNextStep: () -> Unit,
-    onBack: () -> Unit,
-    onCancel: () -> Unit,
-) {
-    val pagerState = rememberPagerState(pageCount = { Step.entries.size })
-
-    LaunchedEffect(uiState.currentStep) {
-        pagerState.animateScrollToPage(uiState.currentStep.ordinal)
-    }
-    HorizontalPager(
-        state = pagerState,
-        modifier = Modifier
-            .fillMaxSize(),
-        userScrollEnabled = false
-    ) { page ->
-        when (Step.entries[page]) {
-            Step.BASIC_INFO -> CreateTrainBasicInfoScreen(
+        basicInfoContent = { id ->
+            CreateTrainBasicInfoScreen(
                 onClose = onCancel,
-                onNext = onNextStep,
-                teamId = uiState.teamId
+                onNext = viewModel::onNextStep,
+                teamId = id
             )
-
-            Step.CONCEPTS -> CreateTrainConceptsScreen(
+        },
+        conceptsContent = { onBack, onNext, onClose ->
+            CreateTrainConceptsScreen(
                 onBack = onBack,
-                onNext = onNextStep,
-                onClose = onCancel,
+                onNext = onNext,
+                onClose = onClose,
             )
-
-            Step.TASKS -> CreateTrainTasksScreen(
+        },
+        tasksContent = { onBack, onNext, onClose ->
+            CreateTrainTasksScreen(
                 onBack = onBack,
-                onNext = onNextStep,
-                onClose = onCancel,
+                onNext = onNext,
+                onClose = onClose,
             )
-
-            Step.TRAIN_DETAIL -> CreateTrainDetailsScreenV2(
+        },
+        trainDetailsContent = { onBack, onClose, id ->
+            CreateTrainDetailsScreenV2(
                 onBack = onBack,
-                onClose = {
-                    onCancel()
-                },
-                onTrainingSaved = onCancel, //  navigate up
-                teamId = uiState.teamId,
+                onClose = onClose,
+                onTrainingSaved = onCancel,
+                teamId = id,
             )
         }
-    }
+    )
 }

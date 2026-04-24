@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sedilant.yambol.data.draftTrain.TrainingDraftRepository
 import com.sedilant.yambol.domain.get.GetTeamsUseCase
-import com.sedilant.yambol.domain.models.TeamDomainModel
+import com.sedilant.yambol.feature.createTrain.stepsScreens.basicInfo.BasicInfoUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -27,8 +27,8 @@ class CreateTrainBasicInfoViewModel(
     private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<UiStateNew>(UiStateNew.Loading)
-    val uiState: StateFlow<UiStateNew> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow<BasicInfoUiState>(BasicInfoUiState.Loading)
+    val uiState: StateFlow<BasicInfoUiState> = _uiState.asStateFlow()
 
     private var draftId: String?
         get() = savedStateHandle.get<String>(KEY_DRAFT_ID)
@@ -45,7 +45,7 @@ class CreateTrainBasicInfoViewModel(
      */
     private fun loadOrCreateActiveDraft() {
         viewModelScope.launch {
-            _uiState.value = UiStateNew.Loading
+            _uiState.value = BasicInfoUiState.Loading
 
             try {
                 val teamList = getAllTeamsUseCase().first()
@@ -54,7 +54,7 @@ class CreateTrainBasicInfoViewModel(
 
                 val draft = repository.getDraft(id)
                 if (draft != null) {
-                    _uiState.value = UiStateNew.Success(
+                    _uiState.value = BasicInfoUiState.Success(
                         selectedDate = draft.date,
                         startHour = draft.startTime,
                         endHour = draft.startTime + (draft.endTime / 60f), // change duration from endHour
@@ -62,7 +62,7 @@ class CreateTrainBasicInfoViewModel(
                         selectedTeamId = teamId
                     )
                 } else {
-                    _uiState.value = UiStateNew.Success(
+                    _uiState.value = BasicInfoUiState.Success(
                         selectedDate = Clock.System.now(),
                         teamsList = teamList,
                         selectedTeamId = teamId,
@@ -71,14 +71,14 @@ class CreateTrainBasicInfoViewModel(
                     )
                 }
             } catch (e: Exception) {
-                _uiState.value = UiStateNew.Error("Error al cargar el borrador: ${e.message}")
+                _uiState.value = BasicInfoUiState.Error("Error al cargar el borrador: ${e.message}")
             }
         }
     }
 
     fun onDateSelected(date: Instant) {
         val currentState = _uiState.value
-        if (currentState is UiStateNew.Success) {
+        if (currentState is BasicInfoUiState.Success) {
             _uiState.value = currentState.copy(selectedDate = date)
             saveDateToRepository(date)
         }
@@ -87,7 +87,7 @@ class CreateTrainBasicInfoViewModel(
     fun onStartTimeChanged(hour: Int, minute: Int) {
         val hourAsFloat = hour + (minute / 60f)
         val currentState = _uiState.value
-        if (currentState is UiStateNew.Success) {
+        if (currentState is BasicInfoUiState.Success) {
             _uiState.value = currentState.copy(startHour = hourAsFloat)
             saveTimeToRepository(hourAsFloat)
         }
@@ -96,7 +96,7 @@ class CreateTrainBasicInfoViewModel(
     fun onEndTimeChanged(hour: Int, minute: Int) {
         val hourAsFloat = hour + (minute / 60f)
         val currentState = _uiState.value
-        if (currentState is UiStateNew.Success) {
+        if (currentState is BasicInfoUiState.Success) {
             _uiState.value = currentState.copy(endHour = hourAsFloat)
             saveDurationToRepository(hourAsFloat)
         }
@@ -107,7 +107,7 @@ class CreateTrainBasicInfoViewModel(
      */
     fun onTeamSelected(teamId: String) {
         val currentState = _uiState.value
-        if (currentState is UiStateNew.Success) {
+        if (currentState is BasicInfoUiState.Success) {
             _uiState.value = currentState.copy(selectedTeamId = teamId)
         }
     }
@@ -118,7 +118,7 @@ class CreateTrainBasicInfoViewModel(
     fun saveStepData() {
         val id = draftId ?: return
         val currentState = _uiState.value
-        if (currentState is UiStateNew.Success) {
+        if (currentState is BasicInfoUiState.Success) {
             viewModelScope.launch {
                 try {
                     repository.updateTrainingData(
@@ -129,7 +129,7 @@ class CreateTrainBasicInfoViewModel(
                         teamId = currentState.selectedTeamId
                     )
                 } catch (e: Exception) {
-                    _uiState.value = UiStateNew.Error("Error al guardar: ${e.message}")
+                    _uiState.value = BasicInfoUiState.Error("Error al guardar: ${e.message}")
                 }
             }
         }
@@ -185,18 +185,6 @@ class CreateTrainBasicInfoViewModel(
     private fun getCurrentHourAsFloat(): Float {
         val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
         return now.hour + (now.minute / 60f)
-    }
-
-    sealed class UiStateNew {
-        data object Loading : UiStateNew()
-        data class Success(
-            val selectedDate: Instant,
-            val startHour: Float,
-            val endHour: Float,
-            val teamsList: List<TeamDomainModel>,
-            val selectedTeamId: String
-        ) : UiStateNew()
-        data class Error(val message: String) : UiStateNew()
     }
 
     companion object {

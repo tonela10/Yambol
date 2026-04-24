@@ -32,15 +32,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.koin.androidx.compose.koinViewModel
-import com.sedilant.yambol.R
+import com.sedilant.yambol.core.designsystem.Res
+import com.sedilant.yambol.core.designsystem.*
 import com.sedilant.yambol.ui.home.models.PlayerUiModel
 import com.sedilant.yambol.ui.home.models.TeamUiModel
 import com.sedilant.yambol.ui.theme.YambolTheme
@@ -111,7 +113,7 @@ private fun HomeScreenStateless(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    SectionHeader(title = stringResource(R.string.teams))
+                    SectionHeader(title = stringResource(Res.string.teams))
                     IconButton(
                         onClick = { homeUiState.currentTeam?.let { onEditTeam(it.name) } },
                         modifier = Modifier
@@ -119,7 +121,7 @@ private fun HomeScreenStateless(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Edit,
-                            contentDescription = stringResource(R.string.cd_edit_team_name),
+                            contentDescription = stringResource(Res.string.cd_edit_team_name),
                             tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(18.dp)
                         )
@@ -136,7 +138,7 @@ private fun HomeScreenStateless(
                 }
 
                 if (homeUiState.listOfPlayer.isNotEmpty()) {
-                    SectionHeader(title = stringResource(R.string.players))
+                    SectionHeader(title = stringResource(Res.string.players))
                     PlayersRow(
                         listOfPlayer = homeUiState.listOfPlayer,
                         modifier = Modifier.padding(bottom = 16.dp)
@@ -219,11 +221,11 @@ fun TeamTabs(
             item {
                 AssistChip(
                     onClick = onCreateTeam,
-                    label = { Text(stringResource(R.string.add_team)) },
+                    label = { Text(stringResource(Res.string.add_team)) },
                     leadingIcon = {
                         Icon(
                             Icons.Filled.Add,
-                            contentDescription = stringResource(R.string.cd_add_team),
+                            contentDescription = stringResource(Res.string.cd_add_team),
                             Modifier.size(AssistChipDefaults.IconSize)
                         )
                     },
@@ -323,7 +325,7 @@ private fun ActionButtonsSection(
         modifier = modifier.padding(horizontal = 20.dp)
     ) {
         Text(
-            text = stringResource(R.string.quick_actions),
+            text = stringResource(Res.string.quick_actions),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.SemiBold,
             color = MaterialTheme.colorScheme.onSurface,
@@ -339,9 +341,9 @@ private fun ActionButtonsSection(
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             BigButtonYambol(
-                drawable = R.drawable.healt_icon_filled,
-                title = stringResource(R.string.last_training),
-                description = stringResource(R.string.view_recent_session),
+                drawable = Res.drawable.healt_icon_filled,
+                title = stringResource(Res.string.last_training),
+                description = stringResource(Res.string.view_recent_session),
                 onClick = onLastTrainClick,
                 modifier = Modifier.weight(1f)
             )
@@ -352,7 +354,7 @@ private fun ActionButtonsSection(
 @Composable
 private fun BigButtonYambol(
     modifier: Modifier = Modifier,
-    drawable: Int,
+    drawable: DrawableResource,
     title: String,
     description: String,
     onClick: () -> Unit,
@@ -427,7 +429,7 @@ private fun PlayersRowPreview() {
 private fun YambolButtonPreview() {
     YambolTheme {
         BigButtonYambol(
-            drawable = R.drawable.fitness_center,
+            drawable = Res.drawable.fitness_center,
             title = "New Training",
             description = "Register a new session"
         ) { }

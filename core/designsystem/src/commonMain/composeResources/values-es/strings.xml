@@ -1,0 +1,191 @@
+<resources>
+    <!-- App Name -->
+    <string name="app_name">Yambol</string>
+
+    <!-- Common Actions -->
+    <string name="cancel">Cancelar</string>
+    <string name="ok">OK</string>
+    <string name="save">Guardar</string>
+    <string name="add">Añadir</string>
+    <string name="edit">Editar</string>
+    <string name="delete">Eliminar</string>
+    <string name="next">Siguiente</string>
+    <string name="back">Volver</string>
+    <string name="retry">Reintentar</string>
+    <string name="close">Cerrar</string>
+    <string name="loading">Cargando…</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Inicio</string>
+    <string name="nav_profile">Perfil</string>
+    <string name="nav_training">Entrenamientos</string>
+
+    <!-- Screen Titles -->
+    <string name="add_teams_stats_screen">Añadir estadísticas del equipo</string>
+    <string name="board_screen_title">Tablero</string>
+    <string name="create_team_screen">Crear equipo</string>
+    <string name="create_train_screen">Crear entrenamiento</string>
+    <string name="player_card_screen">Ficha del jugador</string>
+    <string name="profile_screen_title">Perfil</string>
+    <string name="statistic_screen_title">Estadísticas</string>
+    <string name="training_details_screen">Detalles del entrenamiento</string>
+    <string name="training_screen_title">Entrenamientos</string>
+
+    <!-- Home Screen -->
+    <string name="teams">Equipos</string>
+    <string name="players">Jugadores</string>
+    <string name="quick_actions">Acciones rápidas</string>
+    <string name="last_training">Último entrenamiento</string>
+    <string name="new_training">Nuevo entrenamiento</string>
+    <string name="view_recent_session">Ver tu sesión reciente</string>
+    <string name="register_new_session">Registrar una nueva sesión</string>
+    <string name="add_team">Añadir equipo</string>
+
+    <!-- Create Team Screen -->
+    <string name="create_your_team">Crea tu equipo</string>
+    <string name="give_team_unique_name">Dale a tu equipo un nombre único</string>
+    <string name="add_team_players">Añadir jugadores al equipo</string>
+    <string name="add_at_least_players">Añade al menos 5 jugadores para crear tu equipo</string>
+    <string name="player_number">Jugador %d</string>
+    <string name="team_progress">Progreso del equipo</string>
+    <string name="players_progress">%1$d / %2$d jugadores</string>
+    <string name="ready_to_finish">✓ ¡Listo para finalizar!</string>
+    <string name="add_player">Añadir jugador</string>
+    <string name="create_team">Crear equipo</string>
+    <string name="error_name_empty_or_exists">El nombre está vacío o ya existe</string>
+
+    <!-- Create Training Screens -->
+    <string name="new_training_session">Nuevo entrenamiento</string>
+    <string name="create_training">Crear entrenamiento</string>
+    <string name="training_details">Detalles del entrenamiento</string>
+    <string name="training_basic_information">Información básica del entrenamiento</string>
+    <string name="basic_information">Información básica</string>
+    <string name="general_information">Información general</string>
+
+    <!-- Training - Basic Info -->
+    <string name="select_team">Seleccionar equipo</string>
+    <string name="team_label">Equipo</string>
+    <string name="select_date">Seleccionar fecha</string>
+    <string name="training_date">Fecha del entrenamiento</string>
+    <string name="date_label">Fecha: %s</string>
+    <string name="training_duration">Duración del entrenamiento</string>
+    <string name="duration_label">Duración: %s</string>
+    <string name="hours">Horas</string>
+    <string name="minutes">Minutos</string>
+
+    <!-- Training - Concepts -->
+    <string name="concepts_question">¿Qué conceptos quieres trabajar?</string>
+    <string name="search_concepts">Buscar conceptos</string>
+    <string name="concepts">Conceptos</string>
+    <string name="add_concept">Añadir concepto</string>
+    <string name="concept_name">Nombre del concepto</string>
+    <string name="concepts_selected">%d concepto(s) seleccionado(s)</string>
+    <string name="concepts_worked">Conceptos trabajados (%d)</string>
+    <string name="no_concepts_found">No se encontraron conceptos</string>
+
+    <!-- Training - Tasks/Exercises -->
+    <string name="exercises_question">¿QUÉ EJERCICIOS HARÁS?</string>
+    <string name="add_new_exercise">Añadir nuevo ejercicio</string>
+    <string name="add_existing_exercise">Añadir ejercicio existente</string>
+    <string name="exercises_added">%d ejercicio(s) añadido(s)</string>
+    <string name="exercises_label">Ejercicios (%d)</string>
+    <string name="no_exercises_yet">No hay ejercicios todavía</string>
+    <string name="add_first_exercise">Añade tu primer ejercicio</string>
+    <string name="variation_label">Variación: %s</string>
+    <string name="variables_help_text">Las variables te ayudan a rastrear y modificar la tarea durante el entrenamiento</string>
+
+    <!-- Training - Validation -->
+    <string name="error_concepts_required_to_continue">Selecciona al menos un concepto para continuar.</string>
+    <string name="error_task_concept_required">Selecciona al menos un concepto para la tarea.</string>
+
+    <!-- Training - Details & Review -->
+    <string name="add_specific_tasks_and_drills_for_this_training_optional">Añade tareas y ejercicios específicos para este entrenamiento (opcional)</string>
+    <string name="no_tasks_added">No se han añadido tareas</string>
+    <string name="no_tasks_added_yet">No se han añadido tareas todavía</string>
+    <string name="tasks_are_optional_but_help_structure_your_training">Las tareas son opcionales pero ayudan a estructurar tu entrenamiento</string>
+    <string name="review_all_details_before_saving_your_training">Revisa todos los detalles antes de guardar tu entrenamiento</string>
+    <string name="saving">Guardando…</string>
+    <string name="save_training">Guardar entrenamiento</string>
+    <string name="sessions">Sesiones</string>
+
+    <!-- Training List & Details -->
+    <string name="filter_by_date">Filtrar por fecha</string>
+    <string name="no_tasks_session">Esta sesión de entrenamiento no tiene tareas todavía.</string>
+
+    <!-- Step Progress -->
+    <string name="step_progress">Paso %1$d de %2$d</string>
+
+    <!-- Content Descriptions -->
+    <string name="cd_edit_team_name">Editar nombre del equipo</string>
+    <string name="cd_add_team">Añadir equipo</string>
+    <string name="cd_add">Añadir</string>
+    <string name="cd_search">Buscar</string>
+    <string name="cd_close">Cerrar</string>
+
+    <!-- Error Messages -->
+    <string name="error">Error</string>
+    <string name="error_loading_training">Error al cargar el entrenamiento</string>
+    <string name="error_unknown">Error desconocido</string>
+    <string name="loading_teams">Cargando equipos…</string>
+
+    <!-- Objectives -->
+    <string name="team_objectives">Objetivos del equipo</string>
+    <string name="cd_add_objective">Añadir objetivo</string>
+    <string name="no_objectives_yet">Aún no hay objetivos</string>
+    <string name="add_first_objective_hint">Pulsa el botón + para añadir tu primer objetivo</string>
+    <string name="add_new_objective_title">Añadir nuevo objetivo</string>
+    <string name="objective_description_label">Descripción del objetivo</string>
+    <string name="objective_description_placeholder">p. ej., Anotar 10 tiros libres seguidos</string>
+    <string name="objective_description_error">Introduce una descripción del objetivo</string>
+    <string name="objective_description_help">Describe lo que el equipo debe lograr durante el entrenamiento</string>
+    <string name="add_objective">Añadir objetivo</string>
+    <string name="edit_objective_title">Editar objetivo</string>
+    <string name="objective_completed_cd">Completado</string>
+    <string name="objective_completed_text">Este objetivo está completado</string>
+    <string name="save_changes">Guardar cambios</string>
+    <string name="delete_objective">Eliminar objetivo</string>
+    <string name="delete_objective_title">Eliminar objetivo</string>
+    <string name="delete_objective_confirmation">¿Seguro que quieres eliminar este objetivo? Esta acción no se puede deshacer.</string>
+
+    <!-- Profile/Auth -->
+    <string name="cd_user_avatar">Avatar de usuario</string>
+    <string name="account_information">Información de la cuenta</string>
+    <string name="email_label">Correo electrónico</string>
+    <string name="email_verified_label">Correo verificado</string>
+    <string name="yes">Sí</string>
+    <string name="no">No</string>
+    <string name="sign_out">Cerrar sesión</string>
+    <string name="delete_account">Eliminar cuenta</string>
+    <string name="delete_account_title">¿Eliminar cuenta?</string>
+    <string name="delete_account_message">Esta acción no se puede deshacer. Todos tus datos se eliminarán permanentemente.</string>
+    <string name="cd_email_verification">Verificación de correo</string>
+    <string name="verify_your_email">Verifica tu correo</string>
+    <string name="verification_sent_to">Hemos enviado un correo de verificación a:</string>
+    <string name="verification_check_inbox">Revisa tu bandeja de entrada y haz clic en el enlace de verificación para completar tu registro.</string>
+    <string name="checking">Comprobando...</string>
+    <string name="verified_my_email">He verificado mi correo</string>
+    <string name="sending">Enviando...</string>
+    <string name="resend_verification_email">Reenviar correo de verificación</string>
+    <string name="cancel_and_sign_out">Cancelar y cerrar sesión</string>
+
+    <string name="welcome_back">Bienvenido de nuevo</string>
+    <string name="sign_in_to_account">Inicia sesión en tu cuenta</string>
+    <string name="enter_password">Introduce tu contraseña</string>
+    <string name="go_back">Volver</string>
+    <string name="continue_with_email">Continuar con correo</string>
+    <string name="password_label">Contraseña</string>
+    <string name="confirm_password_label">Confirmar contraseña</string>
+    <string name="toggle_password_visibility">Mostrar/ocultar contraseña</string>
+    <string name="sign_in">Iniciar sesión</string>
+    <string name="or_divider">  o  </string>
+    <string name="no_account_sign_up">¿No tienes cuenta? Regístrate</string>
+    <string name="create_account">Crear cuenta</string>
+    <string name="sign_up_get_started">Regístrate para comenzar</string>
+    <string name="sign_up">Registrarse</string>
+    <string name="already_have_account_sign_in">¿Ya tienes cuenta? Inicia sesión</string>
+    <string name="password_requirement_min_length">Al menos 6 caracteres</string>
+    <string name="password_requirement_number">Al menos 1 número</string>
+    <string name="password_requirement_symbol">Al menos 1 símbolo (!@#\$%^*)</string>
+    <string name="cd_google">Google</string>
+    <string name="continue_with_google">Continuar con Google</string>
+</resources>

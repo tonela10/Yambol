@@ -105,7 +105,14 @@ dependencies {
     // Core modules
     implementation(project(":core:domain"))
     implementation(project(":core:data"))
+    implementation(project(":core:designsystem"))
+    implementation(libs.compose.components.resources)
 
+    // Feature modules
+    implementation(project(":feature:profile"))
+    implementation(project(":feature:createTeam"))
+    implementation(project(":feature:createTrain"))
+    implementation(project(":feature:login"))
 
     // Sentry
     implementation(libs.sentry.android)

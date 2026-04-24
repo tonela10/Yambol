@@ -1,6 +1,5 @@
 package com.sedilant.yambol.ui
 
-import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -20,20 +19,23 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
+import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.sedilant.yambol.R
+import com.sedilant.yambol.core.designsystem.Res
+import com.sedilant.yambol.core.designsystem.*
 import com.sedilant.yambol.YambolScreen
 import com.sedilant.yambol.ui.theme.YambolTheme
 
 data class TopLevelRoute(
-    @StringRes val nameResId: Int,
+    val nameResId: StringResource,
     val route: YambolScreen,
     val filledIcon: IconType,
     val outlinedIcon: IconType
@@ -41,7 +43,7 @@ data class TopLevelRoute(
 
 sealed interface IconType {
     data class Vector(val imageVector: ImageVector) : IconType
-    data class Resource(val id: Int) : IconType
+    data class Resource(val id: DrawableResource) : IconType
 }
 
 @Composable
@@ -55,19 +57,19 @@ fun NavigationBottomBar(
     val topLevelRoutes = remember {
         listOf(
             TopLevelRoute(
-                nameResId = R.string.nav_home,
+                nameResId = Res.string.nav_home,
                 route = YambolScreen.Home,
                 filledIcon = IconType.Vector(Icons.Filled.Home),
                 outlinedIcon = IconType.Vector(Icons.Outlined.Home)
             ),
             TopLevelRoute(
-                nameResId = R.string.nav_training,
+                nameResId = Res.string.nav_training,
                 route = YambolScreen.Training,
-                filledIcon = IconType.Resource(R.drawable.sports_basketball_filled),
-                outlinedIcon = IconType.Resource(R.drawable.sports_basketball_oulined)
+                filledIcon = IconType.Resource(Res.drawable.sports_basketball_filled),
+                outlinedIcon = IconType.Resource(Res.drawable.sports_basketball_oulined)
             ),
             TopLevelRoute(
-                nameResId = R.string.nav_profile,
+                nameResId = Res.string.nav_profile,
                 route = YambolScreen.Profile,
                 filledIcon = IconType.Vector(Icons.Filled.AccountCircle),
                 outlinedIcon = IconType.Vector(Icons.Outlined.AccountCircle),
@@ -136,7 +138,7 @@ private fun NavigationIcon(
             contentDescription = contentDescription
         )
         is IconType.Resource -> Icon(
-            imageVector = ImageVector.vectorResource(id = iconType.id),
+            imageVector = vectorResource(iconType.id),
             contentDescription = contentDescription
         )
     }

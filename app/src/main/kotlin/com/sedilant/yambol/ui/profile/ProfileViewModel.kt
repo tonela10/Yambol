@@ -5,28 +5,12 @@ import androidx.lifecycle.viewModelScope
 import com.sedilant.yambol.data.DataStoreManager
 import com.sedilant.yambol.data.firebaseAuth.AuthRepository
 import com.sedilant.yambol.data.firebaseAuth.AuthResult
+import com.sedilant.yambol.feature.profile.ProfileUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-
-/**
- * UI State for the Profile Screen
- */
-sealed class ProfileUiState {
-    data object Loading : ProfileUiState()
-
-    data class Authenticated(
-        val userName: String,
-        val userEmail: String,
-        val isEmailVerified: Boolean,
-        val photoUrl: String?,
-        val showDeleteConfirmation: Boolean = false
-    ) : ProfileUiState()
-
-    data class Error(val message: String) : ProfileUiState()
-}
 
 /**
  * ViewModel for Profile Screen
