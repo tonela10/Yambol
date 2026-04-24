@@ -1,9 +1,8 @@
 package com.sedilant.yambol.data.team.player
 
 import kotlinx.coroutines.flow.Flow
-import javax.inject.Inject
 
-class PlayerRepositoryImpl @Inject constructor(
+class PlayerRepositoryImpl(
     private val playerDao: PlayerDao,
 ) : PlayerRepository {
     override suspend fun insertPlayer(player: PlayerEntity): Long {

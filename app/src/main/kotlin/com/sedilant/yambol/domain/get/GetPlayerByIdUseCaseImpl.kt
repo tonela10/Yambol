@@ -2,9 +2,8 @@ package com.sedilant.yambol.domain.get
 
 import com.sedilant.yambol.data.firestore.PlayerRepository
 import com.sedilant.yambol.ui.home.models.PlayerUiModel
-import javax.inject.Inject
 
-class GetPlayerByIdUseCaseImpl @Inject constructor(
+class GetPlayerByIdUseCaseImpl(
     private val playerRepository: PlayerRepository
 ) : GetPlayerByIdUseCase {
 

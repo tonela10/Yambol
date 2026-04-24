@@ -4,13 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sedilant.yambol.data.firebaseAuth.AuthRepository
 import com.sedilant.yambol.data.firebaseAuth.AuthResult
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 /**
  * Password validation result
@@ -62,8 +60,7 @@ sealed class LoginUiState {
 /**
  * ViewModel for Login Screen
  */
-@HiltViewModel
-class LoginViewModel @Inject constructor(
+class LoginViewModel(
     private val authRepository: AuthRepository
 ) : ViewModel() {
 

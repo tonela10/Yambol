@@ -34,7 +34,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 import com.sedilant.yambol.R
 import com.sedilant.yambol.domain.models.TaskDomain
 import com.sedilant.yambol.domain.models.TrainDomainModel
@@ -48,12 +49,8 @@ import kotlinx.datetime.toLocalDateTime
 fun TrainingDetailsScreen(
     trainId: String,
     onNavigateBack: () -> Unit,
-    trainingDetailsViewModel: TrainingDetailsViewModel = hiltViewModel(
-        creationCallback = { factory: TrainingDetailsViewModelFactory ->
-            factory.create(
-                trainId = trainId
-            )
-        }
+    trainingDetailsViewModel: TrainingDetailsViewModel = koinViewModel(
+        parameters = { parametersOf(trainId) }
     )
 ) {
     val uiState by trainingDetailsViewModel.uiState.collectAsState()

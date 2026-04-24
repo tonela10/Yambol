@@ -2,9 +2,8 @@ package com.sedilant.yambol.data.team
 
 import com.sedilant.yambol.data.queries.TrainWithTrainTask
 import kotlinx.coroutines.flow.Flow
-import javax.inject.Inject
 
-class TeamRepositoryImpl @Inject constructor(
+class TeamRepositoryImpl(
     private val teamDao: TeamDao,
     private val teamObjectivesDao: TeamObjectivesDao,
     private val trainingDao: TrainingDao,

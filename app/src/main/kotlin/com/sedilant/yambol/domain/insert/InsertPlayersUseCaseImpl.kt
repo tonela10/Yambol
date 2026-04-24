@@ -4,9 +4,8 @@ import com.sedilant.yambol.data.firebaseAuth.AuthRepository
 import com.sedilant.yambol.data.firestore.PlayerDto
 import com.sedilant.yambol.data.firestore.PlayerRepository
 import com.sedilant.yambol.ui.home.models.PlayerUiModel
-import javax.inject.Inject
 
-class InsertPlayersUseCaseImpl @Inject constructor(
+class InsertPlayersUseCaseImpl(
     private val playerRepository: PlayerRepository,
     private val authRepository: AuthRepository
 ) : InsertPlayersUseCase {

@@ -5,18 +5,13 @@ import androidx.lifecycle.viewModelScope
 import com.sedilant.yambol.domain.get.GetTrainWithTrainTaskByTrainIdUseCase
 import com.sedilant.yambol.domain.models.TrainDomainModel
 import com.sedilant.yambol.domain.models.TaskDomain
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-@HiltViewModel(assistedFactory = TrainingDetailsViewModelFactory::class)
-class TrainingDetailsViewModel @AssistedInject constructor(
-    @Assisted private val trainId: String,
+class TrainingDetailsViewModel(
+    private val trainId: String,
     private val getTrainWithTrainTaskByTrainIdUseCase: GetTrainWithTrainTaskByTrainIdUseCase
 ) : ViewModel() {
 
@@ -48,9 +43,4 @@ sealed interface TrainingDetailsUiState {
         val train: TrainDomainModel,
         val taskList: List<TaskDomain>
     ) : TrainingDetailsUiState
-}
-
-@AssistedFactory
-interface TrainingDetailsViewModelFactory {
-    fun create(trainId: String): TrainingDetailsViewModel
 }

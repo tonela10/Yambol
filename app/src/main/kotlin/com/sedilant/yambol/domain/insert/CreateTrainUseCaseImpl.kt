@@ -3,10 +3,9 @@ package com.sedilant.yambol.domain.insert
 import com.sedilant.yambol.data.firebaseAuth.AuthRepository
 import com.sedilant.yambol.data.firestore.TrainDto
 import com.sedilant.yambol.data.firestore.TrainRepository
-import javax.inject.Inject
 import kotlinx.datetime.Instant
 
-class CreateTrainUseCaseImpl @Inject constructor(
+class CreateTrainUseCaseImpl(
     private val trainRepository: TrainRepository,
     private val authRepository: AuthRepository
 ) : CreateTrainUseCase {

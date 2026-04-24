@@ -1,0 +1,16 @@
+-- Merging decision tree log ---
+manifest
+ADDED from /Users/sedilant/Projects/Yambol/feature/training/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest2815217671245949271.xml:2:13-83
+INJECTED from /Users/sedilant/Projects/Yambol/feature/training/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest2815217671245949271.xml:2:13-83
+	package
+		INJECTED from /Users/sedilant/Projects/Yambol/feature/training/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest2815217671245949271.xml
+	xmlns:android
+		ADDED from /Users/sedilant/Projects/Yambol/feature/training/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest2815217671245949271.xml:2:23-81
+uses-sdk
+INJECTED from /Users/sedilant/Projects/Yambol/feature/training/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest2815217671245949271.xml reason: use-sdk injection requested
+INJECTED from /Users/sedilant/Projects/Yambol/feature/training/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest2815217671245949271.xml
+INJECTED from /Users/sedilant/Projects/Yambol/feature/training/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest2815217671245949271.xml
+	android:targetSdkVersion
+		INJECTED from /Users/sedilant/Projects/Yambol/feature/training/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest2815217671245949271.xml
+	android:minSdkVersion
+		INJECTED from /Users/sedilant/Projects/Yambol/feature/training/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest2815217671245949271.xml

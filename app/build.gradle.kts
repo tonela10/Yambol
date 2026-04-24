@@ -1,11 +1,18 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
-    id("org.jetbrains.kotlin.plugin.serialization") version "2.0.0"
+    alias(libs.plugins.kotlin.serialization)
     id("com.google.gms.google-services")
+}
+
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(localPropertiesFile.inputStream())
 }
 
 android {
@@ -20,6 +27,12 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField(
+            "String",
+            "SENTRY_DSN",
+            "\"${localProperties.getProperty("SENTRY_DSN") ?: System.getenv("SENTRY_DSN") ?: ""}\""
+        )
     }
 
     buildTypes {
@@ -32,14 +45,15 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "17"
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -62,12 +76,10 @@ dependencies {
     implementation(libs.kotlinx.datetime)
     implementation(libs.reorderable)
 
-    // Firebase
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.analytics)
-    implementation(libs.firebase.auth)
-    implementation(libs.firebase.ui.auth)
-    implementation(libs.firebase.firestore.ktx)
+    // Firebase (GitLive KMP wrappers)
+    implementation(libs.gitlive.firebase.auth)
+    implementation(libs.gitlive.firebase.firestore)
+    implementation(libs.gitlive.firebase.analytics)
 
     // Google Sign-In
     implementation(libs.play.services.auth)
@@ -83,13 +95,18 @@ dependencies {
     implementation(libs.androidx.material3)
     ksp(libs.androidx.room.compiler)
 
-    // Hilt
-    implementation(libs.hilt.android)
-    implementation(libs.androidx.hilt.navigation.compose)
-    ksp(libs.hilt.android.compiler)
+    // Koin
+    implementation(libs.koin.android)
+    implementation(libs.koin.androidx.compose)
+
+    // Logging
+    implementation(libs.kermit)
 
 
-    testImplementation(libs.junit)
+    // Sentry
+    implementation(libs.sentry.android)
+
+    testImplementation(libs.kotlin.test)
 
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

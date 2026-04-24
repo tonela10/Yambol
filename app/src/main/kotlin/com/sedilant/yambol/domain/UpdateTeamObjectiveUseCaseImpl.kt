@@ -3,9 +3,8 @@ package com.sedilant.yambol.domain
 import com.sedilant.yambol.data.firebaseAuth.AuthRepository
 import com.sedilant.yambol.data.firestore.TeamObjectiveDto
 import com.sedilant.yambol.data.firestore.TeamObjectiveRepository
-import javax.inject.Inject
 
-class UpdateTeamObjectiveUseCaseImpl @Inject constructor(
+class UpdateTeamObjectiveUseCaseImpl(
     private val repository: TeamObjectiveRepository,
     private val authRepository: AuthRepository
 ) : UpdateTeamObjectiveUseCase {

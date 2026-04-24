@@ -1,6 +1,6 @@
 package com.sedilant.yambol.ui.login
 
-import android.util.Log
+import co.touchlab.kermit.Logger
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -25,7 +25,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.exceptions.GetCredentialCancellationException
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.sedilant.yambol.R
@@ -38,7 +38,7 @@ private const val WEB_CLIENT_ID = "448568418891-4vq7apk7c16o5s69qg6gvns664oc8cif
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
-    viewModel: LoginViewModel = hiltViewModel()
+    viewModel: LoginViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
@@ -69,9 +69,9 @@ fun LoginScreen(
 
                 viewModel.signInWithGoogle(idToken)
             } catch (e: GetCredentialCancellationException) {
-                Log.d("LoginScreen", "Google Sign-In cancelled by user")
+                Logger.d("LoginScreen") { "Google Sign-In cancelled by user" }
             } catch (e: Exception) {
-                Log.e("LoginScreen", "Google Sign-In failed", e)
+                Logger.e("LoginScreen", e) { "Google Sign-In failed" }
                 viewModel.onGoogleSignInFailed(e.message ?: "Google Sign-In failed")
             }
         }

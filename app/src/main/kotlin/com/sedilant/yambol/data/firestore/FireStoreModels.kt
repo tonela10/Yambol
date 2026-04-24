@@ -1,8 +1,9 @@
 package com.sedilant.yambol.data.firestore
 
-import com.google.firebase.Timestamp
+import dev.gitlive.firebase.firestore.Timestamp
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.Serializable
 
-// Common metadata for Firestore entities
 interface FirestoreEntityMeta {
     val id: String
     val userId: String
@@ -11,26 +12,29 @@ interface FirestoreEntityMeta {
     val localId: Long?
 }
 
+@Serializable
 data class TeamDto(
     override val id: String = "",
     val name: String = "",
     override val userId: String = "",
-    override val createdAt: Timestamp? = null,
-    override val updatedAt: Timestamp? = null,
+    @Contextual override val createdAt: Timestamp? = null,
+    @Contextual override val updatedAt: Timestamp? = null,
     override val localId: Long? = null
 ) : FirestoreEntityMeta
 
+@Serializable
 data class PlayerDto(
     override val id: String = "",
     val name: String = "",
     val number: Int? = null,
     val teamId: String = "",
     override val userId: String = "",
-    override val createdAt: Timestamp? = null,
-    override val updatedAt: Timestamp? = null,
+    @Contextual override val createdAt: Timestamp? = null,
+    @Contextual override val updatedAt: Timestamp? = null,
     override val localId: Long? = null
 ) : FirestoreEntityMeta
 
+@Serializable
 data class TaskDto(
     override val id: String = "",
     val name: String = "",
@@ -38,11 +42,12 @@ data class TaskDto(
     val variables: List<String> = emptyList(),
     val conceptIds: List<String> = emptyList(),
     override val userId: String = "",
-    override val createdAt: Timestamp? = null,
-    override val updatedAt: Timestamp? = null,
+    @Contextual override val createdAt: Timestamp? = null,
+    @Contextual override val updatedAt: Timestamp? = null,
     override val localId: Long? = null
 ) : FirestoreEntityMeta
 
+@Serializable
 data class TrainDto(
     override val id: String = "",
     val dateMillis: Long? = null,
@@ -52,27 +57,29 @@ data class TrainDto(
     val taskIds: List<String> = emptyList(),
     val conceptIds: List<String> = emptyList(),
     override val userId: String = "",
-    override val createdAt: Timestamp? = null,
-    override val updatedAt: Timestamp? = null,
+    @Contextual override val createdAt: Timestamp? = null,
+    @Contextual override val updatedAt: Timestamp? = null,
     override val localId: Long? = null
 ) : FirestoreEntityMeta
 
+@Serializable
 data class ConceptDto(
     override val id: String = "",
     val name: String = "",
     override val userId: String = "",
-    override val createdAt: Timestamp? = null,
-    override val updatedAt: Timestamp? = null,
+    @Contextual override val createdAt: Timestamp? = null,
+    @Contextual override val updatedAt: Timestamp? = null,
     override val localId: Long? = null
 ) : FirestoreEntityMeta
 
+@Serializable
 data class TeamObjectiveDto(
     override val id: String = "",
     val title: String = "",
     val teamId: String = "",
     var completed: Boolean = false,
     override val userId: String = "",
-    override val createdAt: Timestamp? = null,
-    override val updatedAt: Timestamp? = null,
+    @Contextual override val createdAt: Timestamp? = null,
+    @Contextual override val updatedAt: Timestamp? = null,
     override val localId: Long? = null
 ) : FirestoreEntityMeta

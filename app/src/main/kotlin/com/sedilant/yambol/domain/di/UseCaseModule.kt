@@ -42,75 +42,28 @@ import com.sedilant.yambol.domain.insert.InsertTeamObjectiveUseCase
 import com.sedilant.yambol.domain.insert.InsertTeamObjectiveUseCaseImpl
 import com.sedilant.yambol.domain.insert.InsertTeamUseCase
 import com.sedilant.yambol.domain.insert.InsertTeamUseCaseImpl
-import dagger.Binds
-import dagger.Module
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
+import org.koin.dsl.module
 
-@Module
-@InstallIn(SingletonComponent::class)
-abstract class UseCaseModule {
-
-    @Binds
-    abstract fun bindGetTeamsUseCase(impl: GetTeamsUseCaseImpl): GetTeamsUseCase
-
-    @Binds
-    abstract fun bindGetPlayersUseCase(impl: GetPlayersByTeamIdUseCaseImpl): GetPlayersByTeamIdUseCase
-
-    @Binds
-    abstract fun bindInsertPlayer(impl: InsertPlayerUseCaseImpl): InsertPlayerUseCase
-
-    @Binds
-    abstract fun bindInsertPlayers(impl: InsertPlayersUseCaseImpl): InsertPlayersUseCase
-
-    @Binds
-    abstract fun bindInsertTeam(impl: InsertTeamUseCaseImpl): InsertTeamUseCase
-
-    @Binds
-    abstract fun bindGetTeamObjectives(impl: GetTeamObjectivesUseCaseImpl): GetTeamObjectivesUseCase
-
-    @Binds
-    abstract fun bindInsertTeamObjectives(impl: InsertTeamObjectiveUseCaseImpl): InsertTeamObjectiveUseCase
-
-    @Binds
-    abstract fun bindUpdateTeamObjective(impl: UpdateTeamObjectiveUseCaseImpl): UpdateTeamObjectiveUseCase
-
-    @Binds
-    abstract fun bindToggleTeamObjective(impl: ToggleTeamObjectiveUseCaseImpl): ToggleTeamObjectiveUseCase
-
-    @Binds
-    abstract fun bindDeleteTeamObjective(impl: DeleteTeamObjectiveUseCaseImpl): DeleteTeamObjectiveUseCase
-
-    @Binds
-    abstract fun bindGetPlayerById(impl: GetPlayerByIdUseCaseImpl): GetPlayerByIdUseCase
-
-    @Binds
-    abstract fun bindGetAllTrainsByTeamIdUseCase(impl: GetAllTrainsByTeamIdUseCaseImpl): GetAllTrainsByTeamIdUseCase
-
-    @Binds
-    abstract fun bindGetTrainWithTrainTaskByTrainIdUseCase(impl: GetTrainWithTrainTaskByTrainIdUseCaseImpl): GetTrainWithTrainTaskByTrainIdUseCase
-
-    @Binds
-    abstract fun bindCreateTrainUseCase(impl: CreateTrainUseCaseImpl): CreateTrainUseCase
-
-    @Binds
-    abstract fun bindCreateTrainTaskUseCase(impl: CreateTrainTaskUseCaseImpl): CreateTrainTaskUseCase
-
-    @Binds
-    abstract fun bindGetLastTrainOfTeamUseCase(impl: GetLastTrainOfTeamUseCaseImpl): GetLastTrainOfTeamUseCase
-
-    @Binds
-    abstract fun bindUpdateTeamUseCase(impl: UpdateTeamUseCaseImpl): UpdateTeamUseCase
-
-    @Binds
-    abstract fun bindUpdatePlayerUseCase(impl: UpdatePlayerUseCaseImpl): UpdatePlayerUseCase
-
-    @Binds
-    abstract fun bindCheckJerseyNumberUseCase(impl: CheckJerseyNumberUseCaseImpl): CheckJerseyNumberUseCase
-
-    @Binds
-    abstract fun bindDeletePlayerUseCase(impl: DeletePlayerUseCaseImpl): DeletePlayerUseCase
-
-    @Binds
-    abstract fun bindGetAllTasksUseCase(impl: GetAllTasksUseCaseImpl): GetAllTaskUseCase
+val useCaseModule = module {
+    factory<GetTeamsUseCase>                       { GetTeamsUseCaseImpl(get(), get()) }
+    factory<GetPlayersByTeamIdUseCase>             { GetPlayersByTeamIdUseCaseImpl(get(), get()) }
+    factory<InsertPlayerUseCase>                   { InsertPlayerUseCaseImpl(get(), get()) }
+    factory<InsertPlayersUseCase>                  { InsertPlayersUseCaseImpl(get(), get()) }
+    factory<InsertTeamUseCase>                     { InsertTeamUseCaseImpl(get(), get()) }
+    factory<GetTeamObjectivesUseCase>              { GetTeamObjectivesUseCaseImpl(get(), get()) }
+    factory<InsertTeamObjectiveUseCase>            { InsertTeamObjectiveUseCaseImpl(get(), get()) }
+    factory<UpdateTeamObjectiveUseCase>            { UpdateTeamObjectiveUseCaseImpl(get(), get()) }
+    factory<ToggleTeamObjectiveUseCase>            { ToggleTeamObjectiveUseCaseImpl(get()) }
+    factory<DeleteTeamObjectiveUseCase>            { DeleteTeamObjectiveUseCaseImpl(get()) }
+    factory<GetPlayerByIdUseCase>                  { GetPlayerByIdUseCaseImpl(get()) }
+    factory<GetAllTrainsByTeamIdUseCase>           { GetAllTrainsByTeamIdUseCaseImpl(get(), get()) }
+    factory<GetTrainWithTrainTaskByTrainIdUseCase> { GetTrainWithTrainTaskByTrainIdUseCaseImpl(get(), get(), get()) }
+    factory<CreateTrainUseCase>                    { CreateTrainUseCaseImpl(get(), get()) }
+    factory<CreateTrainTaskUseCase>                { CreateTrainTaskUseCaseImpl(get(), get(), get()) }
+    factory<GetLastTrainOfTeamUseCase>             { GetLastTrainOfTeamUseCaseImpl(get(), get()) }
+    factory<UpdateTeamUseCase>                     { UpdateTeamUseCaseImpl(get()) }
+    factory<UpdatePlayerUseCase>                   { UpdatePlayerUseCaseImpl(get(), get()) }
+    factory<CheckJerseyNumberUseCase>              { CheckJerseyNumberUseCaseImpl(get(), get()) }
+    factory<DeletePlayerUseCase>                   { DeletePlayerUseCaseImpl(get()) }
+    factory<GetAllTaskUseCase>                     { GetAllTasksUseCaseImpl(get(), get()) }
 }

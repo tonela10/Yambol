@@ -6,7 +6,6 @@ import com.sedilant.yambol.data.draftTrain.TrainingDraftRepository
 import com.sedilant.yambol.data.firebaseAuth.AuthRepository
 import com.sedilant.yambol.data.firestore.ConceptDto
 import com.sedilant.yambol.data.firestore.ConceptRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -17,11 +16,9 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
 @OptIn(ExperimentalCoroutinesApi::class)
-class CreateTrainConceptsViewModel @Inject constructor(
+class CreateTrainConceptsViewModel(
     private val draftRepository: TrainingDraftRepository,
     private val conceptRepository: ConceptRepository,
     private val authRepository: AuthRepository,

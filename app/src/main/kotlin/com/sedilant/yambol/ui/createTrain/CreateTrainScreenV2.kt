@@ -8,7 +8,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 import com.sedilant.yambol.ui.createTrain.stepsScreens.basicInfo.CreateTrainBasicInfoScreen
 import com.sedilant.yambol.ui.createTrain.stepsScreens.concepts.CreateTrainConceptsScreen
 import com.sedilant.yambol.ui.createTrain.stepsScreens.tasks.CreateTrainTasksScreen
@@ -25,10 +26,8 @@ fun CreateTrainScreenV2(
     onCancel: () -> Unit,
     teamId: String,
 ) {
-    val viewModel: CreateTrainV2ViewModel = hiltViewModel(
-        creationCallback = { factory: CreateTrainV2ViewModelFactory ->
-            factory.create(teamId)
-        }
+    val viewModel: CreateTrainV2ViewModel = koinViewModel(
+        parameters = { parametersOf(teamId) }
     )
     val uiState by viewModel.uiState.collectAsState()
 

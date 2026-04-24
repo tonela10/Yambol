@@ -7,10 +7,9 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import javax.inject.Inject
 
 // TODO Change to English
-class TrainingDraftRepositoryImpl @Inject constructor(
+class TrainingDraftRepositoryImpl(
     private val trainingDraftDao: TrainingDraftDao
 ) : TrainingDraftRepository {
     override suspend fun createDraft(training: Training): String {

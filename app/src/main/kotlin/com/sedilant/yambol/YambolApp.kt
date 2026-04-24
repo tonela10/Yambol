@@ -7,7 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -64,7 +64,7 @@ sealed interface YambolScreen {
 
 @Composable
 fun YambolApp(
-    viewModel: YambolAppViewModel = hiltViewModel()
+    viewModel: YambolAppViewModel = koinViewModel()
 ) {
     val navController = rememberNavController()
     val isAuthenticated = viewModel.isAuthenticated.collectAsState()

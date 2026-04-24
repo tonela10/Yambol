@@ -5,10 +5,9 @@ import com.sedilant.yambol.data.firestore.TaskRepository
 import com.sedilant.yambol.data.firestore.TrainRepository
 import com.sedilant.yambol.domain.models.TaskDomain
 import com.sedilant.yambol.domain.models.TrainWithTaskDomainModel
-import javax.inject.Inject
 import kotlinx.datetime.Instant
 
-class GetTrainWithTrainTaskByTrainIdUseCaseImpl @Inject constructor(
+class GetTrainWithTrainTaskByTrainIdUseCaseImpl(
     private val trainRepository: TrainRepository,
     private val taskRepository: TaskRepository,
     private val authRepository: AuthRepository

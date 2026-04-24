@@ -39,7 +39,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import com.sedilant.yambol.R
 import com.sedilant.yambol.ui.home.models.PlayerUiModel
 import com.sedilant.yambol.ui.home.models.TeamUiModel
@@ -48,7 +48,7 @@ import com.sedilant.yambol.ui.theme.YambolTheme
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    homeViewModel: HomeViewModel = hiltViewModel(),
+    homeViewModel: HomeViewModel = koinViewModel(),
     onCreateTeam: (Boolean) -> Unit,
     onLastTrainClick: (String) -> Unit
 ) {

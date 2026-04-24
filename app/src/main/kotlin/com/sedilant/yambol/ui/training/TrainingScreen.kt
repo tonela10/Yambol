@@ -20,7 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import com.sedilant.yambol.R
 import com.sedilant.yambol.domain.models.TrainDomainModel
 import com.sedilant.yambol.ui.home.SectionHeader
@@ -39,7 +39,7 @@ fun TrainingScreen(
     modifier: Modifier = Modifier,
     onTrainClicked: (String) -> Unit,
     onNavigateToCreateTraining: (String) -> Unit,
-    trainingViewModel: TrainingViewModel = hiltViewModel()
+    trainingViewModel: TrainingViewModel = koinViewModel()
 ) {
 
     val uiState = trainingViewModel.uiState.collectAsState().value

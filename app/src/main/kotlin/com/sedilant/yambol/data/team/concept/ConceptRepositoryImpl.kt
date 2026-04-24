@@ -1,9 +1,8 @@
 package com.sedilant.yambol.data.team.concept
 
 import kotlinx.coroutines.flow.Flow
-import javax.inject.Inject
 
-class ConceptRepositoryImpl @Inject constructor(
+class ConceptRepositoryImpl(
     private val conceptDao: ConceptDao
 ) : ConceptRepository {
     override suspend fun insertConcept(concept: ConceptEntity): Long {

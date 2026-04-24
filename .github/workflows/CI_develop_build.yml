@@ -26,6 +26,8 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build Debug APK
+        env:
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
         run: ./gradlew assembleDebug
 
       - name: Upload APK

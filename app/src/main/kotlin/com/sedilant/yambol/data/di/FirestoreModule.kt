@@ -1,6 +1,7 @@
 package com.sedilant.yambol.data.di
 
-import com.google.firebase.firestore.FirebaseFirestore
+import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.firestore.firestore
 import com.sedilant.yambol.data.firestore.ConceptRepository
 import com.sedilant.yambol.data.firestore.FirestoreConceptRepository
 import com.sedilant.yambol.data.firestore.FirestorePlayerRepository
@@ -13,55 +14,14 @@ import com.sedilant.yambol.data.firestore.TaskRepository
 import com.sedilant.yambol.data.firestore.TeamObjectiveRepository
 import com.sedilant.yambol.data.firestore.TeamRepository
 import com.sedilant.yambol.data.firestore.TrainRepository
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
+import org.koin.dsl.module
 
-@Module
-@InstallIn(SingletonComponent::class)
-object FirestoreModule {
-
-    @Provides
-    @Singleton
-    fun provideFirebaseFirestore(): FirebaseFirestore {
-        return FirebaseFirestore.getInstance()
-    }
-
-    @Provides
-    @Singleton
-    fun provideFirestoreTeamRepository(db: FirebaseFirestore): TeamRepository {
-        return FirestoreTeamRepository(db)
-    }
-
-    @Provides
-    @Singleton
-    fun provideFirestorePlayerRepository(db: FirebaseFirestore): PlayerRepository {
-        return FirestorePlayerRepository(db)
-    }
-
-    @Provides
-    @Singleton
-    fun provideFirestoreTaskRepository(db: FirebaseFirestore): TaskRepository {
-        return FirestoreTaskRepository(db)
-    }
-
-    @Provides
-    @Singleton
-    fun provideFirestoreTrainRepository(db: FirebaseFirestore): TrainRepository {
-        return FirestoreTrainRepository(db)
-    }
-
-    @Provides
-    @Singleton
-    fun provideFirestoreConceptRepository(db: FirebaseFirestore): ConceptRepository {
-        return FirestoreConceptRepository(db)
-    }
-
-    @Provides
-    @Singleton
-    fun provideFirestoreTeamObjectiveRepository(db: FirebaseFirestore): TeamObjectiveRepository {
-        return FirestoreTeamObjectiveRepository(db)
-    }
+val firestoreModule = module {
+    single { Firebase.firestore }
+    single<TeamRepository> { FirestoreTeamRepository(get()) }
+    single<PlayerRepository> { FirestorePlayerRepository(get()) }
+    single<TaskRepository> { FirestoreTaskRepository(get()) }
+    single<TrainRepository> { FirestoreTrainRepository(get()) }
+    single<ConceptRepository> { FirestoreConceptRepository(get()) }
+    single<TeamObjectiveRepository> { FirestoreTeamObjectiveRepository(get()) }
 }
