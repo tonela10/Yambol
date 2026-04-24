@@ -21,11 +21,12 @@ import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.sedilant.yambol.R
+import com.sedilant.yambol.core.designsystem.Res
+import com.sedilant.yambol.core.designsystem.*
 import com.sedilant.yambol.domain.models.TrainDomainModel
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -80,7 +81,7 @@ private fun TrainingItem(
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     Icon(
-                        painter = painterResource(R.drawable.calendar_month_24dp),
+                        painter = painterResource(Res.drawable.calendar_month_24dp),
                         contentDescription = "Date",
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(18.dp)
@@ -97,7 +98,7 @@ private fun TrainingItem(
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     Icon(
-                        painter = painterResource(R.drawable.schedule_24dp), // TODO Clock icon
+                        painter = painterResource(Res.drawable.schedule_24dp), // TODO Clock icon
                         contentDescription = "Duration",
                         tint = MaterialTheme.colorScheme.secondary,
                         modifier = Modifier.size(16.dp)
@@ -117,7 +118,7 @@ private fun TrainingItem(
                     verticalAlignment = Alignment.Top
                 ) {
                     Icon(
-                        painter = painterResource(R.drawable.target_24dp), // TODO SportsSoccer icon
+                        painter = painterResource(Res.drawable.target_24dp), // TODO SportsSoccer icon
                         contentDescription = "Concepts",
                         tint = MaterialTheme.colorScheme.tertiary,
                         modifier = Modifier.size(18.dp)

@@ -45,7 +45,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -53,7 +53,8 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.sedilant.yambol.R
+import com.sedilant.yambol.core.designsystem.Res
+import com.sedilant.yambol.core.designsystem.*
 import com.sedilant.yambol.ui.home.models.TeamObjectivesUiModel
 import com.sedilant.yambol.ui.theme.YambolTheme
 import kotlinx.coroutines.launch
@@ -94,7 +95,7 @@ fun TaskList(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = stringResource(R.string.team_objectives),
+                    text = stringResource(Res.string.team_objectives),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onSurface
@@ -106,7 +107,7 @@ fun TaskList(
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Add,
-                        contentDescription = stringResource(R.string.cd_add_objective),
+                        contentDescription = stringResource(Res.string.cd_add_objective),
                         tint = MaterialTheme.colorScheme.primary
                     )
                 }
@@ -120,13 +121,13 @@ fun TaskList(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = stringResource(R.string.no_objectives_yet),
+                        text = stringResource(Res.string.no_objectives_yet),
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center
                     )
                     Text(
-                        text = stringResource(R.string.add_first_objective_hint),
+                        text = stringResource(Res.string.add_first_objective_hint),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center,
@@ -203,7 +204,7 @@ private fun CreateObjectiveBottomSheetContent(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Text(
-            text = stringResource(R.string.add_new_objective_title),
+            text = stringResource(Res.string.add_new_objective_title),
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.SemiBold,
             color = MaterialTheme.colorScheme.onSurface,
@@ -216,17 +217,17 @@ private fun CreateObjectiveBottomSheetContent(
                 textState.value = it
                 isError.value = false
             },
-            label = { Text(stringResource(R.string.objective_description_label)) },
-            placeholder = { Text(stringResource(R.string.objective_description_placeholder)) },
+            label = { Text(stringResource(Res.string.objective_description_label)) },
+            placeholder = { Text(stringResource(Res.string.objective_description_placeholder)) },
             modifier = Modifier.fillMaxWidth(),
             isError = isError.value,
             supportingText = {
-                Text(stringResource(R.string.objective_description_error))
+                Text(stringResource(Res.string.objective_description_error))
             }
         )
 
         Text(
-            text = stringResource(R.string.objective_description_help),
+            text = stringResource(Res.string.objective_description_help),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(start = 4.dp)
@@ -243,7 +244,7 @@ private fun CreateObjectiveBottomSheetContent(
                 modifier = Modifier.weight(1f),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text(stringResource(R.string.cancel))
+                Text(stringResource(Res.string.cancel))
             }
 
             Button(
@@ -257,7 +258,7 @@ private fun CreateObjectiveBottomSheetContent(
                 modifier = Modifier.weight(1f),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text(stringResource(R.string.add_objective))
+                Text(stringResource(Res.string.add_objective))
             }
         }
     }
@@ -435,7 +436,7 @@ private fun ObjectiveOptionsBottomSheetContent(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Text(
-            text = stringResource(R.string.edit_objective_title),
+            text = stringResource(Res.string.edit_objective_title),
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.SemiBold,
             color = MaterialTheme.colorScheme.onSurface,
@@ -457,12 +458,12 @@ private fun ObjectiveOptionsBottomSheetContent(
                 ) {
                     Icon(
                         imageVector = Icons.Default.CheckCircle,
-                        contentDescription = stringResource(R.string.objective_completed_cd),
+                        contentDescription = stringResource(Res.string.objective_completed_cd),
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(20.dp)
                     )
                     Text(
-                        text = stringResource(R.string.objective_completed_text),
+                        text = stringResource(Res.string.objective_completed_text),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(start = 8.dp)
@@ -477,11 +478,11 @@ private fun ObjectiveOptionsBottomSheetContent(
                 textState.value = it
                 isError.value = false
             },
-            label = { Text(stringResource(R.string.objective_description_label)) },
+            label = { Text(stringResource(Res.string.objective_description_label)) },
             modifier = Modifier.fillMaxWidth(),
             isError = isError.value,
             supportingText = {
-                Text(stringResource(R.string.objective_description_error))
+                Text(stringResource(Res.string.objective_description_error))
             }
         )
 
@@ -507,7 +508,7 @@ private fun ObjectiveOptionsBottomSheetContent(
                     modifier = Modifier.size(18.dp)
                 )
                 Spacer(modifier = Modifier.size(8.dp))
-                Text(stringResource(R.string.save_changes))
+                Text(stringResource(Res.string.save_changes))
             }
 
             OutlinedButton(
@@ -528,7 +529,7 @@ private fun ObjectiveOptionsBottomSheetContent(
                     modifier = Modifier.size(18.dp)
                 )
                 Spacer(modifier = Modifier.size(8.dp))
-                Text(stringResource(R.string.delete_objective))
+                Text(stringResource(Res.string.delete_objective))
             }
 
             OutlinedButton(
@@ -536,7 +537,7 @@ private fun ObjectiveOptionsBottomSheetContent(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text(stringResource(R.string.cancel))
+                Text(stringResource(Res.string.cancel))
             }
         }
     }
@@ -546,13 +547,13 @@ private fun ObjectiveOptionsBottomSheetContent(
             onDismissRequest = { showDeleteConfirmation.value = false },
             title = {
                 Text(
-                    stringResource(R.string.delete_objective_title),
+                    stringResource(Res.string.delete_objective_title),
                     style = MaterialTheme.typography.titleMedium
                 )
             },
             text = {
                 Text(
-                    stringResource(R.string.delete_objective_confirmation),
+                    stringResource(Res.string.delete_objective_confirmation),
                     style = MaterialTheme.typography.bodyMedium
                 )
             },
@@ -564,7 +565,7 @@ private fun ObjectiveOptionsBottomSheetContent(
                     }
                 ) {
                     Text(
-                        stringResource(R.string.delete),
+                        stringResource(Res.string.delete),
                         color = MaterialTheme.colorScheme.error
                     )
                 }
@@ -573,7 +574,7 @@ private fun ObjectiveOptionsBottomSheetContent(
                 TextButton(
                     onClick = { showDeleteConfirmation.value = false }
                 ) {
-                    Text(stringResource(R.string.cancel))
+                    Text(stringResource(Res.string.cancel))
                 }
             },
             shape = RoundedCornerShape(16.dp)

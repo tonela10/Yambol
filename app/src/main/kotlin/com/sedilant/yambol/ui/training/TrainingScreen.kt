@@ -17,11 +17,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.koin.androidx.compose.koinViewModel
-import com.sedilant.yambol.R
+import com.sedilant.yambol.core.designsystem.Res
+import com.sedilant.yambol.core.designsystem.*
 import com.sedilant.yambol.domain.models.TrainDomainModel
 import com.sedilant.yambol.ui.home.SectionHeader
 import com.sedilant.yambol.ui.home.TeamTabs
@@ -83,7 +84,7 @@ private fun TrainingScreenStateless(
                         .fillMaxSize()
                 ) {
                     SectionHeader(
-                        title = stringResource(R.string.teams),
+                        title = stringResource(Res.string.teams),
                         modifier = Modifier.padding(horizontal = 0.dp)
                     )
                     TeamTabs(
@@ -96,7 +97,7 @@ private fun TrainingScreenStateless(
                     )
 
                     SectionHeader(
-                        title = stringResource(R.string.filter_by_date),
+                        title = stringResource(Res.string.filter_by_date),
                         modifier = Modifier.padding(horizontal = 0.dp)
                     )
                     DateFilterSection(
@@ -106,7 +107,7 @@ private fun TrainingScreenStateless(
                     )
 
                     SectionHeader(
-                        title = stringResource(R.string.sessions),
+                        title = stringResource(Res.string.sessions),
                         modifier = Modifier.padding(horizontal = 0.dp)
                     )
                     TrainingList(
