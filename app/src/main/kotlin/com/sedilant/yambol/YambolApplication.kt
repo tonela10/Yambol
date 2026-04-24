@@ -16,13 +16,20 @@ class YambolApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         Firebase.initialize(this)
-        SentryAndroid.init(this) { options ->
-            options.dsn = "SENTRY_DSN_PLACEHOLDER"
-            options.isEnableUserInteractionTracing = true
-        }
+        initSentry()
         startKoin {
             androidContext(this@YambolApplication)
             modules(dataModule, firestoreModule, useCaseModule, viewModelModule)
+        }
+    }
+
+    private fun initSentry() {
+        val dsn = BuildConfig.SENTRY_DSN
+        if (dsn.isNotBlank()) {
+            SentryAndroid.init(this) { options ->
+                options.dsn = dsn
+                options.isEnableUserInteractionTracing = true
+            }
         }
     }
 }
