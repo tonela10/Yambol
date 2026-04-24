@@ -1,4 +1,4 @@
-package com.sedilant.yambol.ui.login
+package com.sedilant.yambol.feature.login
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -43,15 +43,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import com.sedilant.yambol.R
+import com.sedilant.yambol.core.designsystem.Res
+import com.sedilant.yambol.core.designsystem.*
 
 /**
  * Sign-In Screen Content
@@ -95,7 +96,7 @@ fun SignInContent(
         Spacer(modifier = Modifier.height(32.dp))
 
         Text(
-            text = stringResource(R.string.welcome_back),
+            text = stringResource(Res.string.welcome_back),
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface
@@ -104,7 +105,7 @@ fun SignInContent(
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = if (showPasswordField) stringResource(R.string.enter_password) else stringResource(R.string.sign_in_to_account),
+            text = if (showPasswordField) stringResource(Res.string.enter_password) else stringResource(Res.string.sign_in_to_account),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -120,7 +121,7 @@ fun SignInContent(
                 IconButton(onClick = onGoBackToEmail) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.go_back)
+                        contentDescription = stringResource(Res.string.go_back)
                     )
                 }
                 Text(
@@ -142,7 +143,7 @@ fun SignInContent(
                 OutlinedTextField(
                     value = email,
                     onValueChange = onEmailChange,
-                    label = { Text(stringResource(R.string.email_label)) },
+                    label = { Text(stringResource(Res.string.email_label)) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
                     isError = emailError != null,
@@ -170,7 +171,7 @@ fun SignInContent(
                     shape = MaterialTheme.shapes.medium
                 ) {
                     Text(
-                        text = stringResource(R.string.continue_with_email),
+                        text = stringResource(Res.string.continue_with_email),
                         style = MaterialTheme.typography.titleMedium
                     )
                 }
@@ -186,7 +187,7 @@ fun SignInContent(
                 OutlinedTextField(
                     value = password,
                     onValueChange = onPasswordChange,
-                    label = { Text(stringResource(R.string.password_label)) },
+                    label = { Text(stringResource(Res.string.password_label)) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
                     isError = passwordError != null,
@@ -209,7 +210,7 @@ fun SignInContent(
                         IconButton(onClick = onTogglePasswordVisibility) {
                             Icon(
                                 imageVector = if (isPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                                contentDescription = stringResource(R.string.toggle_password_visibility)
+                                contentDescription = stringResource(Res.string.toggle_password_visibility)
                             )
                         }
                     },
@@ -226,7 +227,7 @@ fun SignInContent(
                     shape = MaterialTheme.shapes.medium
                 ) {
                     Text(
-                        text = stringResource(R.string.sign_in),
+                        text = stringResource(Res.string.sign_in),
                         style = MaterialTheme.typography.titleMedium
                     )
                 }
@@ -242,7 +243,7 @@ fun SignInContent(
         ) {
             HorizontalDivider(modifier = Modifier.weight(1f))
             Text(
-                text = stringResource(R.string.or_divider),
+                text = stringResource(Res.string.or_divider),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -262,7 +263,7 @@ fun SignInContent(
         // Navigate to Sign Up
         TextButton(onClick = onNavigateToSignUp) {
             Text(
-                text = stringResource(R.string.no_account_sign_up),
+                text = stringResource(Res.string.no_account_sign_up),
                 color = MaterialTheme.colorScheme.primary
             )
         }
@@ -313,7 +314,7 @@ fun SignUpContent(
         Spacer(modifier = Modifier.height(32.dp))
 
         Text(
-            text = stringResource(R.string.create_account),
+            text = stringResource(Res.string.create_account),
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface
@@ -322,7 +323,7 @@ fun SignUpContent(
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = stringResource(R.string.sign_up_get_started),
+            text = stringResource(Res.string.sign_up_get_started),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -333,7 +334,7 @@ fun SignUpContent(
         OutlinedTextField(
             value = email,
             onValueChange = onEmailChange,
-            label = { Text(stringResource(R.string.email_label)) },
+            label = { Text(stringResource(Res.string.email_label)) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             isError = emailError != null,
@@ -354,7 +355,7 @@ fun SignUpContent(
         OutlinedTextField(
             value = password,
             onValueChange = onPasswordChange,
-            label = { Text(stringResource(R.string.password_label)) },
+            label = { Text(stringResource(Res.string.password_label)) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             isError = password.isNotEmpty() && !passwordValidation.isValid,
@@ -370,7 +371,7 @@ fun SignUpContent(
                 IconButton(onClick = onTogglePasswordVisibility) {
                     Icon(
                         imageVector = if (isPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                        contentDescription = stringResource(R.string.toggle_password_visibility)
+                        contentDescription = stringResource(Res.string.toggle_password_visibility)
                     )
                 }
             },
@@ -389,7 +390,7 @@ fun SignUpContent(
         OutlinedTextField(
             value = confirmPassword,
             onValueChange = onConfirmPasswordChange,
-            label = { Text(stringResource(R.string.confirm_password_label)) },
+            label = { Text(stringResource(Res.string.confirm_password_label)) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             isError = confirmPasswordError != null,
@@ -412,7 +413,7 @@ fun SignUpContent(
                 IconButton(onClick = onToggleConfirmPasswordVisibility) {
                     Icon(
                         imageVector = if (isConfirmPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                        contentDescription = stringResource(R.string.toggle_password_visibility)
+                        contentDescription = stringResource(Res.string.toggle_password_visibility)
                     )
                 }
             },
@@ -430,7 +431,7 @@ fun SignUpContent(
             enabled = passwordValidation.isValid && confirmPassword == password && email.isNotBlank()
         ) {
             Text(
-                text = stringResource(R.string.sign_up),
+                text = stringResource(Res.string.sign_up),
                 style = MaterialTheme.typography.titleMedium
             )
         }
@@ -444,7 +445,7 @@ fun SignUpContent(
         ) {
             HorizontalDivider(modifier = Modifier.weight(1f))
             Text(
-                text = stringResource(R.string.or_divider),
+                text = stringResource(Res.string.or_divider),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -464,7 +465,7 @@ fun SignUpContent(
         // Navigate to Sign In
         TextButton(onClick = onNavigateToSignIn) {
             Text(
-                text = stringResource(R.string.already_have_account_sign_in),
+                text = stringResource(Res.string.already_have_account_sign_in),
                 color = MaterialTheme.colorScheme.primary
             )
         }
@@ -483,15 +484,15 @@ private fun PasswordRequirements(
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         PasswordRequirementItem(
-            text = stringResource(R.string.password_requirement_min_length),
+            text = stringResource(Res.string.password_requirement_min_length),
             isMet = validation.hasMinLength
         )
         PasswordRequirementItem(
-            text = stringResource(R.string.password_requirement_number),
+            text = stringResource(Res.string.password_requirement_number),
             isMet = validation.hasNumber
         )
         PasswordRequirementItem(
-            text = stringResource(R.string.password_requirement_symbol),
+            text = stringResource(Res.string.password_requirement_symbol),
             isMet = validation.hasSymbol
         )
     }
@@ -546,17 +547,16 @@ fun GoogleSignInButton(
             )
         } else {
             Icon(
-                painter = painterResource(id = R.drawable.ic_google),
-                contentDescription = stringResource(R.string.cd_google),
+                painter = painterResource(Res.drawable.ic_google),
+                contentDescription = stringResource(Res.string.cd_google),
                 modifier = Modifier.size(24.dp),
                 tint = Color.Unspecified
             )
             Spacer(modifier = Modifier.width(12.dp))
             Text(
-                text = stringResource(R.string.continue_with_google),
+                text = stringResource(Res.string.continue_with_google),
                 style = MaterialTheme.typography.titleMedium
             )
         }
     }
 }
-
