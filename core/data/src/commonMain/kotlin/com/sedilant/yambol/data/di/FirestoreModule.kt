@@ -14,14 +14,24 @@ import com.sedilant.yambol.data.firestore.TaskRepository
 import com.sedilant.yambol.data.firestore.TeamObjectiveRepository
 import com.sedilant.yambol.data.firestore.TeamRepository
 import com.sedilant.yambol.data.firestore.TrainRepository
+import com.sedilant.yambol.data.firebaseAuth.AuthRepository
+import com.sedilant.yambol.data.firebaseAuth.AuthRepositoryImpl
+import dev.gitlive.firebase.auth.auth
 import org.koin.dsl.module
 
-val firestoreModule = module {
+val coreDataModule = module {
+    // Firebase instances
     single { Firebase.firestore }
+    single { Firebase.auth }
+
+    // Firestore repositories
     single<TeamRepository> { FirestoreTeamRepository(get()) }
     single<PlayerRepository> { FirestorePlayerRepository(get()) }
     single<TaskRepository> { FirestoreTaskRepository(get()) }
     single<TrainRepository> { FirestoreTrainRepository(get()) }
     single<ConceptRepository> { FirestoreConceptRepository(get()) }
     single<TeamObjectiveRepository> { FirestoreTeamObjectiveRepository(get()) }
+
+    // Auth
+    single<AuthRepository> { AuthRepositoryImpl(get()) }
 }

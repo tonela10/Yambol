@@ -1,7 +1,6 @@
-package com.sedilant.yambol
+package com.sedilant.yambol.domain
 
 import com.sedilant.yambol.data.firestore.TeamRepository
-import com.sedilant.yambol.domain.UpdateTeamUseCase
 
 class UpdateTeamUseCaseImpl(
     private val teamRepository: TeamRepository
