@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.sedilant.yambol.domain.get.GetTeamsUseCase
 import com.sedilant.yambol.domain.insert.InsertPlayersUseCase
 import com.sedilant.yambol.domain.insert.InsertTeamUseCase
-import com.sedilant.yambol.ui.home.models.PlayerUiModel
+import com.sedilant.yambol.domain.models.PlayerDomainModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
@@ -34,7 +34,7 @@ class CreateTeamViewModel(
 
     private lateinit var listOfTeams: List<String>
     var teamId: String = ""
-    private var listOfPlayers: MutableList<PlayerUiModel> = mutableListOf()
+    private var listOfPlayers: MutableList<PlayerDomainModel> = mutableListOf()
 
     private val teamNameFlow = MutableStateFlow(ValueAndValidation())
     private val playerNameFlow = MutableStateFlow("")
@@ -129,7 +129,7 @@ class CreateTeamViewModel(
                 }
 
                 listOfPlayers.add(
-                    PlayerUiModel(
+                    PlayerDomainModel(
                         name = name,
                         number = number,
                         teamId = teamId,
