@@ -1,6 +1,6 @@
 package com.sedilant.yambol.domain.di
 
-import com.sedilant.yambol.UpdateTeamUseCaseImpl
+import com.sedilant.yambol.domain.UpdateTeamUseCaseImpl
 import com.sedilant.yambol.domain.CheckJerseyNumberUseCase
 import com.sedilant.yambol.domain.CheckJerseyNumberUseCaseImpl
 import com.sedilant.yambol.domain.DeleteTeamObjectiveUseCase

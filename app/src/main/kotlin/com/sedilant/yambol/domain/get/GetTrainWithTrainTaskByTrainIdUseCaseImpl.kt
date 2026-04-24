@@ -35,8 +35,10 @@ class GetTrainWithTrainTaskByTrainIdUseCaseImpl(
             emptyList()
         }
 
-        val duration = if (train.endTime != null && train.startTime != null) {
-            train.endTime - train.startTime
+        val end = train.endTime
+        val start = train.startTime
+        val duration = if (end != null && start != null) {
+            end - start
         } else {
             0f
         }

@@ -2,7 +2,7 @@ package com.sedilant.yambol
 
 import android.app.Application
 import com.sedilant.yambol.data.di.dataModule
-import com.sedilant.yambol.data.di.firestoreModule
+import com.sedilant.yambol.data.di.coreDataModule
 import com.sedilant.yambol.di.viewModelModule
 import com.sedilant.yambol.domain.di.useCaseModule
 import dev.gitlive.firebase.Firebase
@@ -19,7 +19,7 @@ class YambolApplication : Application() {
         initSentry()
         startKoin {
             androidContext(this@YambolApplication)
-            modules(dataModule, firestoreModule, useCaseModule, viewModelModule)
+            modules(coreDataModule, dataModule, useCaseModule, viewModelModule)
         }
     }
 

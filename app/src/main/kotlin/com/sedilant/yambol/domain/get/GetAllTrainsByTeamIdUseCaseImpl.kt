@@ -18,8 +18,10 @@ class GetAllTrainsByTeamIdUseCaseImpl(
         // I will use .first() on the flow to get current state.
 
         return trainRepository.listByTeamFlow(userId, teamId).first().map {
-            val duration = if (it.endTime != null && it.startTime != null) {
-                it.endTime - it.startTime
+            val end = it.endTime
+            val start = it.startTime
+            val duration = if (end != null && start != null) {
+                end - start
             } else {
                 0f
             }

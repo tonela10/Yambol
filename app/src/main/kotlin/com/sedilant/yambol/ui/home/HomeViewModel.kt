@@ -190,7 +190,14 @@ class HomeViewModel(
                             HomeUiState.Success(
                                 listOfTeams = uiTeams,
                                 currentTeam = uiTeams.first { it.id == teamId },
-                                listOfPlayer = teamPlayerList,
+                                listOfPlayer = teamPlayerList.map { domain ->
+                                    PlayerUiModel(
+                                        id = domain.id,
+                                        name = domain.name,
+                                        number = domain.number,
+                                        teamId = domain.teamId,
+                                    )
+                                },
                                 listOfObjectives = teamObjectivesList.map {
                                     TeamObjectivesUiModel(
                                         description = it.description,

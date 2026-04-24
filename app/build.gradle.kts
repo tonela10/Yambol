@@ -102,6 +102,10 @@ dependencies {
     // Logging
     implementation(libs.kermit)
 
+    // Core modules
+    implementation(project(":core:domain"))
+    implementation(project(":core:data"))
+
 
     // Sentry
     implementation(libs.sentry.android)
