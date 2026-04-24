@@ -1,6 +1,6 @@
 package com.sedilant.yambol.ui.login
 
-import android.util.Log
+import co.touchlab.kermit.Logger
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -69,9 +69,9 @@ fun LoginScreen(
 
                 viewModel.signInWithGoogle(idToken)
             } catch (e: GetCredentialCancellationException) {
-                Log.d("LoginScreen", "Google Sign-In cancelled by user")
+                Logger.d("LoginScreen") { "Google Sign-In cancelled by user" }
             } catch (e: Exception) {
-                Log.e("LoginScreen", "Google Sign-In failed", e)
+                Logger.e("LoginScreen", e) { "Google Sign-In failed" }
                 viewModel.onGoogleSignInFailed(e.message ?: "Google Sign-In failed")
             }
         }
